@@ -78,22 +78,22 @@ export function Ghost() {
       const vel = velRef.current;
 
       if (flyingRef.current) {
-        // Spring-lag chase toward cursor target. Tuned hot — the ghost
-        // keeps up with fast flicks while still showing a hint of trail.
+        // Gentle spring-lag chase — trails behind the cursor with a soft,
+        // unhurried catch-up so it reads as floating, not snapping.
         const dx = targetRef.current.x - pos.x;
         const dy = targetRef.current.y - pos.y;
         const dist = Math.hypot(dx, dy);
 
         let k: number, d: number;
         if (dist > 240) {
-          k = 0.22;
-          d = 0.74;
+          k = 0.09;
+          d = 0.75;
         } else if (dist > 90) {
-          k = 0.16;
-          d = 0.76;
+          k = 0.06;
+          d = 0.77;
         } else {
-          k = 0.1;
-          d = 0.78;
+          k = 0.04;
+          d = 0.80;
         }
         vel.x = (vel.x + dx * k) * d;
         vel.y = (vel.y + dy * k) * d;
@@ -107,9 +107,9 @@ export function Ghost() {
         const bobX = Math.sin(bobRef.current * 0.9) * 3 * bobScale;
         const bobY = Math.sin(bobRef.current * 1.3 + 0.6) * 4.5 * bobScale;
 
-        // Tilt — more responsive, faster catch-up to velocity.
-        const rawTilt = Math.max(-18, Math.min(18, vel.x * 2.6));
-        tiltRef.current = tiltRef.current * 0.65 + rawTilt * 0.35;
+        // Tilt — softer, follows velocity with more smoothing.
+        const rawTilt = Math.max(-14, Math.min(14, vel.x * 1.6));
+        tiltRef.current = tiltRef.current * 0.82 + rawTilt * 0.18;
 
         const vw = window.innerWidth;
         const vh = window.innerHeight;
