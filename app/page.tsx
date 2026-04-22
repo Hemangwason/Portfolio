@@ -283,7 +283,11 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap gap-2 text-sm">
             {[
-              { label: "Twitter / X", href: "#", external: false },
+              {
+                label: "Twitter / X",
+                href: "https://x.com/Hemangsidetake",
+                external: true,
+              },
               {
                 label: "CV",
                 href: "/hemang-wason-cv.pdf",
