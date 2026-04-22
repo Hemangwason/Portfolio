@@ -121,7 +121,13 @@ function ProjectModalBody({
       </button>
 
       {/* Masthead */}
-      <div className="relative aspect-video w-full overflow-hidden bg-black/[0.04]">
+      <div
+        className="relative aspect-video w-full overflow-hidden"
+        style={{
+          backgroundColor:
+            project.masthead?.bg ?? project.thumbnail?.bg ?? "rgba(0,0,0,0.04)",
+        }}
+      >
         <MastheadMedia project={project} seed={meshSeed} />
 
         {/* overlay chip */}

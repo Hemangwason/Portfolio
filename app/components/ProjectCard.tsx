@@ -53,7 +53,10 @@ export function ProjectCard({ project, index, onOpen }: Props) {
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
       >
         {/* Media area */}
-        <div className="relative h-48 overflow-hidden bg-black/[0.04]">
+        <div
+          className="relative h-48 overflow-hidden"
+          style={{ backgroundColor: project.thumbnail?.bg ?? "rgba(0,0,0,0.04)" }}
+        >
           <CardMedia project={project} seed={seed} />
 
           {/* floating meta chip */}

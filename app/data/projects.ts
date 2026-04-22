@@ -1,6 +1,6 @@
 export type ProjectMedia =
-  | { type: "image"; src: string; alt?: string }
-  | { type: "video"; src: string; poster?: string };
+  | { type: "image"; src: string; alt?: string; bg?: string }
+  | { type: "video"; src: string; poster?: string; bg?: string };
 
 export type Project = {
   id: string;
@@ -44,11 +44,13 @@ export const projects: Project[] = [
       type: "video",
       src: "/projects/thumbs/sidetake.mp4",
       poster: "/projects/thumbs/sidetake-poster.jpg",
+      bg: "#02040A",
     },
     masthead: {
       type: "video",
       src: "/projects/sidetake.mp4",
       poster: "/projects/sidetake-poster.jpg",
+      bg: "#02040A",
     },
     writeup: [
       "Sidetake started from a frustration: every productivity app treated me like a knowledge worker with tasks, but a creative day isn\u2019t tasks \u2014 it\u2019s a rhythm. You open Pinterest for one thing, fall into Are.na, bounce to Figma, dip into Instagram \u2018for a second,\u2019 and an afternoon is gone. The one decision the whole product rests on was to stop logging tasks and start logging five stages of creative process \u2014 Referencing, Ideation, Execution, Editing, Drift. That taxonomy became the spine.",
@@ -73,11 +75,13 @@ export const projects: Project[] = [
       type: "video",
       src: "/projects/thumbs/sidetalk.mp4",
       poster: "/projects/thumbs/sidetalk-poster.jpg",
+      bg: "#FFFFFF",
     },
     masthead: {
       type: "video",
       src: "/projects/sidetalk.mp4",
       poster: "/projects/sidetalk-poster.jpg",
+      bg: "#E4E9F5",
     },
     writeup: [
       "SideTalk is a chat-first learning platform built for creative students to ask real questions, share work-in-progress, and receive practical guidance from mentors and peers inside structured communities. Instead of treating learning like a one-way system, Sidetake is designed to make it feel conversational, collaborative, and much closer to how young creatives actually grow today.",
@@ -102,11 +106,13 @@ export const projects: Project[] = [
       type: "video",
       src: "/projects/thumbs/boomerang.mp4",
       poster: "/projects/thumbs/boomerang-poster.jpg",
+      bg: "#D8D6F2",
     },
     masthead: {
       type: "video",
       src: "/projects/boomerang.mp4",
       poster: "/projects/boomerang-poster.jpg",
+      bg: "#D8D6F2",
     },
     writeup: [
       "Boomerang is an AI-powered alumni rehiring platform, built in under five hours for ContextCon \u2014 a hackathon with Y Combinator and Crossdata. Instead of tracking former employees one-by-one on LinkedIn, it continuously maps where alumni work today, scores each on their likelihood to return (0\u2013100), surfaces a \u201Cwhy now\u201D signal, and drafts a personalized re-engagement message \u2014 turning a static alumni list into a live, ranked hiring pipeline.",
@@ -131,11 +137,13 @@ export const projects: Project[] = [
       type: "video",
       src: "/projects/thumbs/jexlin.mp4",
       poster: "/projects/thumbs/jexlin-poster.jpg",
+      bg: "#1A1917",
     },
     masthead: {
       type: "video",
       src: "/projects/jexlin.mp4",
       poster: "/projects/jexlin-poster.jpg",
+      bg: "#1A1917",
     },
     writeup: [
       "Jexlin is a fashion and accessories brand built around self-expression, individuality, and storytelling through style. It brings together streetwear energy, bold visual language, and experimental accessories to create pieces that feel personal, expressive, and unapologetically distinct. The larger ambition was to treat fashion as a medium for point of view, not transactional merch \u2014 a label where people wear their identity, and every piece behaves like one sentence in a bigger story.",
@@ -160,11 +168,13 @@ export const projects: Project[] = [
       type: "video",
       src: "/projects/thumbs/crater.mp4",
       poster: "/projects/thumbs/crater-poster.jpg",
+      bg: "#0B0B0B",
     },
     masthead: {
       type: "video",
       src: "/projects/crater.mp4",
       poster: "/projects/crater-poster.jpg",
+      bg: "#0B0B0B",
     },
     writeup: [
       "Crater is a defense layer for the AI era. AI tools are being adopted at a pace no security stack was built for: people paste sensitive data into chatbots, install extensions with full-page permissions, and connect plugins that quietly train on their work \u2014 without understanding data retention, sharing, or scope. Traditional security tools (DLP, EDR, browser security) don\u2019t see AI-specific risk. The threat model shifted from malware to consent and data flow, and there\u2019s no seatbelt for the way people actually use AI.",
@@ -188,11 +198,13 @@ export const projects: Project[] = [
       type: "video",
       src: "/projects/thumbs/sid-voice-host.mp4",
       poster: "/projects/thumbs/sid-voice-host-poster.jpg",
+      bg: "#E3E7F6",
     },
     masthead: {
       type: "video",
       src: "/projects/sid-voice-host.mp4",
       poster: "/projects/sid-voice-host-poster.jpg",
+      bg: "#E3E7F6",
     },
     writeup: [
       "Sid is voice-first: the real output is a presence in a room, not a page on a screen. That inverted the brief \u2014 I wasn\u2019t designing a dashboard but the atmosphere a piece of software carries in the five minutes an operator uses it, and the mood it sets for the thing about to happen. The screen had to feel like the opening credits, not the film. One sentence sat above every decision: warm, not clinical. Hosted, not automated.",
@@ -219,10 +231,12 @@ export const projects: Project[] = [
       type: "video",
       src: "/projects/thumbs/healthy-high-five.mp4",
       poster: "/projects/thumbs/healthy-high-five-poster.jpg",
+      bg: "#131C0C",
     },
     masthead: {
       type: "video",
       src: "/projects/healthy-high-five.mp4",
+      bg: "#131C0C",
     },
     writeup: [
       "Healthy High-Five was a full-funnel in-app experience built to push adoption of Zomato's Healthy Mode — where users see macro breakdowns, understand what's in a dish, and browse meals ranked by nutrition (high / medium / low / super-high). The core offer was clean: place four orders via Healthy Mode and the fifth is free.",
@@ -249,10 +263,12 @@ export const projects: Project[] = [
       type: "video",
       src: "/projects/thumbs/independence-day-banner.mp4",
       poster: "/projects/thumbs/independence-day-banner-poster.jpg",
+      bg: "#BDEFFB",
     },
     masthead: {
       type: "video",
       src: "/projects/independence-day-banner.mp4",
+      bg: "#BDEFFB",
     },
     writeup: [
       "For the Zomato Independence Day homepage banner, the goal wasn't \u201Clet's put a flag and call it a day.\u201D We wanted it to feel like a proud recap of the past year — quick, visual, and unmistakably India. So we brought in cultural anchors (national monuments, the peacock, kites, festive textures) and paired them with a modern \u201Cwe're actually doing big things\u201D beat: Chandrayaan.",
@@ -280,10 +296,12 @@ export const projects: Project[] = [
       type: "video",
       src: "/projects/thumbs/asia-cup-2025.mp4",
       poster: "/projects/thumbs/asia-cup-2025-poster.jpg",
+      bg: "#070E61",
     },
     masthead: {
       type: "video",
       src: "/projects/asia-cup-2025.mp4",
+      bg: "#070E61",
     },
     writeup: [
       "For the Zomato Asia Cup 2025 homepage banner, Nishant and I set ourselves a slightly unhinged brief: could we fit an entire \u201Cmatch moment\u201D into one compact in-app placement — without it feeling like a generic sports poster?",
@@ -310,10 +328,12 @@ export const projects: Project[] = [
       type: "video",
       src: "/projects/thumbs/goat-offers-bumrah.mp4",
       poster: "/projects/thumbs/goat-offers-bumrah-poster.jpg",
+      bg: "#1E0003",
     },
     masthead: {
       type: "video",
       src: "/projects/goat-offers-bumrah.mp4",
+      bg: "#1E0003",
     },
     writeup: [
       "For Zomato's Asia Cup collab with Jasprit Bumrah (then the No.1 T20 bowler), the brief was clear: make the homepage banner feel like match-night adrenaline — without turning it into noisy chaos.",
@@ -340,10 +360,12 @@ export const projects: Project[] = [
       type: "video",
       src: "/projects/thumbs/durga-puja-pandal.mp4",
       poster: "/projects/thumbs/durga-puja-pandal-poster.jpg",
+      bg: "#FAC67D",
     },
     masthead: {
       type: "video",
       src: "/projects/durga-puja-pandal.mp4",
+      bg: "#FAC67D",
     },
     writeup: [
       "For the Zomato Durga Puja homepage banner, the concept was beautifully straightforward: don't show a pandal — make the user feel like they're entering one.",
@@ -370,10 +392,12 @@ export const projects: Project[] = [
       type: "video",
       src: "/projects/thumbs/zomato-plus-identity.mp4",
       poster: "/projects/thumbs/zomato-plus-identity-poster.jpg",
+      bg: "#000000",
     },
     masthead: {
       type: "video",
       src: "/projects/zomato-plus-identity.mp4",
+      bg: "#000000",
     },
     writeup: [
       "Zomato Plus is where the brand-to-brand action lives — collabs, partnerships, and business-facing stories with companies like HP (and a bunch more). My task was to build a clear identity for Plus that works across business collaterals — without making it look like a stiff \u201Ccorporate sub-brand.\u201D",
