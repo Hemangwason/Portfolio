@@ -57,6 +57,35 @@ export const projects: Project[] = [
     ],
   },
   {
+    id: "sidetalk",
+    title: "SideTalk",
+    tagline: "Designing a more natural way to learn",
+    kind: "ground",
+    year: "2026",
+    tags: ["Learning", "Community", "Mentorship"],
+    accent: "var(--brand)",
+    emoji: "💬",
+    blurb:
+      "A chat-first learning platform where creative students ask real questions, share work-in-progress, and get guidance from mentors and peers inside structured communities.",
+    role: "Founding designer",
+    client: "Sidetake",
+    thumbnail: {
+      type: "video",
+      src: "/projects/thumbs/sidetalk.mp4",
+      poster: "/projects/thumbs/sidetalk-poster.jpg",
+    },
+    masthead: {
+      type: "video",
+      src: "/projects/sidetalk.mp4",
+      poster: "/projects/sidetalk-poster.jpg",
+    },
+    writeup: [
+      "SideTalk is a chat-first learning platform built for creative students to ask real questions, share work-in-progress, and receive practical guidance from mentors and peers inside structured communities. Instead of treating learning like a one-way system, Sidetake is designed to make it feel conversational, collaborative, and much closer to how young creatives actually grow today.",
+      "What I built through SideTalk was not just a platform, but a more intuitive learning experience. As a designer, my perspective was centered on reducing the distance between curiosity and action \u2014 making it easier for someone to ask, discover, respond, and improve without the heaviness of traditional mentorship models. The product was shaped to feel simple, familiar, and alive, while still giving enough structure for meaningful learning to happen.",
+      "The larger vision behind SideTalk was to create a space where guidance does not feel gated, delayed, or intimidating. I wanted to design a system where students could learn in public, interact with people slightly ahead of them, and feel like they were part of a real creative ecosystem rather than just consuming content alone. From a design lens, that meant building an experience that balances clarity with energy, community with usability, and conversation with purpose.",
+    ],
+  },
+  {
     id: "boomerang",
     title: "Boomerang",
     tagline: "Alumni rehiring as a live, ranked pipeline",
