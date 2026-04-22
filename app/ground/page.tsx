@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BackHome } from "../components/BackHome";
-import { ProjectCard } from "../components/ProjectCard";
+import { ProjectGrid } from "../components/ProjectGrid";
 import { Marquee } from "../components/Marquee";
 import { SystemDiagram } from "../components/SystemDiagram";
 import { LogoTile } from "../components/LogoTile";
@@ -172,11 +172,10 @@ export default function GroundPage() {
             </p>
           </header>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {productProjects.map((project, i) => (
-              <ProjectCard key={project.id} project={project} index={i} />
-            ))}
-          </div>
+          <ProjectGrid
+            projects={productProjects}
+            className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+          />
         </div>
       </section>
 

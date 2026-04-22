@@ -2,7 +2,7 @@ import Link from "next/link";
 import { PlaygroundTitle } from "./components/PlaygroundTitle";
 import { FloatingLogos } from "./components/FloatingLogos";
 import { Marquee } from "./components/Marquee";
-import { ProjectCard } from "./components/ProjectCard";
+import { ProjectGrid } from "./components/ProjectGrid";
 import { LogoTile } from "./components/LogoTile";
 import { platforms } from "./components/BrandLogos";
 import { projects } from "./data/projects";
@@ -89,11 +89,7 @@ export default function Home() {
             </p>
           </header>
 
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project, i) => (
-              <ProjectCard key={project.id} project={project} index={i} />
-            ))}
-          </div>
+          <ProjectGrid projects={projects} />
         </div>
       </section>
 
