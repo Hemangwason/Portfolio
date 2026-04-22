@@ -20,7 +20,7 @@ const variantByProject: Record<string, number> = {
 
 export function ProjectCard({ project, index, onOpen }: Props) {
   const reduce = useReducedMotion();
-  const kindLabel = project.kind === "play" ? "PLAY" : "GROUND";
+  const kindLabel = project.kind === "play" ? "VISUALS" : "PRODUCT";
   const kindAccent =
     project.kind === "play" ? "var(--accent)" : "var(--brand)";
   const seed = variantByProject[project.id] ?? index;

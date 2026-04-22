@@ -89,7 +89,7 @@ function ProjectModalBody({
   project: Project;
   onClose: () => void;
 }) {
-  const kindLabel = project.kind === "play" ? "PLAY" : "GROUND";
+  const kindLabel = project.kind === "play" ? "VISUALS" : "PRODUCT";
   const kindAccent =
     project.kind === "play" ? "var(--accent)" : "var(--brand)";
 
