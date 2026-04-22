@@ -12,18 +12,10 @@ type Props = {
 };
 
 const variantByProject: Record<string, number> = {
-  "orbit-os": 1,
-  "mango-bank": 4,
-  "signal-health": 3,
-  lunchbox: 2,
-  "sidetake-studio": 5,
-  "ferry-wayfinding": 0,
-  "mixtape-posters": 5,
-  "zine-dispatch": 2,
-  "moving-things": 4,
-  "tiny-type": 1,
-  "hello-stickers": 0,
-  "field-notes": 3,
+  sidetake: 1,
+  boomerang: 4,
+  jexlin: 2,
+  crater: 5,
 };
 
 export function ProjectCard({ project, index, onOpen }: Props) {

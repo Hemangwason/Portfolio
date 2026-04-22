@@ -112,8 +112,8 @@ export default function Home() {
               </h2>
             </div>
             <p className="max-w-md text-sm text-black/60 md:text-right">
-              Ten projects from the last three years across fintech,
-              healthcare, consumer, and editorial.
+              Products I&apos;m building, brand systems, and in-app
+              motion shipped across the last two years.
             </p>
           </header>
 
