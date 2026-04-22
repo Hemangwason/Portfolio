@@ -12,6 +12,7 @@ type Props = {
   withLabel?: boolean;
   className?: string;
   style?: CSSProperties;
+  noLink?: boolean;
 };
 
 const sizeMap: Record<
@@ -47,6 +48,7 @@ export function LogoTile({
   withLabel = true,
   className = "",
   style,
+  noLink = false,
 }: Props) {
   const s = sizeMap[size];
   const platform = platformByKey[platformKey];
@@ -76,7 +78,7 @@ export function LogoTile({
     </div>
   );
 
-  if (!href || href === "#") {
+  if (noLink || !href || href === "#") {
     return content;
   }
 

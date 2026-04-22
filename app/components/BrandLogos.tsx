@@ -56,25 +56,28 @@ export function LetterboxdLogo(props: IconProps) {
   );
 }
 
+// Temple Run — stepped ziggurat silhouette. Not a logo lift, but reads as
+// "temple" at icon size where the character art would collapse.
 export function TempleRunLogo(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden {...props}>
       <path
         fill="currentColor"
-        d="M3 20h18v2H3v-2Zm2-4h14l-2-9H7l-2 9Zm4-7h6l.9 4H8.1L9 9Zm3-8 3 4H9l3-4Z"
+        d="M12 2.5 9.5 6h5L12 2.5ZM7 7l-1.5 2.5h13L17 7H7Zm-2 4-1.5 2.5h17L18 11H5Zm-2 4-1 2.5h20l-1-2.5H3Zm-1 4v2h22v-2H2Z"
       />
     </svg>
   );
 }
 
+// Clash of Clans — barbarian head silhouette (helmet + mustache) which is
+// the recognisable element of the actual logo mark.
 export function ClashLogo(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden {...props}>
       <path
         fill="currentColor"
-        d="M12 2 3 5v6c0 5 3.9 9.7 9 11 5.1-1.3 9-6 9-11V5l-9-3Zm0 4.5 5 1.7V11c0 3.5-2.6 6.9-5 7.8-2.4-.9-5-4.3-5-7.8V8.2L12 6.5Z"
+        d="M6.5 5.5C6 4.5 5 4 4 4.5v3c.5-.5 1.5-.5 2 0-.3.8-.5 1.7-.5 2.5 0 2.5 1.5 4.5 3 5v1H7c-.6 0-1 .4-1 1v2h12v-2c0-.6-.4-1-1-1h-2v-1c1.5-.5 3-2.5 3-5 0-.8-.2-1.7-.5-2.5.5-.5 1.5-.5 2 0v-3c-1-.5-2 0-2.5 1C16 4 14 3.5 12 3.5S8 4 6.5 5.5Zm3 4a.8.8 0 1 1 0 1.6.8.8 0 0 1 0-1.6Zm5 0a.8.8 0 1 1 0 1.6.8.8 0 0 1 0-1.6Zm-5.3 3h5.6c-.3 1-1.4 1.5-2.8 1.5s-2.5-.5-2.8-1.5Z"
       />
-      <path fill="currentColor" d="M9 10h6v2H9v-2Zm0 3h6v1.5H9V13Z" />
     </svg>
   );
 }
@@ -101,13 +104,114 @@ export function GitHubLogo(props: IconProps) {
   );
 }
 
+// Survivors.io — stick-figure hero with a gun, cropped to a readable
+// silhouette at tile size.
 export function SurvivorsLogo(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden {...props}>
       <path
         fill="currentColor"
-        d="M12 2C7.6 2 4 5.6 4 10v4c0 1.5 1 2.8 2.4 3.2L7 20h3v-2h1v2h2v-2h1v2h3l.6-2.8C18 16.8 20 15.5 20 14v-4c0-4.4-3.6-8-8-8Zm-2.5 8a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm5 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3ZM10 14h4l-1 2h-2l-1-2Z"
+        d="M12 2.2a2.8 2.8 0 0 0-2.8 2.8c0 1 .5 1.9 1.3 2.4L9.9 9H7.3c-.4 0-.7.4-.7.8v2.4c0 .4.3.8.7.8H9v9h2.3v-5.5h1.4V22H15v-9h1.7c.4 0 .7-.4.7-.8V9.8c0-.4-.3-.8-.7-.8h-1l2.7-1.3c.35-.16.5-.58.33-.92l-.5-1a.7.7 0 0 0-.93-.33L14.6 7.2a2.8 2.8 0 0 0-2.6-5Zm0 1.6a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z"
       />
+    </svg>
+  );
+}
+
+// Claude — Anthropic's "petal" mark: a single sparkle with soft, slightly
+// curved rays rather than a rigid star.
+export function ClaudeLogo(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden {...props}>
+      <path
+        fill="currentColor"
+        d="M12 2c.45 0 .86.3.99.73l1.72 5.56 5.56 1.72a1.04 1.04 0 0 1 0 1.98l-5.56 1.72-1.72 5.56a1.04 1.04 0 0 1-1.98 0l-1.72-5.56-5.56-1.72a1.04 1.04 0 0 1 0-1.98l5.56-1.72 1.72-5.56A1.04 1.04 0 0 1 12 2Z"
+      />
+    </svg>
+  );
+}
+
+// Codex — OpenAI's interlocking knot silhouette. Codex is OpenAI's product,
+// so we lean on the parent brand mark; background colour differentiates it
+// from the ChatGPT tile.
+export function CodexLogo(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden {...props}>
+      <path
+        fill="currentColor"
+        d="M21.55 9.88a5.37 5.37 0 0 0-.46-4.41 5.43 5.43 0 0 0-5.85-2.6A5.37 5.37 0 0 0 11.17 1a5.44 5.44 0 0 0-5.18 3.75 5.37 5.37 0 0 0-3.6 2.6 5.43 5.43 0 0 0 .67 6.37 5.37 5.37 0 0 0 .46 4.41 5.43 5.43 0 0 0 5.85 2.6A5.37 5.37 0 0 0 13.04 23a5.44 5.44 0 0 0 5.18-3.76 5.37 5.37 0 0 0 3.59-2.6 5.43 5.43 0 0 0-.68-7.38Zm-8.08 11.34a4.02 4.02 0 0 1-2.58-.94l.12-.07 4.3-2.48a.71.71 0 0 0 .35-.61v-6.06l1.82 1.05a.07.07 0 0 1 .04.05v5.02a4.05 4.05 0 0 1-4.05 4.04ZM4.8 17.56a4.02 4.02 0 0 1-.48-2.71l.12.08 4.3 2.48a.69.69 0 0 0 .7 0l5.26-3.03v2.1a.08.08 0 0 1-.03.06l-4.35 2.51a4.05 4.05 0 0 1-5.52-1.49Zm-1.12-9.3a4.03 4.03 0 0 1 2.13-1.78v5.13a.7.7 0 0 0 .35.6l5.23 3.01-1.82 1.05a.06.06 0 0 1-.06 0l-4.34-2.5a4.04 4.04 0 0 1-1.49-5.5Zm14.94 3.47-5.25-3.04 1.82-1.05a.06.06 0 0 1 .06 0l4.35 2.51a4.05 4.05 0 0 1-.6 7.3v-5.11a.71.71 0 0 0-.38-.6Zm1.81-2.72-.13-.08-4.29-2.5a.7.7 0 0 0-.7 0L10.04 9.47v-2.1a.07.07 0 0 1 .03-.06l4.35-2.51a4.05 4.05 0 0 1 6.01 4.19ZM9.05 13.27l-1.82-1.05a.08.08 0 0 1-.04-.05V7.15a4.05 4.05 0 0 1 6.64-3.11l-.13.07-4.3 2.48a.71.71 0 0 0-.35.61Zm.99-2.13 2.34-1.35 2.34 1.35v2.7L12.38 15.2l-2.34-1.35Z"
+      />
+    </svg>
+  );
+}
+
+// Cursor — their angular upward arrow. Sharp triangular silhouette.
+export function CursorLogo(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden {...props}>
+      <path
+        fill="currentColor"
+        d="m11.925 24 10.425-6-10.425-6L1.5 18l10.425 6Zm10.425-6V6l-10.425-6v12L22.35 18ZM11.925 12V0L1.5 6v12l10.425-6Z"
+      />
+    </svg>
+  );
+}
+
+// ChatGPT — OpenAI's six-petal interlocking knot mark.
+export function ChatGPTLogo(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden {...props}>
+      <path
+        fill="currentColor"
+        d="M21.55 9.88a5.37 5.37 0 0 0-.46-4.41 5.43 5.43 0 0 0-5.85-2.6A5.37 5.37 0 0 0 11.17 1a5.44 5.44 0 0 0-5.18 3.75 5.37 5.37 0 0 0-3.6 2.6 5.43 5.43 0 0 0 .67 6.37 5.37 5.37 0 0 0 .46 4.41 5.43 5.43 0 0 0 5.85 2.6A5.37 5.37 0 0 0 13.04 23a5.44 5.44 0 0 0 5.18-3.76 5.37 5.37 0 0 0 3.59-2.6 5.43 5.43 0 0 0-.68-7.38Zm-8.08 11.34a4.02 4.02 0 0 1-2.58-.94l.12-.07 4.3-2.48a.71.71 0 0 0 .35-.61v-6.06l1.82 1.05a.07.07 0 0 1 .04.05v5.02a4.05 4.05 0 0 1-4.05 4.04ZM4.8 17.56a4.02 4.02 0 0 1-.48-2.71l.12.08 4.3 2.48a.69.69 0 0 0 .7 0l5.26-3.03v2.1a.08.08 0 0 1-.03.06l-4.35 2.51a4.05 4.05 0 0 1-5.52-1.49Zm-1.12-9.3a4.03 4.03 0 0 1 2.13-1.78v5.13a.7.7 0 0 0 .35.6l5.23 3.01-1.82 1.05a.06.06 0 0 1-.06 0l-4.34-2.5a4.04 4.04 0 0 1-1.49-5.5Zm14.94 3.47-5.25-3.04 1.82-1.05a.06.06 0 0 1 .06 0l4.35 2.51a4.05 4.05 0 0 1-.6 7.3v-5.11a.71.71 0 0 0-.38-.6Zm1.81-2.72-.13-.08-4.29-2.5a.7.7 0 0 0-.7 0L10.04 9.47v-2.1a.07.07 0 0 1 .03-.06l4.35-2.51a4.05 4.05 0 0 1 6.01 4.19ZM9.05 13.27l-1.82-1.05a.08.08 0 0 1-.04-.05V7.15a4.05 4.05 0 0 1 6.64-3.11l-.13.07-4.3 2.48a.71.71 0 0 0-.35.61Zm.99-2.13 2.34-1.35 2.34 1.35v2.7L12.38 15.2l-2.34-1.35Z"
+      />
+    </svg>
+  );
+}
+
+// Gemini — Google Gemini's concave four-point sparkle. Tight curves between
+// rays are what makes this mark read as Gemini and not a generic star.
+export function GeminiLogo(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden {...props}>
+      <path
+        fill="currentColor"
+        d="M12 1c.28 5.07 1.65 8.31 4.35 9.72 2.7 1.41 5.52 2.2 8.65 2.28-3.13.08-5.95.87-8.65 2.28C13.65 16.69 12.28 19.93 12 25c-.28-5.07-1.65-8.31-4.35-9.72-2.7-1.41-5.52-2.2-8.65-2.28 3.13-.08 5.95-.87 8.65-2.28C10.35 9.31 11.72 6.07 12 1Z"
+      />
+    </svg>
+  );
+}
+
+// Grok — xAI's angular wordmark glyph. Elongated X with sharp vertical cuts.
+export function GrokLogo(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden {...props}>
+      <path
+        fill="currentColor"
+        d="m3.32 2.5 6.04 8.04L2.6 19.5h3.67l4.95-6.6 4.96 6.6h4.22L13.25 9.9l6.21-7.4h-3.63l-4.54 5.4-4-5.4H3.32Z"
+      />
+    </svg>
+  );
+}
+
+// Vercel — the equilateral triangle wordmark.
+export function VercelLogo(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden {...props}>
+      <path fill="currentColor" d="M12 2 1.6 21.5h20.8L12 2Z" />
+    </svg>
+  );
+}
+
+// Figma — five-shape mark (two rounded rects, one pill, one circle, one
+// half-pill) rendered monochrome. Centered in a 24x24 box at 16 wide.
+export function FigmaLogo(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden {...props}>
+      <path fill="currentColor" d="M4 4C4 1.79 5.79 0 8 0h4v8H8C5.79 8 4 6.21 4 4Z" />
+      <path fill="currentColor" d="M12 0h4c2.21 0 4 1.79 4 4s-1.79 4-4 4h-4V0Z" />
+      <path fill="currentColor" d="M4 12c0-2.21 1.79-4 4-4h4v8H8c-2.21 0-4-1.79-4-4Z" />
+      <path fill="currentColor" d="M20 12c0 2.21-1.79 4-4 4s-4-1.79-4-4 1.79-4 4-4 4 1.79 4 4Z" />
+      <path fill="currentColor" d="M8 24c2.21 0 4-1.79 4-4v-4H8c-2.21 0-4 1.79-4 4s1.79 4 4 4Z" />
     </svg>
   );
 }
@@ -122,7 +226,15 @@ export type PlatformKey =
   | "clash"
   | "survivors"
   | "youtube"
-  | "github";
+  | "github"
+  | "claude"
+  | "codex"
+  | "cursor"
+  | "chatgpt"
+  | "gemini"
+  | "grok"
+  | "vercel"
+  | "figma";
 
 export type Platform = {
   key: PlatformKey;
@@ -216,6 +328,70 @@ export const platforms: Platform[] = [
     brand: "#0a0a0a",
     href: "#",
     Icon: GitHubLogo,
+  },
+  {
+    key: "claude",
+    name: "Claude",
+    label: "reason",
+    brand: "#D97757",
+    href: "https://claude.ai/",
+    Icon: ClaudeLogo,
+  },
+  {
+    key: "codex",
+    name: "Codex",
+    label: "build",
+    brand: "#111111",
+    href: "https://openai.com/codex",
+    Icon: CodexLogo,
+  },
+  {
+    key: "cursor",
+    name: "Cursor",
+    label: "edit",
+    brand: "#000000",
+    href: "https://cursor.com/",
+    Icon: CursorLogo,
+  },
+  {
+    key: "chatgpt",
+    name: "ChatGPT",
+    label: "ask",
+    brand: "#10A37F",
+    href: "https://chat.openai.com/",
+    Icon: ChatGPTLogo,
+  },
+  {
+    key: "gemini",
+    name: "Gemini",
+    label: "search",
+    brand: "#4285F4",
+    href: "https://gemini.google.com/",
+    Icon: GeminiLogo,
+  },
+  {
+    key: "grok",
+    name: "Grok",
+    label: "poke",
+    brand: "#1D1D1F",
+    href: "https://grok.com/",
+    Icon: GrokLogo,
+  },
+  {
+    key: "vercel",
+    name: "Vercel",
+    label: "deploy",
+    brand: "#000000",
+    href: "https://vercel.com/",
+    Icon: VercelLogo,
+  },
+  {
+    key: "figma",
+    name: "Figma",
+    label: "design",
+    brand: "#0F0F0F",
+    href: "https://figma.com/",
+    Icon: FigmaLogo,
   },
 ];
 

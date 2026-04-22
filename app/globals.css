@@ -44,7 +44,8 @@ body {
   font-family: var(--font-sans), "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 800;
   letter-spacing: -0.045em;
-  line-height: 0.88;
+  /* 1.0 keeps the p-descender on line 1 clear of the g-ascender on line 2 */
+  line-height: 1;
 }
 
 .hero-word .letter {

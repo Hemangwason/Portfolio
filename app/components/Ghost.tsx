@@ -15,7 +15,11 @@ export function Ghost() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [flying, setFlying] = useState(false);
-  const [hint, setHint] = useState(true);
+  // Two-phase ambient coaching:
+  //   intro  — a one-liner from the ghost ("hi, i'm hem…")
+  //   hint   — a smaller delight nudge after the intro has been read
+  const [intro, setIntro] = useState(true);
+  const [hint, setHint] = useState(false);
 
   // All animation state lives in refs so the rAF loop never re-renders.
   const flyingRef = useRef(false);
@@ -74,35 +78,38 @@ export function Ghost() {
       const vel = velRef.current;
 
       if (flyingRef.current) {
-        // Spring-lag chase toward cursor target.
+        // Spring-lag chase toward cursor target. Tuned hot — the ghost
+        // keeps up with fast flicks while still showing a hint of trail.
         const dx = targetRef.current.x - pos.x;
         const dy = targetRef.current.y - pos.y;
         const dist = Math.hypot(dx, dy);
 
         let k: number, d: number;
         if (dist > 240) {
-          k = 0.08;
-          d = 0.82;
+          k = 0.22;
+          d = 0.74;
         } else if (dist > 90) {
-          k = 0.05;
-          d = 0.85;
+          k = 0.16;
+          d = 0.76;
         } else {
-          k = 0.022;
-          d = 0.88;
+          k = 0.1;
+          d = 0.78;
         }
         vel.x = (vel.x + dx * k) * d;
         vel.y = (vel.y + dy * k) * d;
         pos.x += vel.x;
         pos.y += vel.y;
 
-        // Always-on floating bob.
+        // Always-on floating bob — fades out at high speed so it never
+        // fights with the chase.
         bobRef.current += 0.04;
-        const bobScale = dist > 240 ? 0.35 : dist > 90 ? 0.7 : 1;
+        const bobScale = dist > 240 ? 0.18 : dist > 90 ? 0.4 : 0.85;
         const bobX = Math.sin(bobRef.current * 0.9) * 3 * bobScale;
         const bobY = Math.sin(bobRef.current * 1.3 + 0.6) * 4.5 * bobScale;
 
-        const rawTilt = Math.max(-12, Math.min(12, vel.x * 1.6));
-        tiltRef.current = tiltRef.current * 0.82 + rawTilt * 0.18;
+        // Tilt — more responsive, faster catch-up to velocity.
+        const rawTilt = Math.max(-18, Math.min(18, vel.x * 2.6));
+        tiltRef.current = tiltRef.current * 0.65 + rawTilt * 0.35;
 
         const vw = window.innerWidth;
         const vh = window.innerHeight;
@@ -133,17 +140,37 @@ export function Ghost() {
     flyingRef.current = flying;
   }, [flying]);
 
-  // Hide hint after a few seconds.
+  // Phase 1: intro bubble reads for ~10s, then collapses into the smaller
+  // "take me along" hint for another 8s. Both dismissed early on click.
+  useEffect(() => {
+    if (!intro) return;
+    const id = window.setTimeout(() => {
+      setIntro(false);
+      setHint(true);
+    }, 10000);
+    return () => window.clearTimeout(id);
+  }, [intro]);
+
   useEffect(() => {
     if (!hint) return;
-    const id = window.setTimeout(() => setHint(false), 6500);
+    const id = window.setTimeout(() => setHint(false), 8000);
     return () => window.clearTimeout(id);
   }, [hint]);
 
   const onClick = () => {
+    setIntro(false);
     setHint(false);
     if (flying) {
-      // Dock at current position. Reset velocity so it doesn't drift.
+      // Dock at current position, but clamp inside the viewport with a
+      // comfortable margin so the ghost never ends up clipped under a
+      // screen edge, a floating dev badge, or behind another UI element.
+      const MARGIN = 12;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      posRef.current = {
+        x: Math.max(MARGIN, Math.min(vw - GHOST_W - MARGIN, posRef.current.x)),
+        y: Math.max(MARGIN, Math.min(vh - GHOST_H - MARGIN, posRef.current.y)),
+      };
       velRef.current = { x: 0, y: 0 };
       setFlying(false);
       return;
@@ -189,13 +216,42 @@ export function Ghost() {
         cursor: flying ? "grabbing" : "grab",
       }}
     >
-      {hint && !flying && (
-        <span
-          className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 animate-fade-in whitespace-nowrap rounded-full border border-black/8 bg-white/95 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-black/70 shadow-sm backdrop-blur"
-          style={{ animation: "ghostHint 0.5s 1.2s both" }}
+      {intro && !flying && (
+        <div
+          className="pointer-events-none absolute -top-[78px] left-6 z-10 w-[220px]"
+          style={{ animation: "ghostHint 0.6s 0.3s both" }}
         >
-          click me ✦
-        </span>
+          <div className="relative rounded-2xl bg-white px-3 py-2 text-[11px] leading-snug text-black/80 shadow-[0_14px_32px_-12px_rgba(30,41,59,0.25)] ring-1 ring-black/5 ghost-hint-bob">
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/40">
+              boo · a note
+            </p>
+            <p className="mt-1">
+              hi — i&apos;m{" "}
+              <span className="font-semibold text-black">hem</span>,
+              hemang&apos;s ghost. left here to make sure you get him on
+              the team <span aria-hidden>✦</span>
+            </p>
+            <span
+              aria-hidden
+              className="absolute bottom-0 left-5 h-2 w-2 translate-y-1/2 rotate-45 bg-white ring-1 ring-black/5"
+            />
+          </div>
+        </div>
+      )}
+
+      {hint && !flying && (
+        <div
+          className="pointer-events-none absolute -top-8 left-7 z-10"
+          style={{ animation: "ghostHint 0.6s 0.1s both" }}
+        >
+          <div className="relative whitespace-nowrap rounded-full bg-[var(--brand,#0057FF)] px-2 py-[3px] font-mono text-[9px] font-medium lowercase tracking-[0.08em] text-white/95 shadow-[0_4px_10px_-4px_rgba(0,87,255,0.4)] ghost-hint-bob">
+            take me along ✦
+            <span
+              aria-hidden
+              className="absolute bottom-0 left-2.5 h-[5px] w-[5px] translate-y-1/2 rotate-45 bg-[var(--brand,#0057FF)]"
+            />
+          </div>
+        </div>
       )}
 
       <button
@@ -218,12 +274,24 @@ export function Ghost() {
         @keyframes ghostHint {
           from {
             opacity: 0;
-            transform: translateX(-50%) translateY(6px);
+            transform: translateY(8px) scale(0.92);
           }
           to {
             opacity: 1;
-            transform: translateX(-50%) translateY(0);
+            transform: translateY(0) scale(1);
           }
+        }
+        @keyframes ghostHintBob {
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-3px);
+          }
+        }
+        .ghost-hint-bob {
+          animation: ghostHintBob 2.4s ease-in-out 1s infinite;
         }
         .ghost-btn {
           transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);

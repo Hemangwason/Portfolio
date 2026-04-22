@@ -3,7 +3,7 @@ import { PlaygroundTitle } from "./components/PlaygroundTitle";
 import { FloatingLogos } from "./components/FloatingLogos";
 import { Marquee } from "./components/Marquee";
 import { ProjectGrid } from "./components/ProjectGrid";
-import { LogoTile } from "./components/LogoTile";
+import { LogoBadge, LogoTile } from "./components/LogoTile";
 import { LiveSites } from "./components/LiveSites";
 import { platforms } from "./components/BrandLogos";
 import { projects } from "./data/projects";
@@ -25,8 +25,10 @@ export default function Home() {
           <PlaygroundTitle />
 
           <p className="mx-auto mt-8 max-w-2xl text-balance px-2 text-center text-[15px] leading-relaxed text-black/60 sm:mt-10 sm:px-0 sm:text-base md:text-lg">
-            Hemang — product designer working across research, systems,
-            and the boring screens no one ships. Click{" "}
+            Currently at{" "}
+            <span className="font-semibold text-[#E23744]">Zomato</span>{" "}
+            as a product &amp; visual designer. Working across research,
+            systems, and the boring screens no one ships. Click{" "}
             <Link
               href="/play"
               className="font-semibold text-black underline decoration-[var(--accent)] decoration-[2px] underline-offset-[5px]"
@@ -110,7 +112,7 @@ export default function Home() {
               </h2>
             </div>
             <p className="max-w-md text-sm text-black/60 md:text-right">
-              Twelve projects from the last three years across fintech,
+              Ten projects from the last three years across fintech,
               healthcare, consumer, and editorial.
             </p>
           </header>
@@ -130,21 +132,46 @@ export default function Home() {
               The corners of the internet I spend time in.
             </h2>
             <p className="max-w-xl text-sm text-black/60">
-              Playlists, films I'm working through, design references I
-              bookmark, and the games I play when the screens go dark.
+              Playlists, films, design references, AI co-pilots I bounce
+              ideas off daily, and the games I play when the screens go
+              dark.
             </p>
           </header>
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {platforms.map((p) => (
+          {(() => {
+            const aiKeys = new Set([
+              "claude",
+              "codex",
+              "cursor",
+              "chatgpt",
+              "gemini",
+              "grok",
+            ]);
+            // Vercel + Figma are tools, not hangouts — keep them out of this grid.
+            const visible = platforms.filter(
+              (p) => p.key !== "vercel" && p.key !== "figma",
+            );
+            const daily = visible.filter((p) => !aiKeys.has(p.key));
+            const ai = visible.filter((p) => aiKeys.has(p.key));
+
+            const Tile = (p: (typeof platforms)[number]) => (
               <a
                 key={p.key}
                 href={p.href}
+                target={p.href.startsWith("http") ? "_blank" : undefined}
+                rel={
+                  p.href.startsWith("http")
+                    ? "noopener noreferrer"
+                    : undefined
+                }
                 className="glass group flex items-center gap-3 rounded-2xl p-3 transition-transform duration-300 hover:-translate-y-0.5"
               >
                 <span
                   className="grid h-11 w-11 place-items-center rounded-xl transition-transform group-hover:scale-105"
-                  style={{ background: p.brand, color: p.textOnBrand ?? "#fff" }}
+                  style={{
+                    background: p.brand,
+                    color: p.textOnBrand ?? "#fff",
+                  }}
                 >
                   <p.Icon className="h-5 w-5" />
                 </span>
@@ -157,8 +184,31 @@ export default function Home() {
                   </span>
                 </div>
               </a>
-            ))}
-          </div>
+            );
+
+            return (
+              <div className="flex flex-col gap-8">
+                <div>
+                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-black/35">
+                    ── daily rotation
+                  </p>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                    {daily.map(Tile)}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="mb-3 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-black/35">
+                    ── ai co-pilots
+                    <span className="inline-block h-1 w-1 rounded-full bg-emerald-500" />
+                  </p>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
+                    {ai.map(Tile)}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </section>
 
@@ -167,36 +217,37 @@ export default function Home() {
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2">
           <Link
             href="/play"
-            className="glass-strong group relative flex min-h-[220px] flex-col justify-between overflow-hidden rounded-[24px] p-6 transition-transform duration-500 hover:-translate-y-1 sm:min-h-[260px] sm:rounded-[28px] sm:p-8"
+            className="glass-strong group relative flex min-h-[260px] flex-col justify-between overflow-hidden rounded-[24px] p-6 transition-transform duration-500 hover:-translate-y-1 sm:min-h-[320px] sm:rounded-[28px] sm:p-8"
           >
             <div className="flex items-center gap-3">
-              <LogoTile platformKey="spotify" size="sm" withLabel={false} />
+              <LogoTile platformKey="figma" size="sm" withLabel={false} noLink />
               <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-black/50">
                 /play · visual
               </span>
             </div>
             <div>
               <h3 className="text-[clamp(1.8rem,4vw,2.8rem)] font-semibold leading-[0.95] tracking-tight">
-                Posters, type &amp;
+                Illustrations, type &amp;
                 <br />
-                <span className="brand-gradient-text">motion experiments.</span>
+                <span className="brand-gradient-text">motion for apps.</span>
               </h3>
               <p className="mt-4 max-w-md text-sm text-black/60">
-                Visual work — weekends, prints, and the things I make
-                when the spec is just "make it feel alive".
+                Visual work that lives inside the product — illustrations,
+                empty states, and the small details that give a shipped
+                app its feel.
               </p>
             </div>
-            <span className="font-mono text-xs uppercase tracking-[0.2em] text-black/70">
+            <span className="mt-10 font-mono text-xs uppercase tracking-[0.2em] text-black/70 sm:mt-14">
               Open play →
             </span>
           </Link>
 
           <Link
             href="/ground"
-            className="glass-strong group relative flex min-h-[220px] flex-col justify-between overflow-hidden rounded-[24px] p-6 transition-transform duration-500 hover:-translate-y-1 sm:min-h-[260px] sm:rounded-[28px] sm:p-8"
+            className="glass-strong group relative flex min-h-[260px] flex-col justify-between overflow-hidden rounded-[24px] p-6 transition-transform duration-500 hover:-translate-y-1 sm:min-h-[320px] sm:rounded-[28px] sm:p-8"
           >
             <div className="flex items-center gap-3">
-              <LogoTile platformKey="behance" size="sm" withLabel={false} />
+              <LogoTile platformKey="claude" size="sm" withLabel={false} noLink />
               <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-black/50">
                 /ground · product
               </span>
@@ -212,7 +263,7 @@ export default function Home() {
                 the rigour of shipping things people use every week.
               </p>
             </div>
-            <span className="font-mono text-xs uppercase tracking-[0.2em] text-black/70">
+            <span className="mt-10 font-mono text-xs uppercase tracking-[0.2em] text-black/70 sm:mt-14">
               Open ground →
             </span>
           </Link>
@@ -247,9 +298,33 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <p className="mx-auto mt-8 max-w-6xl font-mono text-[10px] uppercase tracking-[0.22em] text-black/30 sm:mt-10">
-          © 2026 · built with care, shipped with doubt
-        </p>
+        <div className="mx-auto mt-8 flex max-w-6xl flex-col gap-4 sm:mt-10 md:flex-row md:items-center md:justify-between">
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-black/30">
+            © 2026 · built with care, shipped with doubt
+          </p>
+          <div className="glass flex flex-wrap items-center gap-2 rounded-full px-3 py-1.5 text-[11px] text-black/65 sm:gap-2.5">
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-black/45">
+              vibe-coded in &lt;10 hrs
+            </span>
+            <span className="h-3 w-px bg-black/15" />
+            <span className="flex items-center gap-1.5">
+              <LogoBadge platformKey="claude" size="sm" />
+              <span>Claude Pro</span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <LogoBadge platformKey="codex" size="sm" />
+              <span>Codex</span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <LogoBadge platformKey="cursor" size="sm" />
+              <span>Cursor</span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <LogoBadge platformKey="vercel" size="sm" />
+              <span>Vercel</span>
+            </span>
+          </div>
+        </div>
       </footer>
     </main>
   );

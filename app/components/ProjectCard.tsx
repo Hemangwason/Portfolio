@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Project } from "../data/projects";
 import { GradientMesh, variantFor } from "./GradientMesh";
@@ -142,17 +143,7 @@ function CardMedia({
   const media = project.thumbnail;
 
   if (media?.type === "video") {
-    return (
-      <video
-        src={media.src}
-        poster={media.poster}
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-    );
+    return <LazyCardVideo src={media.src} poster={media.poster} />;
   }
 
   if (media?.type === "image") {
@@ -169,6 +160,47 @@ function CardMedia({
     <GradientMesh
       variant={variantFor(seed)}
       className="absolute inset-0 h-full w-full"
+    />
+  );
+}
+
+// Pauses card videos when they scroll out of view so the browser isn't
+// decoding six clips at once — keeps the /play grid smooth. `preload="metadata"`
+// defers most of the download until the browser decides to play.
+function LazyCardVideo({ src, poster }: { src: string; poster?: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        const v = ref.current;
+        if (!v) return;
+        if (entry.isIntersecting) {
+          v.play().catch(() => {});
+        } else {
+          v.pause();
+        }
+      },
+      { threshold: 0.15 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <video
+      ref={ref}
+      src={src}
+      poster={poster}
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      className="absolute inset-0 h-full w-full object-cover"
     />
   );
 }

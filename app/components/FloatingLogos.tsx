@@ -14,84 +14,121 @@ type FloatingItem = {
   size?: "sm" | "md";
 };
 
-// Desktop / tablet: 8 tiles arranged around the title's safe zone.
+// Desktop / tablet: tiles arranged around the title's safe zone.
 // Title sits roughly in the central 60% horizontal × 40% vertical band — keep
 // every tile fully outside of that to avoid the visual collision.
+// Mix of platforms (Spotify/YouTube/etc) + AI tools (Claude/Codex/Gemini…)
+// since both sets live in the same daily rotation.
 const desktopItems: FloatingItem[] = [
-  { key: "spotify", style: { top: "8%", left: "5%" }, rotate: -6, delay: 0.1 },
-  { key: "vimeo", style: { top: "10%", right: "6%" }, rotate: 5, delay: 0.2 },
+  // Top band — platforms left, AI tools right.
+  { key: "spotify", style: { top: "7%", left: "4%" }, rotate: -6, delay: 0.1 },
+  { key: "claude", style: { top: "8%", right: "5%" }, rotate: 5, delay: 0.15 },
   {
     key: "youtube",
-    style: { top: "16%", left: "26%" },
+    style: { top: "17%", left: "22%" },
     rotate: -3,
+    delay: 0.25,
+    withLabel: false,
+  },
+  {
+    key: "cursor",
+    style: { top: "15%", right: "23%" },
+    rotate: 4,
     delay: 0.3,
     withLabel: false,
   },
+  // Mid band — icon-only, tucked right against the edges.
   {
     key: "github",
-    style: { top: "14%", right: "28%" },
-    rotate: 4,
-    delay: 0.35,
+    style: { top: "42%", left: "2%" },
+    rotate: -10,
+    delay: 0.38,
     withLabel: false,
+    size: "sm",
   },
+  {
+    key: "codex",
+    style: { top: "44%", right: "2%" },
+    rotate: 9,
+    delay: 0.4,
+    withLabel: false,
+    size: "sm",
+  },
+  // Lower band.
   {
     key: "behance",
-    style: { bottom: "26%", left: "3%" },
+    style: { bottom: "24%", left: "4%" },
     rotate: -8,
-    delay: 0.4,
+    delay: 0.45,
   },
   {
-    key: "discord",
-    style: { bottom: "30%", right: "4%" },
+    key: "gemini",
+    style: { bottom: "27%", right: "4%" },
     rotate: 7,
-    delay: 0.3,
-  },
-  {
-    key: "letterboxd",
-    style: { bottom: "10%", left: "22%" },
-    rotate: 3,
     delay: 0.5,
   },
   {
-    key: "survivors",
-    style: { bottom: "8%", right: "22%" },
+    key: "letterboxd",
+    style: { bottom: "9%", left: "20%" },
+    rotate: 3,
+    delay: 0.55,
+  },
+  {
+    key: "chatgpt",
+    style: { bottom: "8%", right: "20%" },
     rotate: -5,
-    delay: 0.45,
+    delay: 0.6,
   },
 ];
 
-// Mobile: 4 small icon-only tiles tucked into the corners. No labels — keeps
-// the hero airy and avoids any chance of overlap with the wrapped title.
+// Mobile: 6 small icon-only tiles tucked into the corners and edges.
+// Keeps the hero airy while still representing both platforms + AI tools.
 const mobileItems: FloatingItem[] = [
   {
     key: "spotify",
-    style: { top: "9%", left: "6%" },
+    style: { top: "8%", left: "5%" },
     rotate: -8,
-    delay: 0.15,
+    delay: 0.12,
     withLabel: false,
     size: "sm",
   },
   {
-    key: "vimeo",
-    style: { top: "9%", right: "6%" },
+    key: "claude",
+    style: { top: "8%", right: "5%" },
     rotate: 8,
-    delay: 0.2,
+    delay: 0.18,
     withLabel: false,
     size: "sm",
   },
   {
-    key: "letterboxd",
-    style: { bottom: "12%", left: "8%" },
-    rotate: 5,
+    key: "cursor",
+    style: { top: "40%", left: "3%" },
+    rotate: -5,
+    delay: 0.24,
+    withLabel: false,
+    size: "sm",
+  },
+  {
+    key: "gemini",
+    style: { top: "40%", right: "3%" },
+    rotate: 6,
     delay: 0.3,
     withLabel: false,
     size: "sm",
   },
   {
-    key: "survivors",
-    style: { bottom: "12%", right: "8%" },
+    key: "letterboxd",
+    style: { bottom: "11%", left: "7%" },
+    rotate: 5,
+    delay: 0.36,
+    withLabel: false,
+    size: "sm",
+  },
+  {
+    key: "chatgpt",
+    style: { bottom: "11%", right: "7%" },
     rotate: -6,
-    delay: 0.35,
+    delay: 0.42,
     withLabel: false,
     size: "sm",
   },

@@ -121,7 +121,7 @@ function ProjectModalBody({
       </button>
 
       {/* Masthead */}
-      <div className="relative aspect-[5/2] w-full overflow-hidden">
+      <div className="relative aspect-video w-full overflow-hidden">
         <MastheadMedia project={project} seed={meshSeed} />
 
         {/* overlay chip */}
@@ -162,7 +162,10 @@ function ProjectModalBody({
             <MetaItem label="Role" value={project.role} />
           )}
           {project.client && (
-            <MetaItem label="Client" value={project.client} />
+            <MetaItem
+              label={project.clientLabel ?? "Client"}
+              value={project.client}
+            />
           )}
           {project.team && <MetaItem label="Team" value={project.team} />}
           <MetaItem label="Year" value={project.year} />
