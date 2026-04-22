@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
 const fragments = [
@@ -8,6 +9,9 @@ const fragments = [
   { text: "play", plain: false, href: "/play", accent: "var(--accent)" },
   { text: "ground", plain: false, href: "/ground", accent: "var(--brand)" },
 ];
+
+const letterDelay = (s: number): CSSProperties =>
+  ({ "--letter-delay": `${s}s` } as CSSProperties);
 
 export function PlaygroundTitle() {
   const reduce = useReducedMotion();
@@ -24,19 +28,13 @@ export function PlaygroundTitle() {
           return (
             <span key={fi} className="inline-block">
               {frag.text.split("").map((ch, i) => (
-                <motion.span
+                <span
                   key={`${fi}-${i}`}
                   className="letter"
-                  initial={{ y: "110%", opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{
-                    delay: 0.08 * i,
-                    duration: 0.7,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
+                  style={letterDelay(0.08 * i)}
                 >
                   {ch === " " ? "\u00A0" : ch}
-                </motion.span>
+                </span>
               ))}
             </span>
           );
@@ -60,13 +58,7 @@ export function PlaygroundTitle() {
               <motion.span
                 key={`${fi}-${i}`}
                 className="letter"
-                initial={{ y: "110%", opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{
-                  delay: 0.08 * (fi === 1 ? i + 9 : i + 13),
-                  duration: 0.7,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
+                style={letterDelay(0.08 * (fi === 1 ? i + 9 : i + 13))}
                 whileHover={
                   reduce
                     ? undefined

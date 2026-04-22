@@ -51,6 +51,27 @@ body {
 .hero-word .letter {
   display: inline-block;
   transform-origin: 50% 80%;
+  /* CSS-driven entrance so the letters are guaranteed to render even when a
+     JS animation scheduler is paused (tab opened in background, etc). */
+  animation: letterIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--letter-delay, 0s);
+}
+
+@keyframes letterIn {
+  from {
+    opacity: 0;
+    transform: translateY(110%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-word .letter {
+    animation: none;
+  }
 }
 
 .play-link,
@@ -70,9 +91,12 @@ body {
   bottom: 0.06em;
   height: 0.1em;
   border-radius: 999px;
-  transform: scaleX(0);
+  transform: scaleX(1);
   transform-origin: left center;
-  transition: transform 400ms cubic-bezier(0.33, 1, 0.68, 1);
+  opacity: 0.55;
+  transition:
+    opacity 250ms ease,
+    transform 400ms cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 .play-link::after {
@@ -85,7 +109,7 @@ body {
 
 .play-link:hover::after,
 .ground-link:hover::after {
-  transform: scaleX(1);
+  opacity: 1;
 }
 
 .glass {
