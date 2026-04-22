@@ -223,7 +223,7 @@ export default function GroundPage() {
             </h3>
           </div>
           <a
-            href="mailto:hemang@sidetake.com"
+            href="mailto:hemangwason@gmail.com"
             className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition-transform hover:-translate-y-0.5"
           >
             Email me

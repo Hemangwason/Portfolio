@@ -278,19 +278,33 @@ export default function Home() {
               Hemang Wason · Product Designer
             </p>
             <p className="mt-2 text-lg font-semibold text-black">
-              hemang@sidetake.com
+              hemangwason@gmail.com
             </p>
           </div>
           <div className="flex flex-wrap gap-2 text-sm">
             {[
-              { label: "Twitter / X", href: "#" },
-              { label: "Read.cv", href: "#" },
-              { label: "LinkedIn", href: "#" },
-              { label: "Email", href: "mailto:hemang@sidetake.com" },
+              { label: "Twitter / X", href: "#", external: false },
+              {
+                label: "CV",
+                href: "/hemang-wason-cv.pdf",
+                external: true,
+              },
+              {
+                label: "LinkedIn",
+                href: "https://www.linkedin.com/in/hemang-wason-577205161/",
+                external: true,
+              },
+              {
+                label: "Email",
+                href: "mailto:hemangwason@gmail.com",
+                external: false,
+              },
             ].map((l) => (
               <a
                 key={l.label}
                 href={l.href}
+                target={l.external ? "_blank" : undefined}
+                rel={l.external ? "noopener noreferrer" : undefined}
                 className="glass rounded-full px-4 py-1.5 font-medium transition-colors hover:bg-black hover:text-white"
               >
                 {l.label}

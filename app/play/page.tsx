@@ -156,7 +156,7 @@ export default function PlayPage() {
           </Link>
           . For a print or a trade,{" "}
           <a
-            href="mailto:hemang@sidetake.com"
+            href="mailto:hemangwason@gmail.com"
             className="font-semibold text-black underline underline-offset-[5px]"
           >
             email me
