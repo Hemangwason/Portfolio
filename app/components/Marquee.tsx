@@ -11,7 +11,7 @@ export function Marquee({ words, className = "" }: MarqueeProps) {
         {full.map((w, i) => (
           <span
             key={i}
-            className="inline-flex items-center gap-4 text-[clamp(1.6rem,3.8vw,3rem)] font-semibold tracking-tight"
+            className="inline-flex items-center gap-3 text-[clamp(1.25rem,3.8vw,3rem)] font-semibold tracking-tight sm:gap-4"
           >
             {w}
             <span className="inline-block h-2 w-2 rounded-full bg-current opacity-40" />

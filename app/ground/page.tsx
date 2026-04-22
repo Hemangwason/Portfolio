@@ -57,10 +57,10 @@ export default function GroundPage() {
       <BackHome accent="var(--brand)" />
 
       {/* HERO */}
-      <section className="relative flex min-h-[85svh] w-full items-center px-6 pb-16 pt-28">
+      <section className="relative flex min-h-[85svh] w-full items-center px-4 pb-12 pt-24 sm:px-6 sm:pb-16 sm:pt-28">
         <div className="dotted-grid pointer-events-none absolute inset-0 opacity-40" aria-hidden />
 
-        <div className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-14 lg:grid-cols-[1.3fr_1fr]">
+        <div className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-10 sm:gap-14 lg:grid-cols-[1.3fr_1fr]">
           <div>
             <p className="glass mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-black/70">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand)]" />
@@ -118,7 +118,7 @@ export default function GroundPage() {
       </section>
 
       {/* PROCESS */}
-      <section className="relative px-6 py-24">
+      <section className="relative px-4 py-16 sm:px-6 sm:py-24">
         <div className="mx-auto max-w-6xl">
           <header className="mb-14 flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
             <div>
@@ -157,7 +157,7 @@ export default function GroundPage() {
       </section>
 
       {/* CASE STUDIES */}
-      <section className="relative px-6 pb-24">
+      <section className="relative px-4 pb-16 sm:px-6 sm:pb-24">
         <div className="mx-auto max-w-6xl">
           <header className="mb-12 flex flex-col items-start gap-3">
             <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-black/40">
@@ -180,8 +180,8 @@ export default function GroundPage() {
       </section>
 
       {/* OFFLINE — platforms */}
-      <section className="relative px-6 pb-24">
-        <div className="glass-strong mx-auto flex max-w-6xl flex-col items-start gap-6 rounded-[28px] p-10 md:flex-row md:items-center md:justify-between">
+      <section className="relative px-4 pb-16 sm:px-6 sm:pb-24">
+        <div className="glass-strong mx-auto flex max-w-6xl flex-col items-start gap-6 rounded-[24px] p-6 sm:rounded-[28px] sm:p-10 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-black/50">
               03 — When the screens go dark
@@ -203,7 +203,7 @@ export default function GroundPage() {
       </section>
 
       {/* CONTACT STRIP */}
-      <section className="relative mx-6 mb-24 overflow-hidden rounded-[28px] bg-black px-10 py-14 text-white">
+      <section className="relative mx-4 mb-20 overflow-hidden rounded-[24px] bg-black px-6 py-10 text-white sm:mx-6 sm:mb-24 sm:rounded-[28px] sm:px-10 sm:py-14">
         <div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-[var(--brand)] opacity-40 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-[var(--accent)] opacity-30 blur-3xl" />
         <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-start justify-between gap-8 md:flex-row md:items-end">

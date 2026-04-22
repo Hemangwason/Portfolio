@@ -12,19 +12,19 @@ export default function Home() {
   return (
     <main className="relative flex w-full flex-col">
       {/* HERO */}
-      <section className="relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden px-6 py-16">
+      <section className="relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden px-4 py-12 sm:px-6 sm:py-16">
         <div className="dotted-grid pointer-events-none absolute inset-0 opacity-50" aria-hidden />
         <FloatingLogos />
 
-        <div className="relative z-20 flex max-w-6xl flex-col items-center">
-          <p className="glass mb-8 flex items-center gap-2 rounded-full px-4 py-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-black/70">
+        <div className="relative z-20 flex w-full max-w-6xl flex-col items-center">
+          <p className="glass mb-6 flex items-center gap-2 rounded-full px-3 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-black/70 sm:mb-8 sm:px-4 sm:py-1.5 sm:text-[11px]">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
             available for work · 2026
           </p>
 
           <PlaygroundTitle />
 
-          <p className="mx-auto mt-10 max-w-2xl text-center text-base leading-relaxed text-black/60 md:text-lg">
+          <p className="mx-auto mt-8 max-w-2xl text-balance px-2 text-center text-[15px] leading-relaxed text-black/60 sm:mt-10 sm:px-0 sm:text-base md:text-lg">
             Hemang — product designer working across research, systems,
             and the boring screens no one ships. Click{" "}
             <Link
@@ -43,10 +43,10 @@ export default function Home() {
             for products.
           </p>
 
-          <div className="mt-14 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.22em] text-black/40">
-            <span className="inline-block h-px w-8 bg-black/20" />
+          <div className="mt-10 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.22em] text-black/40 sm:mt-14 sm:text-[11px]">
+            <span className="inline-block h-px w-6 bg-black/20 sm:w-8" />
             scroll
-            <span className="inline-block h-px w-8 bg-black/20" />
+            <span className="inline-block h-px w-6 bg-black/20 sm:w-8" />
           </div>
           <div className="mt-3 h-8 w-[1.5px] overflow-hidden rounded-full bg-black/10">
             <span className="block h-full w-full bg-black" style={{ animation: "bob 2.4s ease-in-out infinite" }} />
@@ -71,7 +71,7 @@ export default function Home() {
       </section>
 
       {/* LIVE SITES — shipped & in the wild */}
-      <section className="relative px-6 pt-24 pb-16 md:pt-28">
+      <section className="relative px-4 pt-16 pb-12 sm:px-6 sm:pt-24 sm:pb-16 md:pt-28">
         <div className="mx-auto max-w-6xl">
           <header className="mb-10 flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
             <div>
@@ -96,7 +96,7 @@ export default function Home() {
       </section>
 
       {/* PROJECT WALL */}
-      <section className="relative px-6 pt-12 pb-24 md:pb-32">
+      <section className="relative px-4 pt-8 pb-20 sm:px-6 sm:pt-12 sm:pb-24 md:pb-32">
         <div className="mx-auto max-w-6xl">
           <header className="mb-12 flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
             <div>
@@ -120,7 +120,7 @@ export default function Home() {
       </section>
 
       {/* ELSEWHERE — platform links */}
-      <section className="relative px-6 pb-24">
+      <section className="relative px-4 pb-20 sm:px-6 sm:pb-24">
         <div className="mx-auto max-w-6xl">
           <header className="mb-10 flex flex-col items-start gap-3">
             <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-black/40">
@@ -163,11 +163,11 @@ export default function Home() {
       </section>
 
       {/* SPLIT CTA */}
-      <section className="relative px-6 pb-24">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-5 md:grid-cols-2">
+      <section className="relative px-4 pb-20 sm:px-6 sm:pb-24">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2">
           <Link
             href="/play"
-            className="glass-strong group relative flex min-h-[260px] flex-col justify-between overflow-hidden rounded-[28px] p-8 transition-transform duration-500 hover:-translate-y-1"
+            className="glass-strong group relative flex min-h-[220px] flex-col justify-between overflow-hidden rounded-[24px] p-6 transition-transform duration-500 hover:-translate-y-1 sm:min-h-[260px] sm:rounded-[28px] sm:p-8"
           >
             <div className="flex items-center gap-3">
               <LogoTile platformKey="spotify" size="sm" withLabel={false} />
@@ -193,7 +193,7 @@ export default function Home() {
 
           <Link
             href="/ground"
-            className="glass-strong group relative flex min-h-[260px] flex-col justify-between overflow-hidden rounded-[28px] p-8 transition-transform duration-500 hover:-translate-y-1"
+            className="glass-strong group relative flex min-h-[220px] flex-col justify-between overflow-hidden rounded-[24px] p-6 transition-transform duration-500 hover:-translate-y-1 sm:min-h-[260px] sm:rounded-[28px] sm:p-8"
           >
             <div className="flex items-center gap-3">
               <LogoTile platformKey="behance" size="sm" withLabel={false} />
@@ -220,7 +220,7 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer className="relative mt-auto border-t border-black/10 px-6 py-12">
+      <footer className="relative mt-auto border-t border-black/10 px-4 py-10 sm:px-6 sm:py-12">
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-black/45">
@@ -247,7 +247,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <p className="mx-auto mt-10 max-w-6xl font-mono text-[10px] uppercase tracking-[0.22em] text-black/30">
+        <p className="mx-auto mt-8 max-w-6xl font-mono text-[10px] uppercase tracking-[0.22em] text-black/30 sm:mt-10">
           © 2026 · built with care, shipped with doubt
         </p>
       </footer>

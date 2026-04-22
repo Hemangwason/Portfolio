@@ -13,7 +13,12 @@ export function PlaygroundTitle() {
   const reduce = useReducedMotion();
 
   return (
-    <h1 className="hero-word relative z-20 text-center text-[clamp(3rem,14vw,11rem)]">
+    <h1 className="hero-word relative z-20 text-center text-[clamp(2.6rem,13.5vw,11rem)]">
+      {/* Soft white halo so any background element sits visually behind the title */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[140%] w-[120%] -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-white/55 blur-2xl"
+      />
       {fragments.map((frag, fi) => {
         if (frag.plain) {
           return (

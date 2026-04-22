@@ -43,7 +43,7 @@ export function ProjectModal({ project, onClose }: Props) {
       {project && (
         <motion.div
           key={project.id}
-          className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto overscroll-contain px-4 py-6 md:items-center md:px-6 md:py-10"
+          className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto overscroll-contain px-3 py-4 sm:px-4 sm:py-6 md:items-center md:px-6 md:py-10"
           role="dialog"
           aria-modal="true"
           aria-labelledby={`modal-title-${project.id}`}
@@ -67,7 +67,7 @@ export function ProjectModal({ project, onClose }: Props) {
           <motion.div
             ref={contentRef}
             tabIndex={-1}
-            className="glass-strong relative my-auto w-full max-w-3xl overflow-hidden rounded-[24px] outline-none"
+            className="glass-strong relative my-auto w-full max-w-3xl overflow-hidden rounded-[20px] outline-none sm:rounded-[24px]"
             initial={{ opacity: 0, y: 30, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.98 }}
@@ -102,7 +102,7 @@ function ProjectModalBody({
         type="button"
         onClick={onClose}
         aria-label="Close"
-        className="glass absolute right-4 top-4 z-20 grid h-9 w-9 place-items-center rounded-full text-black/70 transition-colors hover:bg-black hover:text-white"
+        className="glass absolute right-3 top-3 z-20 grid h-10 w-10 place-items-center rounded-full text-black/70 transition-colors hover:bg-black hover:text-white sm:right-4 sm:top-4 sm:h-9 sm:w-9"
       >
         <svg
           width="14"
@@ -143,7 +143,7 @@ function ProjectModalBody({
       </div>
 
       {/* Body */}
-      <div className="relative max-h-[60vh] overflow-y-auto px-6 py-8 md:px-10 md:py-10">
+      <div className="relative max-h-[70vh] overflow-y-auto px-5 py-6 sm:px-6 sm:py-8 md:max-h-[60vh] md:px-10 md:py-10">
         <header>
           <h2
             id={`modal-title-${project.id}`}
