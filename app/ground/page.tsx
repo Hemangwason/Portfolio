@@ -22,8 +22,8 @@ const groundPlatforms = [
 ];
 
 const stats = [
-  { k: "6 yrs", v: "shipping product" },
-  { k: "11", v: "industries" },
+  { k: "2+ yrs", v: "shipping product" },
+  { k: "6", v: "industries" },
   { k: "4,000+", v: "research calls" },
   { k: "0", v: "ego in the room" },
 ];
