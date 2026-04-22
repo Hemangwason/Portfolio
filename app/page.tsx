@@ -4,6 +4,7 @@ import { FloatingLogos } from "./components/FloatingLogos";
 import { Marquee } from "./components/Marquee";
 import { ProjectGrid } from "./components/ProjectGrid";
 import { LogoTile } from "./components/LogoTile";
+import { LiveSites } from "./components/LiveSites";
 import { platforms } from "./components/BrandLogos";
 import { projects } from "./data/projects";
 
@@ -69,13 +70,38 @@ export default function Home() {
         />
       </section>
 
+      {/* LIVE SITES — shipped & in the wild */}
+      <section className="relative px-6 pt-24 pb-16 md:pt-28">
+        <div className="mx-auto max-w-6xl">
+          <header className="mb-10 flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-black/40">
+                01 — Live in the wild
+              </p>
+              <h2 className="mt-3 text-[clamp(2rem,5.5vw,3.6rem)] font-semibold leading-[0.95] tracking-tight">
+                Sites I designed
+                <span className="brand-gradient-text"> from scratch</span>,
+                <br />
+                shipped &amp; live.
+              </h2>
+            </div>
+            <p className="max-w-md text-sm text-black/60 md:text-right">
+              Identity, layout, and front-of-house — built end to end and
+              currently running in the open web.
+            </p>
+          </header>
+
+          <LiveSites />
+        </div>
+      </section>
+
       {/* PROJECT WALL */}
-      <section className="relative px-6 py-24 md:py-32">
+      <section className="relative px-6 pt-12 pb-24 md:pb-32">
         <div className="mx-auto max-w-6xl">
           <header className="mb-12 flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-black/40">
-                01 — Selected work
+                02 — Selected work
               </p>
               <h2 className="mt-3 text-[clamp(2rem,5.5vw,3.6rem)] font-semibold leading-[0.95] tracking-tight">
                 A focused body of
@@ -98,7 +124,7 @@ export default function Home() {
         <div className="mx-auto max-w-6xl">
           <header className="mb-10 flex flex-col items-start gap-3">
             <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-black/40">
-              02 — Elsewhere
+              03 — Elsewhere
             </p>
             <h2 className="text-[clamp(1.8rem,4.5vw,3rem)] font-semibold leading-tight tracking-tight">
               The corners of the internet I spend time in.
