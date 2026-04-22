@@ -146,7 +146,6 @@ function FloatingLayer({
   return (
     <div
       className={`pointer-events-none absolute inset-0 z-10 ${className}`}
-      aria-hidden="true"
       // Radial mask: fully visible at the edges, transparent through the
       // center band where the title sits. Catches any tile that strays
       // toward the middle and softly fades it out.

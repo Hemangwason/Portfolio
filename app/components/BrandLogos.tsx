@@ -253,7 +253,7 @@ export const platforms: Platform[] = [
     label: "listen",
     brand: "#1DB954",
     textOnBrand: "#000",
-    href: "#",
+    href: "https://open.spotify.com/playlist/37i9dQZF1DWYRTlrhMB12D?si=65e7bc322bb44765",
     Icon: SpotifyLogo,
   },
   {
@@ -261,7 +261,7 @@ export const platforms: Platform[] = [
     name: "Vimeo",
     label: "watch",
     brand: "#1AB7EA",
-    href: "#",
+    href: "https://vimeo.com/user89672305?fl=pp&fe=sh",
     Icon: VimeoLogo,
   },
   {
@@ -269,7 +269,7 @@ export const platforms: Platform[] = [
     name: "Behance",
     label: "design",
     brand: "#0057FF",
-    href: "#",
+    href: "https://www.behance.net/hemangwason",
     Icon: BehanceLogo,
   },
   {
@@ -285,7 +285,7 @@ export const platforms: Platform[] = [
     name: "Letterboxd",
     label: "films",
     brand: "#14181C",
-    href: "#",
+    href: "https://boxd.it/7fyDZ",
     Icon: LetterboxdLogo,
   },
   {
@@ -318,7 +318,7 @@ export const platforms: Platform[] = [
     name: "YouTube",
     label: "watch",
     brand: "#FF0033",
-    href: "#",
+    href: "https://www.youtube.com/@Side-take",
     Icon: YouTubeLogo,
   },
   {

@@ -82,8 +82,24 @@ export function LogoTile({
     return content;
   }
 
+  const isExternal = href.startsWith("http");
+
+  if (isExternal) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={name}
+        className="pointer-events-auto inline-block"
+      >
+        {content}
+      </a>
+    );
+  }
+
   return (
-    <Link href={href} prefetch={false} className="inline-block">
+    <Link href={href} prefetch={false} aria-label={name} className="pointer-events-auto inline-block">
       {content}
     </Link>
   );
