@@ -275,7 +275,7 @@ export default function Home() {
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-black/45">
-              Hemang Wason · Product Designer
+              Hemang Wason · Product Builder
             </p>
             <p className="mt-2 text-lg font-semibold text-black">
               hemangwason@gmail.com
