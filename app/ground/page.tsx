@@ -36,16 +36,21 @@ const process = [
   },
   {
     step: "02",
+    title: "Brainstorm",
+    body: "Paired sessions with Claude, Gemini, and Cursor. Not a replacement for taste — the collaborator that never tires of the 20th variant.",
+  },
+  {
+    step: "03",
     title: "Draw",
     body: "Whiteboards, pens, and Figma. Many versions. Most are bad — that's the point.",
   },
   {
-    step: "03",
+    step: "04",
     title: "Ship",
     body: "Design in the repo, not away from it. Specs are conversations, not handoffs.",
   },
   {
-    step: "04",
+    step: "05",
     title: "Measure",
     body: "Ship small, measure, adjust. Ego goes in the drawer for at least two sprints.",
   },
@@ -130,12 +135,12 @@ export default function GroundPage() {
               </h2>
             </div>
             <p className="max-w-sm text-sm text-black/60 md:text-right">
-              The same four moves on every project — from cap-table
-              tools to ferry signage.
+              The same five moves on every project — from AI security
+              tools to streetwear storefronts.
             </p>
           </header>
 
-          <ol className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <ol className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
             {process.map((p) => (
               <li
                 key={p.step}
