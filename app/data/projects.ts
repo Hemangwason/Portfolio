@@ -43,6 +43,7 @@ export const projects: Project[] = [
     thumbnail: {
       type: "video",
       src: "/projects/thumbs/sidetake.mp4",
+      poster: "/projects/thumbs/sidetake-poster.jpg",
     },
     masthead: {
       type: "video",
@@ -71,6 +72,7 @@ export const projects: Project[] = [
     thumbnail: {
       type: "video",
       src: "/projects/thumbs/boomerang.mp4",
+      poster: "/projects/thumbs/boomerang-poster.jpg",
     },
     masthead: {
       type: "video",
@@ -99,6 +101,7 @@ export const projects: Project[] = [
     thumbnail: {
       type: "video",
       src: "/projects/thumbs/jexlin.mp4",
+      poster: "/projects/thumbs/jexlin-poster.jpg",
     },
     masthead: {
       type: "video",
@@ -127,6 +130,7 @@ export const projects: Project[] = [
     thumbnail: {
       type: "video",
       src: "/projects/thumbs/crater.mp4",
+      poster: "/projects/thumbs/crater-poster.jpg",
     },
     masthead: {
       type: "video",
@@ -143,10 +147,10 @@ export const projects: Project[] = [
     id: "sid-voice-host",
     title: "Sid Voice Host",
     tagline: "A voice that opens the room before the host walks on",
-    kind: "play",
+    kind: "ground",
     year: "2026",
     tags: ["Art direction", "UI", "Motion"],
-    accent: "var(--accent)",
+    accent: "var(--brand)",
     emoji: "🎙️",
     blurb:
       "Art direction and interface for an AI co-emcee \u2014 a voice that sets the room\u2019s mood before the human host walks on. Two screens, one atmosphere.",
@@ -154,6 +158,7 @@ export const projects: Project[] = [
     thumbnail: {
       type: "video",
       src: "/projects/thumbs/sid-voice-host.mp4",
+      poster: "/projects/thumbs/sid-voice-host-poster.jpg",
     },
     masthead: {
       type: "video",
@@ -184,6 +189,7 @@ export const projects: Project[] = [
     thumbnail: {
       type: "video",
       src: "/projects/thumbs/healthy-high-five.mp4",
+      poster: "/projects/thumbs/healthy-high-five-poster.jpg",
     },
     masthead: {
       type: "video",
@@ -213,6 +219,7 @@ export const projects: Project[] = [
     thumbnail: {
       type: "video",
       src: "/projects/thumbs/independence-day-banner.mp4",
+      poster: "/projects/thumbs/independence-day-banner-poster.jpg",
     },
     masthead: {
       type: "video",
@@ -243,6 +250,7 @@ export const projects: Project[] = [
     thumbnail: {
       type: "video",
       src: "/projects/thumbs/asia-cup-2025.mp4",
+      poster: "/projects/thumbs/asia-cup-2025-poster.jpg",
     },
     masthead: {
       type: "video",
@@ -272,6 +280,7 @@ export const projects: Project[] = [
     thumbnail: {
       type: "video",
       src: "/projects/thumbs/goat-offers-bumrah.mp4",
+      poster: "/projects/thumbs/goat-offers-bumrah-poster.jpg",
     },
     masthead: {
       type: "video",
@@ -301,6 +310,7 @@ export const projects: Project[] = [
     thumbnail: {
       type: "video",
       src: "/projects/thumbs/durga-puja-pandal.mp4",
+      poster: "/projects/thumbs/durga-puja-pandal-poster.jpg",
     },
     masthead: {
       type: "video",
@@ -330,6 +340,7 @@ export const projects: Project[] = [
     thumbnail: {
       type: "video",
       src: "/projects/thumbs/zomato-plus-identity.mp4",
+      poster: "/projects/thumbs/zomato-plus-identity-poster.jpg",
     },
     masthead: {
       type: "video",

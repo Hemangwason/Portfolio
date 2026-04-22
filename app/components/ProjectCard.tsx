@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Project } from "../data/projects";
 import { GradientMesh, variantFor } from "./GradientMesh";
@@ -35,15 +35,11 @@ export function ProjectCard({ project, index, onOpen }: Props) {
 
   return (
     <motion.article
-      className="group relative"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{
-        duration: 0.6,
-        delay: index * 0.04,
-        ease: [0.22, 1, 0.36, 1],
-      }}
+      // content-visibility lets the browser skip layout/paint for off-screen
+      // cards. contain-intrinsic-size reserves 420px so the scrollbar doesn't
+      // jump as cards below the fold render. Big win on the homepage's 11-card
+      // grid on low-end phones.
+      className="group relative [contain-intrinsic-size:auto_420px] [content-visibility:auto]"
     >
       <motion.div
         role="button"
@@ -143,6 +139,8 @@ function CardMedia({
       <img
         src={media.src}
         alt={media.alt ?? project.title}
+        loading="lazy"
+        decoding="async"
         className="absolute inset-0 h-full w-full object-cover"
       />
     );
@@ -156,43 +154,67 @@ function CardMedia({
   );
 }
 
-// Pauses card videos when they scroll out of view so the browser isn't
-// decoding six clips at once — keeps the /play grid smooth. `preload="metadata"`
-// defers most of the download until the browser decides to play.
+// Poster-first, deferred-mount video card. The <video> element doesn't even
+// enter the DOM until the card is within 200px of the viewport — so 11 cards
+// on the home page don't mean 11 decoders + 11 network fetches on load. Once
+// mounted, preload="none" keeps the network quiet until the user is actually
+// looking at it (40%+ in view), and we pause when they scroll away. The
+// static poster image carries the visual the whole time.
 function LazyCardVideo({ src, poster }: { src: string; poster?: string }) {
-  const ref = useRef<HTMLVideoElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [shouldMount, setShouldMount] = useState(false);
+  const [inView, setInView] = useState(false);
 
   useEffect(() => {
-    const el = ref.current;
+    const el = wrapRef.current;
     if (!el || typeof IntersectionObserver === "undefined") return;
 
     const io = new IntersectionObserver(
       ([entry]) => {
-        const v = ref.current;
-        if (!v) return;
-        if (entry.isIntersecting) {
-          v.play().catch(() => {});
-        } else {
-          v.pause();
-        }
+        // Once the card has come near the viewport, keep the video mounted
+        // so we don't flap DOM nodes on minor scrolls.
+        if (entry.isIntersecting) setShouldMount(true);
+        // Only actually play when the card is meaningfully visible — keeps
+        // concurrent decoders down on phones in a 2-col grid.
+        setInView(entry.isIntersecting && entry.intersectionRatio >= 0.4);
       },
-      { threshold: 0.15 },
+      { threshold: [0, 0.4], rootMargin: "200px" },
     );
     io.observe(el);
     return () => io.disconnect();
   }, []);
 
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (inView) v.play().catch(() => {});
+    else v.pause();
+  }, [inView, shouldMount]);
+
   return (
-    <video
-      ref={ref}
-      src={src}
-      poster={poster}
-      autoPlay
-      muted
-      loop
-      playsInline
-      preload="metadata"
-      className="absolute inset-0 h-full w-full object-cover"
-    />
+    <div ref={wrapRef} className="absolute inset-0 h-full w-full">
+      {poster && !shouldMount && (
+        <img
+          src={poster}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      )}
+      {shouldMount && (
+        <video
+          ref={videoRef}
+          src={src}
+          poster={poster}
+          muted
+          loop
+          playsInline
+          preload="none"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      )}
+    </div>
   );
 }
