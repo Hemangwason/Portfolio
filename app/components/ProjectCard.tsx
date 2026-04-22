@@ -53,7 +53,7 @@ export function ProjectCard({ project, index, onOpen }: Props) {
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
       >
         {/* Media area */}
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative h-48 overflow-hidden bg-black/[0.04]">
           <CardMedia project={project} seed={seed} />
 
           {/* floating meta chip */}
@@ -141,7 +141,7 @@ function CardMedia({
         alt={media.alt ?? project.title}
         loading="lazy"
         decoding="async"
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-contain"
       />
     );
   }
@@ -200,7 +200,7 @@ function LazyCardVideo({ src, poster }: { src: string; poster?: string }) {
           alt=""
           loading="lazy"
           decoding="async"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-contain"
         />
       )}
       {shouldMount && (
@@ -212,7 +212,7 @@ function LazyCardVideo({ src, poster }: { src: string; poster?: string }) {
           loop
           playsInline
           preload="none"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-contain"
         />
       )}
     </div>

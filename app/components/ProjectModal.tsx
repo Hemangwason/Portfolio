@@ -121,7 +121,7 @@ function ProjectModalBody({
       </button>
 
       {/* Masthead */}
-      <div className="relative aspect-video w-full overflow-hidden">
+      <div className="relative aspect-video w-full overflow-hidden bg-black/[0.04]">
         <MastheadMedia project={project} seed={meshSeed} />
 
         {/* overlay chip */}
@@ -241,7 +241,7 @@ function MastheadMedia({
         muted
         loop
         playsInline
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-contain"
       />
     );
   }
@@ -251,7 +251,7 @@ function MastheadMedia({
       <img
         src={media.src}
         alt={media.alt ?? project.title}
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-contain"
       />
     );
   }
