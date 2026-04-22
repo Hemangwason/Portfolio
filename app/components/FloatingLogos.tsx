@@ -21,14 +21,14 @@ const desktopItems: FloatingItem[] = [
   { key: "spotify", style: { top: "8%", left: "5%" }, rotate: -6, delay: 0.1 },
   { key: "vimeo", style: { top: "10%", right: "6%" }, rotate: 5, delay: 0.2 },
   {
-    key: "templerun",
+    key: "youtube",
     style: { top: "16%", left: "26%" },
     rotate: -3,
     delay: 0.3,
     withLabel: false,
   },
   {
-    key: "clash",
+    key: "github",
     style: { top: "14%", right: "28%" },
     rotate: 4,
     delay: 0.35,

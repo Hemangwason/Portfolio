@@ -8,7 +8,6 @@ type Site = {
   domain: string;
   tagline: string;
   role: string;
-  accent: string;
 };
 
 const sites: Site[] = [
@@ -18,7 +17,6 @@ const sites: Site[] = [
     domain: "jexlindesigns.com",
     tagline: "Interior studio · brand & site",
     role: "Identity, site, art direction",
-    accent: "linear-gradient(135deg, #d4a574 0%, #8b6f47 100%)",
   },
   {
     name: "Sidetake",
@@ -26,7 +24,6 @@ const sites: Site[] = [
     domain: "sidetake.com",
     tagline: "Studio of small experiments",
     role: "Brand, site, systems",
-    accent: "linear-gradient(135deg, #3d5afe 0%, #1e40ff 100%)",
   },
   {
     name: "The Lab Mag",
@@ -34,7 +31,6 @@ const sites: Site[] = [
     domain: "thelabmagofficial.com",
     tagline: "Editorial · culture & art",
     role: "Editorial design, web build",
-    accent: "linear-gradient(135deg, #0a0a0a 0%, #2a2a2a 100%)",
   },
   {
     name: "McKinley Rice",
@@ -42,7 +38,6 @@ const sites: Site[] = [
     domain: "mckinleyrice.com",
     tagline: "Talent network · global",
     role: "Site design, narrative flow",
-    accent: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
   },
 ];
 
@@ -68,24 +63,28 @@ export function LiveSites() {
           }}
           whileHover={reduce ? undefined : { y: -4 }}
         >
-          {/* color block / accent */}
-          <div
-            className="relative h-32 overflow-hidden"
-            style={{ background: site.accent }}
-          >
-            <div
-              className="absolute inset-0 opacity-30"
-              style={{
-                backgroundImage:
-                  "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.4), transparent 50%)",
-              }}
-            />
-            <span className="pointer-events-none absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-white/20 px-2.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-white backdrop-blur-md">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+          {/* preview area — blank browser canvas, ready for a screenshot */}
+          <div className="relative h-36 overflow-hidden border-b border-black/8 bg-white">
+            {/* faux browser chrome */}
+            <div className="flex items-center gap-2 border-b border-black/6 bg-black/[0.02] px-3 py-2">
+              <span className="flex gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-black/12" />
+                <span className="h-2 w-2 rounded-full bg-black/12" />
+                <span className="h-2 w-2 rounded-full bg-black/12" />
+              </span>
+              <span className="ml-1 truncate font-mono text-[10px] text-black/35">
+                {site.domain}
+              </span>
+            </div>
+            {/* blank canvas */}
+            <div className="absolute inset-x-0 bottom-0 top-[34px] bg-white" />
+
+            <span className="pointer-events-none absolute right-3 top-[42px] inline-flex items-center gap-1.5 rounded-full border border-black/8 bg-white/90 px-2.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-black/65 backdrop-blur-md">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
               live
             </span>
             <span
-              className="pointer-events-none absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-white/90 text-black opacity-0 transition-all duration-300 group-hover:opacity-100"
+              className="pointer-events-none absolute right-3 bottom-3 grid h-8 w-8 place-items-center rounded-full bg-black/85 text-white opacity-0 transition-all duration-300 group-hover:opacity-100"
               aria-hidden
             >
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -98,10 +97,6 @@ export function LiveSites() {
                 />
               </svg>
             </span>
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/30"
-            />
           </div>
 
           {/* content */}

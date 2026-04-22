@@ -67,7 +67,7 @@ export function ProjectModal({ project, onClose }: Props) {
           <motion.div
             ref={contentRef}
             tabIndex={-1}
-            className="glass-strong relative my-auto w-full max-w-3xl overflow-hidden rounded-[20px] outline-none sm:rounded-[24px]"
+            className="glass-strong relative my-auto w-full max-w-[560px] overflow-hidden rounded-[20px] outline-none sm:rounded-[22px]"
             initial={{ opacity: 0, y: 30, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.98 }}
@@ -121,7 +121,7 @@ function ProjectModalBody({
       </button>
 
       {/* Masthead */}
-      <div className="relative aspect-[16/9] w-full overflow-hidden">
+      <div className="relative aspect-[5/2] w-full overflow-hidden">
         <MastheadMedia project={project} seed={meshSeed} />
 
         {/* overlay chip */}
@@ -143,21 +143,21 @@ function ProjectModalBody({
       </div>
 
       {/* Body */}
-      <div className="relative max-h-[70vh] overflow-y-auto px-5 py-6 sm:px-6 sm:py-8 md:max-h-[60vh] md:px-10 md:py-10">
+      <div className="relative max-h-[68vh] overflow-y-auto px-5 py-5 sm:px-6 sm:py-6 md:max-h-[58vh] md:px-7 md:py-7">
         <header>
           <h2
             id={`modal-title-${project.id}`}
-            className="text-[clamp(1.8rem,3.5vw,2.6rem)] font-semibold leading-[0.95] tracking-tight text-black"
+            className="text-[clamp(1.5rem,2.6vw,2rem)] font-semibold leading-[1] tracking-tight text-black"
           >
             {project.title}
           </h2>
-          <p className="mt-2 text-base text-black/55 md:text-lg">
+          <p className="mt-1.5 text-[14px] text-black/55 md:text-[15px]">
             {project.tagline}
           </p>
         </header>
 
         {/* Meta grid */}
-        <dl className="mt-8 grid grid-cols-2 gap-x-6 gap-y-4 border-y border-black/8 py-6 md:grid-cols-4">
+        <dl className="mt-6 grid grid-cols-2 gap-x-5 gap-y-3 border-y border-black/8 py-4">
           {project.role && (
             <MetaItem label="Role" value={project.role} />
           )}
@@ -169,11 +169,11 @@ function ProjectModalBody({
         </dl>
 
         {/* Writeup */}
-        <div className="mt-8 space-y-5">
+        <div className="mt-6 space-y-4">
           {project.writeup.map((p, i) => (
             <p
               key={i}
-              className="text-[15px] leading-relaxed text-black/75 md:text-base"
+              className="text-[14px] leading-relaxed text-black/75 md:text-[15px]"
             >
               {p}
             </p>
@@ -181,7 +181,7 @@ function ProjectModalBody({
         </div>
 
         {/* Tags */}
-        <div className="mt-8 flex flex-wrap gap-1.5">
+        <div className="mt-6 flex flex-wrap gap-1.5">
           {project.tags.map((t) => (
             <span
               key={t}
@@ -198,7 +198,7 @@ function ProjectModalBody({
             href={project.link.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-black px-4 py-2 text-[13px] font-semibold text-white transition-transform hover:-translate-y-0.5"
           >
             {project.link.label}
             <span aria-hidden>→</span>
