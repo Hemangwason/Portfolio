@@ -152,7 +152,7 @@ export function LiveSites() {
           transition={{
             duration: 0.55,
             delay: i * 0.05,
-            ease: [0.22, 1, 0.36, 1],
+            ease: [0.22, 1, 0.36, 1] as const,
           }}
           whileHover={reduce ? undefined : { y: -4 }}
         >

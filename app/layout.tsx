@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Hanken_Grotesk, Geist_Mono } from "next/font/google";
 import { Ghost } from "./components/Ghost";
+import { GhostProvider } from "./components/GhostContext";
 import "./globals.css";
 
 const hanken = Hanken_Grotesk({
@@ -49,8 +50,10 @@ export default function RootLayout({
       className={`${hanken.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-black">
-        {children}
-        <Ghost />
+        <GhostProvider>
+          {children}
+          <Ghost />
+        </GhostProvider>
       </body>
     </html>
   );

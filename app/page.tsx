@@ -2,10 +2,10 @@ import Link from "next/link";
 import { PlaygroundTitle } from "./components/PlaygroundTitle";
 import { FloatingLogos } from "./components/FloatingLogos";
 import { Marquee } from "./components/Marquee";
-import { ProjectGrid } from "./components/ProjectGrid";
+import { ProjectStory } from "./components/ProjectStory";
+import { GhostPicker } from "./components/GhostPicker";
 import { LogoBadge, LogoTile } from "./components/LogoTile";
 import { LiveSites } from "./components/LiveSites";
-import { platforms } from "./components/BrandLogos";
 import { projects } from "./data/projects";
 
 export default function Home() {
@@ -72,143 +72,50 @@ export default function Home() {
         />
       </section>
 
-      {/* LIVE SITES — shipped & in the wild */}
-      <section className="relative px-4 pt-16 pb-12 sm:px-6 sm:pt-24 sm:pb-16 md:pt-28">
+      {/* GHOST PICKER — pure delight between the marquee and the work */}
+      <GhostPicker />
+
+      {/* STORY INTRO — opens the chapter book */}
+      <section className="relative px-4 pt-10 pb-6 sm:px-6 sm:pt-16 sm:pb-10 md:pt-20">
+        <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
+          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-black/40">
+            ── selected work · {projects.length} chapters ──
+          </p>
+          <h2 className="mt-5 text-balance text-[clamp(2.4rem,6vw,4.4rem)] font-semibold leading-[0.95] tracking-tight">
+            A focused body of
+            <span className="brand-gradient-text"> product and visual </span>
+            work.
+          </h2>
+          <p className="mt-6 max-w-md text-[15px] leading-relaxed text-black/60">
+            Scroll to walk through one project at a time — what it
+            was, why it mattered, and what it took to ship.
+          </p>
+        </div>
+      </section>
+
+      {/* PROJECT STORY — one chapter per viewport */}
+      <ProjectStory projects={projects} />
+
+      {/* OUT IN THE WILD — live sites grid sits after the story */}
+      <section className="relative px-4 pt-12 pb-20 sm:px-6 sm:pt-20 sm:pb-24 md:pt-24">
         <div className="mx-auto max-w-6xl">
           <header className="mb-10 flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-black/40">
-                01 — Live in the wild
+                ── currently live
               </p>
               <h2 className="mt-3 text-[clamp(2rem,5.5vw,3.6rem)] font-semibold leading-[0.95] tracking-tight">
-                Sites I designed
-                <span className="brand-gradient-text"> from scratch</span>,
-                <br />
-                shipped &amp; live.
+                Out in the
+                <span className="brand-gradient-text"> wild.</span>
               </h2>
             </div>
             <p className="max-w-md text-sm text-black/60 md:text-right">
-              Identity, layout, and front-of-house — built end to end and
-              currently running in the open web.
+              Sites I designed end-to-end — identity, layout, and
+              front-of-house — running in the open web right now.
             </p>
           </header>
 
           <LiveSites />
-        </div>
-      </section>
-
-      {/* PROJECT WALL */}
-      <section className="relative px-4 pt-8 pb-20 sm:px-6 sm:pt-12 sm:pb-24 md:pb-32">
-        <div className="mx-auto max-w-6xl">
-          <header className="mb-12 flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-black/40">
-                02 — Selected work
-              </p>
-              <h2 className="mt-3 text-[clamp(2rem,5.5vw,3.6rem)] font-semibold leading-[0.95] tracking-tight">
-                A focused body of
-                <span className="brand-gradient-text"> product and visual </span>
-                work.
-              </h2>
-            </div>
-            <p className="max-w-md text-sm text-black/60 md:text-right">
-              Products I&apos;m building, brand systems, and in-app
-              motion shipped across the last two years.
-            </p>
-          </header>
-
-          <ProjectGrid projects={projects} />
-        </div>
-      </section>
-
-      {/* ELSEWHERE — platform links */}
-      <section className="relative px-4 pb-20 sm:px-6 sm:pb-24">
-        <div className="mx-auto max-w-6xl">
-          <header className="mb-10 flex flex-col items-start gap-3">
-            <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-black/40">
-              03 — Elsewhere
-            </p>
-            <h2 className="text-[clamp(1.8rem,4.5vw,3rem)] font-semibold leading-tight tracking-tight">
-              The corners of the internet I spend time in.
-            </h2>
-            <p className="max-w-xl text-sm text-black/60">
-              Playlists, films, design references, AI co-pilots I bounce
-              ideas off daily, and the games I play when the screens go
-              dark.
-            </p>
-          </header>
-
-          {(() => {
-            const aiKeys = new Set([
-              "claude",
-              "codex",
-              "cursor",
-              "chatgpt",
-              "gemini",
-              "grok",
-            ]);
-            // Vercel + Figma are tools, not hangouts — keep them out of this grid.
-            const visible = platforms.filter(
-              (p) => p.key !== "vercel" && p.key !== "figma",
-            );
-            const daily = visible.filter((p) => !aiKeys.has(p.key));
-            const ai = visible.filter((p) => aiKeys.has(p.key));
-
-            const Tile = (p: (typeof platforms)[number]) => (
-              <a
-                key={p.key}
-                href={p.href}
-                target={p.href.startsWith("http") ? "_blank" : undefined}
-                rel={
-                  p.href.startsWith("http")
-                    ? "noopener noreferrer"
-                    : undefined
-                }
-                className="glass group flex items-center gap-3 rounded-2xl p-3 transition-transform duration-300 hover:-translate-y-0.5"
-              >
-                <span
-                  className="grid h-11 w-11 place-items-center rounded-xl transition-transform group-hover:scale-105"
-                  style={{
-                    background: p.brand,
-                    color: p.textOnBrand ?? "#fff",
-                  }}
-                >
-                  <p.Icon className="h-5 w-5" />
-                </span>
-                <div className="flex flex-col leading-tight">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-black/45">
-                    {p.label}
-                  </span>
-                  <span className="text-sm font-semibold text-black">
-                    {p.name}
-                  </span>
-                </div>
-              </a>
-            );
-
-            return (
-              <div className="flex flex-col gap-8">
-                <div>
-                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-black/35">
-                    ── daily rotation
-                  </p>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                    {daily.map(Tile)}
-                  </div>
-                </div>
-
-                <div>
-                  <p className="mb-3 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-black/35">
-                    ── ai co-pilots
-                    <span className="inline-block h-1 w-1 rounded-full bg-emerald-500" />
-                  </p>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
-                    {ai.map(Tile)}
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
         </div>
       </section>
 

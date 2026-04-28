@@ -168,6 +168,35 @@ body {
   }
 }
 
+/* Bobs the ghost's hat / crown / headphones group up and down so the
+ * accessory looks like it's hovering just above the body instead of
+ * being glued on. Targets an SVG <g> — modern browsers support CSS
+ * transforms on SVG elements and translate in user-space units.
+ * Long 4.2 s loop with a softly-held apex so the hover reads as
+ * drifting, not bobbing — slower than the body so the two motions
+ * stay visibly out of sync. */
+@keyframes ghostAccFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45%,
+  55% {
+    transform: translateY(-4px);
+  }
+}
+.ghost-accessory-float {
+  animation: ghostAccFloat 4.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ghost-accessory-float {
+    animation: none;
+  }
+}
+
 .dotted-grid {
   background-image: radial-gradient(rgba(10, 10, 10, 0.07) 1px, transparent 1px);
   background-size: 22px 22px;
