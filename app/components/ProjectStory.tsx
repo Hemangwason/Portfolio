@@ -228,11 +228,11 @@ function ProjectChapter({
   const kindAccent =
     project.kind === "play" ? "var(--accent)" : "var(--brand)";
 
-  // Bigger parallax than before so each chapter feels like it physically
-  // arrives and departs as you scroll — not just a static slab. Media drifts
-  // ~120px through the section, watermark drifts the opposite direction at
-  // 2.5x the magnitude (the classic "near vs far depth" cue), and a gentle
-  // tilt sells the parallax even when nothing else is moving.
+  // Lighter parallax — translateY only. The previous setup ran translate
+  // + scale + rotate per chapter (5 useTransforms × 12 chapters = 60
+  // animated values per scroll frame), which thrashed paint on slower
+  // devices. translateY alone composites cheaply on the GPU layer and
+  // still sells the depth cue when paired with the watermark drift.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
@@ -240,22 +240,12 @@ function ProjectChapter({
   const stageY = useTransform(
     scrollYProgress,
     [0, 1],
-    reduce ? [0, 0] : [120, -120],
-  );
-  const stageScale = useTransform(
-    scrollYProgress,
-    [0, 0.5, 1],
-    reduce ? [1, 1, 1] : [0.88, 1, 0.94],
-  );
-  const stageRotate = useTransform(
-    scrollYProgress,
-    [0, 0.5, 1],
-    reduce ? [0, 0, 0] : flipped ? [-2.5, 0, 2.5] : [2.5, 0, -2.5],
+    reduce ? [0, 0] : [60, -60],
   );
   const watermarkY = useTransform(
     scrollYProgress,
     [0, 1],
-    reduce ? [0, 0] : [240, -240],
+    reduce ? [0, 0] : [120, -120],
   );
   const watermarkOpacity = useTransform(
     scrollYProgress,
@@ -271,6 +261,10 @@ function ProjectChapter({
     <section
       ref={sectionRef}
       aria-labelledby={`chapter-title-${project.id}`}
+      // content-visibility:auto + reserved size lets the browser skip
+      // layout/paint for chapters not currently in (or near) the viewport.
+      // With 12 chapters that's a real win on long scrolls.
+      style={{ contentVisibility: "auto", containIntrinsicSize: "auto 720px" }}
       className="relative flex min-h-[88svh] w-full items-center overflow-hidden px-4 py-12 sm:px-6 sm:py-16"
     >
       {/* Massive chapter-number watermark — graphic anchor, not text.
@@ -295,7 +289,7 @@ function ProjectChapter({
           {/* Media stage */}
           <motion.div
             className={`md:col-span-7 ${flipped ? "md:order-2" : "md:order-1"}`}
-            style={{ y: stageY, scale: stageScale, rotate: stageRotate }}
+            style={{ y: stageY, willChange: "transform" }}
           >
             <motion.div
               role="button"
