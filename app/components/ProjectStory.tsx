@@ -54,15 +54,22 @@ const CHAPTER_BG_FALLBACK = [
   "#DCD5C7",
 ];
 
-// White-bookend the story so the chapter river enters from white
-// (the "selected work" intro) and exits to white (the live-sites grid).
-const STORY_BOOKEND = "#FFFFFF";
-
 function bgForProject(p: Project, index: number): string {
   return (
     CHAPTER_BG[p.id] ??
     CHAPTER_BG_FALLBACK[index % CHAPTER_BG_FALLBACK.length]
   );
+}
+
+// Fade bookend = the adjacent chapter color with 0 alpha. CSS interpolates
+// the gradient stop from "first-chapter color, fully transparent" to
+// "first-chapter color, fully opaque" — the hue stays steady while alpha
+// ramps, so the body's bg shows through the top/bottom of the river
+// instead of a hard white slab. Eliminates the seam between the story's
+// gradient and the surrounding sections.
+function fadeBookend(hex: string): string {
+  const h = hex.replace("#", "");
+  return `#${h}00`;
 }
 
 // One project per viewport. Each section is a "chapter" — big media stage on
@@ -81,14 +88,14 @@ export function ProjectStory({ projects }: Props) {
   // chapter's color pinned to its own center. CSS interpolates linearly
   // between adjacent stops, so the bg is literally one uninterrupted
   // gradient — no section has its own background, no seams to mismatch,
-  // no hard edges anywhere. White bookends at 0% / 100% blend the river
-  // into the white sections above (intro) and below (live sites).
-  const stops = [`${STORY_BOOKEND} 0%`];
+  // no hard edges anywhere. Bookends fade the same hue to alpha 0 so the
+  // body bg shows through the top/bottom edges with no hard color step.
+  const stops = [`${fadeBookend(colors[0])} 0%`];
   colors.forEach((c, i) => {
     const pct = ((i + 0.5) / colors.length) * 100;
     stops.push(`${c} ${pct.toFixed(2)}%`);
   });
-  stops.push(`${STORY_BOOKEND} 100%`);
+  stops.push(`${fadeBookend(colors[colors.length - 1])} 100%`);
   const riverGradient = `linear-gradient(to bottom, ${stops.join(", ")})`;
 
   return (
