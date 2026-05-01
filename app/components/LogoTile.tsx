@@ -42,6 +42,28 @@ const sizeMap: Record<
   },
 };
 
+// Shared "candy 3D" tile treatment so the platform tiles in the hero
+// floating logos and the footer badges read in the same render-language
+// as the carousel icon bar's active pill: a vertical gradient that
+// derives a lighter top and darker bottom from the brand colour, an
+// inset top-highlight + bottom-shadow for the embossed glass feel, plus
+// a tight contact shadow + a soft floor shadow for grounded depth.
+const tileStyle = (brand: string): CSSProperties => ({
+  background: `linear-gradient(180deg, color-mix(in oklab, ${brand} 70%, white) 0%, ${brand} 55%, color-mix(in oklab, ${brand} 88%, black) 100%)`,
+  boxShadow: [
+    "0 1px 0 rgba(255,255,255,0.55) inset",
+    "0 -1px 1px rgba(0,0,0,0.12) inset",
+    "0 6px 14px rgba(15,23,42,0.12)",
+    "0 1px 2px rgba(15,23,42,0.08)",
+  ].join(", "),
+});
+
+const tileIconStyle: CSSProperties = {
+  // Subtle drop shadow lifts the brand glyph off the gradient just like
+  // the SVG icons in the carousel bar.
+  filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.22))",
+};
+
 export function LogoTile({
   platformKey,
   size = "md",
@@ -61,9 +83,9 @@ export function LogoTile({
     >
       <span
         className={`relative grid place-items-center ${s.tile}`}
-        style={{ background: brand, color: textOnBrand }}
+        style={{ ...tileStyle(brand), color: textOnBrand }}
       >
-        <Icon className={s.icon} />
+        <Icon className={s.icon} style={tileIconStyle} />
       </span>
       {withLabel && (
         <div className="flex flex-col leading-tight">
@@ -121,10 +143,10 @@ export function LogoBadge({
   return (
     <span
       className={`relative grid place-items-center ${s.tile} ${className}`}
-      style={{ background: brand, color: textOnBrand }}
+      style={{ ...tileStyle(brand), color: textOnBrand }}
       aria-label={platform.name}
     >
-      <Icon className={s.icon} />
+      <Icon className={s.icon} style={tileIconStyle} />
     </span>
   );
 }

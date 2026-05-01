@@ -28,9 +28,19 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), "Helvetica Neue", Helvetica, Arial, sans-serif;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Horizontal-overflow guard. We use `clip` instead of `hidden` so the
+   document does NOT establish a scroll container. `overflow: hidden` on
+   html/body hijacks the scroll context and breaks `position: sticky`
+   for every descendant — that's how the carousel pin was failing.
+   `clip` blocks overflow without creating a scrollport, so sticky pins
+   continue to bind to the viewport as expected. */
+html,
+body {
+  overflow-x: clip;
 }
 
 body {

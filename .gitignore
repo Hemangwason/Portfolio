@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# claude code session state
+/.claude/scheduled_tasks.lock
+
+# raw recordings dumped at repo root — keep source media in
+# /public/projects/ instead so it ships as an addressable asset.
+/*.mov
+/Screen Recording*.mp4
+/Comp*.mp4
+/Demo walkthrough*.mp4

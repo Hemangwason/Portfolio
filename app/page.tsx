@@ -1,12 +1,12 @@
-import Link from "next/link";
 import { PlaygroundTitle } from "./components/PlaygroundTitle";
 import { FloatingLogos } from "./components/FloatingLogos";
 import { Marquee } from "./components/Marquee";
-import { ProjectStory } from "./components/ProjectStory";
+import { PinnedShowcase } from "./components/PinnedShowcase";
 import { GhostPicker } from "./components/GhostPicker";
-import { LogoBadge, LogoTile } from "./components/LogoTile";
+import { LogoBadge } from "./components/LogoTile";
 import { LiveSites } from "./components/LiveSites";
 import { projects } from "./data/projects";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -72,108 +72,20 @@ export default function Home() {
         />
       </section>
 
-      {/* GHOST PICKER — pure delight between the marquee and the work */}
+      {/* GHOST PICKER — last text moment before the wall of work */}
       <GhostPicker />
 
-      {/* STORY INTRO — opens the chapter book */}
-      <section className="relative px-4 pt-10 pb-6 sm:px-6 sm:pt-16 sm:pb-10 md:pt-20">
-        <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-black/40">
-            ── selected work · {projects.length} chapters ──
-          </p>
-          <h2 className="mt-5 text-balance text-[clamp(2.4rem,6vw,4.4rem)] font-semibold leading-[0.95] tracking-tight">
-            A focused body of
-            <span className="brand-gradient-text"> product and visual </span>
-            work.
-          </h2>
-          <p className="mt-6 max-w-md text-[15px] leading-relaxed text-black/60">
-            Scroll to walk through one project at a time — what it
-            was, why it mattered, and what it took to ship.
-          </p>
-        </div>
-      </section>
+      {/* PINNED HORIZONTAL SHOWCASE — vertical scroll drives a
+          horizontal traverse through every project, with a sticky
+          icon bar at the top to jump between them. After ghosts the
+          page stops feeling like a vertical document and starts
+          feeling like a deck. */}
+      <PinnedShowcase projects={projects} />
 
-      {/* PROJECT STORY — one chapter per viewport */}
-      <ProjectStory projects={projects} />
-
-      {/* OUT IN THE WILD — live sites grid sits after the story */}
-      <section className="relative px-4 pt-12 pb-20 sm:px-6 sm:pt-20 sm:pb-24 md:pt-24">
-        <div className="mx-auto max-w-6xl">
-          <header className="mb-10 flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-black/40">
-                ── currently live
-              </p>
-              <h2 className="mt-3 text-[clamp(2rem,5.5vw,3.6rem)] font-semibold leading-[0.95] tracking-tight">
-                Out in the
-                <span className="brand-gradient-text"> wild.</span>
-              </h2>
-            </div>
-            <p className="max-w-md text-sm text-black/60 md:text-right">
-              Sites I designed end-to-end — identity, layout, and
-              front-of-house — running in the open web right now.
-            </p>
-          </header>
-
-          <LiveSites />
-        </div>
-      </section>
-
-      {/* SPLIT CTA */}
+      {/* LIVE SITES — second wall of visual work, no header text */}
       <section className="relative px-4 pb-20 sm:px-6 sm:pb-24">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2">
-          <Link
-            href="/play"
-            className="glass-strong group relative flex min-h-[260px] flex-col justify-between overflow-hidden rounded-[24px] p-6 transition-transform duration-500 hover:-translate-y-1 sm:min-h-[320px] sm:rounded-[28px] sm:p-8"
-          >
-            <div className="flex items-center gap-3">
-              <LogoTile platformKey="figma" size="sm" withLabel={false} noLink />
-              <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-black/50">
-                /play · visual
-              </span>
-            </div>
-            <div>
-              <h3 className="text-[clamp(1.8rem,4vw,2.8rem)] font-semibold leading-[0.95] tracking-tight">
-                Illustrations, type &amp;
-                <br />
-                <span className="brand-gradient-text">motion for apps.</span>
-              </h3>
-              <p className="mt-4 max-w-md text-sm text-black/60">
-                Visual work that lives inside the product — illustrations,
-                empty states, and the small details that give a shipped
-                app its feel.
-              </p>
-            </div>
-            <span className="mt-10 font-mono text-xs uppercase tracking-[0.2em] text-black/70 sm:mt-14">
-              Open play →
-            </span>
-          </Link>
-
-          <Link
-            href="/ground"
-            className="glass-strong group relative flex min-h-[260px] flex-col justify-between overflow-hidden rounded-[24px] p-6 transition-transform duration-500 hover:-translate-y-1 sm:min-h-[320px] sm:rounded-[28px] sm:p-8"
-          >
-            <div className="flex items-center gap-3">
-              <LogoTile platformKey="claude" size="sm" withLabel={false} noLink />
-              <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-black/50">
-                /ground · product
-              </span>
-            </div>
-            <div>
-              <h3 className="text-[clamp(1.8rem,4vw,2.8rem)] font-semibold leading-[0.95] tracking-tight">
-                Apps, flows &amp;
-                <br />
-                <span className="brand-gradient-text">shipped software.</span>
-              </h3>
-              <p className="mt-4 max-w-md text-sm text-black/60">
-                Product work — research, information architecture, and
-                the rigour of shipping things people use every week.
-              </p>
-            </div>
-            <span className="mt-10 font-mono text-xs uppercase tracking-[0.2em] text-black/70 sm:mt-14">
-              Open ground →
-            </span>
-          </Link>
+        <div className="mx-auto max-w-6xl">
+          <LiveSites />
         </div>
       </section>
 
