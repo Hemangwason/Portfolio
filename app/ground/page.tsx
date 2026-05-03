@@ -127,8 +127,8 @@ export default function GroundPage() {
 
       {/* CASE STUDIES */}
       <section className="relative px-4 pb-16 sm:px-6 sm:pb-24">
-        <div className="mx-auto max-w-6xl">
-          <header className="mb-12 flex flex-col items-start gap-3">
+        <div className="mx-auto max-w-7xl">
+          <header className="mb-16 flex flex-col items-start gap-3 sm:mb-20">
             <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-[var(--ink-faint)]">
               02 — Selected case studies
             </p>
@@ -136,15 +136,11 @@ export default function GroundPage() {
               Case studies, <span className="serif-italic font-light">written properly.</span>
             </h2>
             <p className="max-w-xl text-sm text-[var(--ink-base)]">
-              Each tile is a preview. Full case studies land here
-              progressively through 2026.
+              Click any tile to open the full case study.
             </p>
           </header>
 
-          <ProjectGrid
-            projects={productProjects}
-            className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
-          />
+          <ProjectGrid projects={productProjects} />
         </div>
       </section>
 

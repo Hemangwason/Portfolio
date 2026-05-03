@@ -5,7 +5,8 @@ import { PinnedShowcase } from "./components/PinnedShowcase";
 import { GhostPicker } from "./components/GhostPicker";
 import { LogoBadge } from "./components/LogoTile";
 import { LiveSites } from "./components/LiveSites";
-import { projects } from "./data/projects";
+import { DimensionDoors } from "./components/DimensionDoors";
+import { featuredProjects } from "./data/projects";
 import Link from "next/link";
 
 export default function Home() {
@@ -75,12 +76,15 @@ export default function Home() {
       {/* GHOST PICKER — last text moment before the wall of work */}
       <GhostPicker />
 
-      {/* PINNED HORIZONTAL SHOWCASE — vertical scroll drives a
-          horizontal traverse through every project, with a sticky
-          icon bar at the top to jump between them. After ghosts the
-          page stops feeling like a vertical document and starts
-          feeling like a deck. */}
-      <PinnedShowcase projects={projects} />
+      {/* PINNED HORIZONTAL SHOWCASE — six hand-picked projects that
+          alternate ground / play. The full archive lives on the
+          dedicated dimension routes via the doors below. */}
+      <PinnedShowcase projects={featuredProjects} />
+
+      {/* DIMENSION DOORS — last move before the page lets the visitor
+          choose their own depth: full product archive on /ground or
+          full visual archive on /play. */}
+      <DimensionDoors />
 
       {/* LIVE SITES — second wall of visual work, no header text */}
       <section className="relative px-4 pb-20 sm:px-6 sm:pb-24">

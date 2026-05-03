@@ -2,6 +2,8 @@ export type ProjectMedia =
   | { type: "image"; src: string; alt?: string; bg?: string }
   | { type: "video"; src: string; poster?: string; bg?: string };
 
+export type ProjectCountry = { flag: string; label: string };
+
 export type Project = {
   id: string;
   title: string;
@@ -23,6 +25,8 @@ export type Project = {
   client?: string;
   /** Override the meta label for `client` (default: "Client"). */
   clientLabel?: string;
+  /** Origin chip shown bottom-right of the card thumbnail. Defaults to India. */
+  country?: ProjectCountry;
   link?: { label: string; href: string };
 };
 
@@ -379,3 +383,19 @@ export const projects: Project[] = [
 
 export const productProjects = projects.filter((p) => p.kind === "ground");
 export const visualProjects = projects.filter((p) => p.kind === "play");
+
+// Hand-curated home-carousel order — alternates ground / play so the
+// horizontal swipe never feels like a single-discipline lump. Six is
+// the cap; the rest live on /ground and /play.
+const FEATURED_IDS = [
+  "sidetake", // ground
+  "healthy-high-five", // play
+  "sidetalk", // ground
+  "asia-cup-2025", // play
+  "jexlin", // ground
+  "independence-day-banner", // play
+] as const;
+
+export const featuredProjects: Project[] = FEATURED_IDS.map((id) =>
+  projects.find((p) => p.id === id),
+).filter((p): p is Project => Boolean(p));

@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Explicitly point Tailwind v4 at our source tree so newly-created
+   files under app/ are reliably picked up by Turbopack-driven dev. */
+@source "./**/*.{ts,tsx}";
+
 /* dual-dimension theme tokens — light default; dark applies to /play and /ground */
 
 :root {

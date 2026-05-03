@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { Project } from "../data/projects";
+import type { Project, ProjectCountry } from "../data/projects";
 import { GradientMesh, variantFor } from "./GradientMesh";
 
 type Props = {
@@ -17,11 +17,14 @@ const variantByProject: Record<string, number> = {
   crater: 5,
 };
 
+const DEFAULT_COUNTRY: ProjectCountry = { flag: "🇮🇳", label: "India" };
+
 export function ProjectCard({ project, index, onOpen }: Props) {
-  const kindLabel = project.kind === "play" ? "VISUALS" : "PRODUCT";
-  const kindAccent =
-    project.kind === "play" ? "var(--accent)" : "var(--brand)";
   const seed = variantByProject[project.id] ?? index;
+  const country = project.country ?? DEFAULT_COUNTRY;
+  // Brucira pattern: small label above the headline is the parent
+  // company / org. Falls back to project title when client isn't set.
+  const company = project.client ?? project.title;
 
   const handleClick = () => onOpen?.();
   const handleKey = (e: React.KeyboardEvent) => {
@@ -32,93 +35,66 @@ export function ProjectCard({ project, index, onOpen }: Props) {
   };
 
   return (
-    <article
-      // content-visibility lets the browser skip layout/paint for off-screen
-      // cards. contain-intrinsic-size reserves 420px so the scrollbar doesn't
-      // jump as cards below the fold render.
-      className="group relative [contain-intrinsic-size:auto_420px] [content-visibility:auto]"
-    >
+    <article className="group relative flex flex-col [contain-intrinsic-size:auto_640px] [content-visibility:auto]">
       <div
         role="button"
         tabIndex={0}
         onClick={handleClick}
         onKeyDown={handleKey}
         aria-label={`Open ${project.title}`}
-        className="card-hover glass-strong relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[22px] text-left outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
+        className="card-hover relative aspect-[4/3] w-full cursor-pointer overflow-hidden rounded-[22px] outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
+        style={{ backgroundColor: project.thumbnail?.bg ?? "var(--surface)" }}
       >
-        {/* Media */}
-        <div
-          className="relative aspect-[16/9] w-full overflow-hidden rounded-t-[22px]"
-          style={{ backgroundColor: project.thumbnail?.bg ?? "var(--surface)" }}
+        <CardMedia project={project} seed={seed} />
+
+        {/* Subtle inner ring keeps the rounded edge crisp on photographic thumbs. */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-[22px] ring-1 ring-inset ring-[var(--border)]"
+        />
+
+        {/* Country chip — sits bottom-right inside the thumbnail. */}
+        <span className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-black shadow-[0_4px_14px_rgba(0,0,0,0.18)] backdrop-blur-md">
+          <span className="text-[14px] leading-none" aria-hidden>
+            {country.flag}
+          </span>
+          <span>{country.label}</span>
+        </span>
+
+        {/* Hover open-arrow */}
+        <span
+          className="pointer-events-none absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-[var(--foreground)] text-[var(--background)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+          aria-hidden
         >
-          <CardMedia project={project} seed={seed} />
-
-          <span
-            className="pointer-events-none absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--ink)] backdrop-blur-md"
-            style={{
-              background: "var(--chip-bg)",
-              border: "1px solid var(--chip-border)",
-            }}
-          >
-            <span
-              className="h-1 w-1 rounded-full"
-              style={{ background: kindAccent }}
+          <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
+            <path
+              d="M3 9 L9 3 M9 3 L4.5 3 M9 3 L9 7.5"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
-            {kindLabel}
-            <span className="text-[var(--ink-mute)]">·</span>
-            {project.year}
-          </span>
+          </svg>
+        </span>
+      </div>
 
-          <span
-            className="pointer-events-none absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-[var(--foreground)] text-[var(--background)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-            aria-hidden
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path
-                d="M3 9 L9 3 M9 3 L4.5 3 M9 3 L9 7.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
-
-          <span
-            aria-hidden
-            className="pointer-events-none absolute inset-0 rounded-t-[22px] ring-1 ring-inset ring-[var(--border)]"
-          />
-        </div>
-
-        {/* Content */}
-        <div className="flex flex-1 flex-col gap-4 p-6">
-          <div>
-            <h3 className="text-[20px] font-semibold leading-tight tracking-tight text-[var(--foreground)]">
-              {project.title}
-            </h3>
-            <p className="mt-1 text-sm font-medium text-[var(--ink-soft)]">
-              {project.tagline}
-            </p>
-          </div>
-
-          <p className="text-sm leading-relaxed text-[var(--ink-base)]">
-            {project.blurb}
-          </p>
-
-          <div className="mt-auto flex flex-wrap gap-1.5 pt-2">
-            {project.tags.map((t) => (
-              <span
-                key={t}
-                className="rounded-full px-2.5 py-0.5 text-[11px] font-medium text-[var(--ink-base)] backdrop-blur-sm"
-                style={{
-                  background: "var(--tag-bg)",
-                  border: "1px solid var(--tag-border)",
-                }}
-              >
-                {t}
-              </span>
-            ))}
-          </div>
+      {/* Text block — sits OUTSIDE the card, brucira style. */}
+      <div className="mt-5 flex flex-col gap-3 sm:mt-6">
+        <p className="text-[15px] font-medium tracking-tight text-[var(--ink)]">
+          {company}
+        </p>
+        <h3 className="max-w-[28ch] text-[clamp(1.4rem,1.9vw,1.85rem)] font-semibold leading-[1.2] tracking-tight text-[var(--foreground)]">
+          {project.tagline}
+        </h3>
+        <div className="mt-1 flex flex-wrap gap-2">
+          {project.tags.map((t) => (
+            <span
+              key={t}
+              className="rounded-full border border-[var(--tag-border)] bg-[var(--tag-bg)] px-3 py-1 text-[12px] font-medium text-[var(--ink-base)]"
+            >
+              {t}
+            </span>
+          ))}
         </div>
       </div>
     </article>

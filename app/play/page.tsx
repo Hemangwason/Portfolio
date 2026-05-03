@@ -93,8 +93,8 @@ export default function PlayPage() {
 
       {/* GRID */}
       <section className="relative px-4 py-16 sm:px-6 sm:py-24">
-        <div className="mx-auto max-w-6xl">
-          <header className="mb-12 flex flex-col items-start gap-3">
+        <div className="mx-auto max-w-7xl">
+          <header className="mb-16 flex flex-col items-start gap-3 sm:mb-20">
             <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-[var(--ink-faint)]">
               01 — Visual archive
             </p>
@@ -103,15 +103,12 @@ export default function PlayPage() {
               <span className="serif-italic font-light">recent first.</span>
             </h2>
             <p className="max-w-xl text-sm text-[var(--ink-base)]">
-              Browse the archive. Each card will open a detailed
-              case-study view — for now they're tile previews.
+              Each card opens a full case study. Click anywhere on a
+              tile to dive in.
             </p>
           </header>
 
-          <ProjectGrid
-            projects={visualProjects}
-            className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
-          />
+          <ProjectGrid projects={visualProjects} />
         </div>
       </section>
 
