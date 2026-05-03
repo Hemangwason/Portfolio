@@ -6,6 +6,7 @@ import { SystemDiagram } from "../components/SystemDiagram";
 import { LogoTile } from "../components/LogoTile";
 import { platformByKey } from "../components/BrandLogos";
 import { productProjects } from "../data/projects";
+import { GroundProcess } from "../components/GroundProcess";
 
 export const metadata = {
   title: "/ground — Hemang's product work",
@@ -28,57 +29,43 @@ const stats = [
   { k: "0", v: "ego in the room" },
 ];
 
-const process = [
-  {
-    step: "01",
-    title: "Listen",
-    body: "Interviews, diary studies, quiet shadowing. I start from the user, not the roadmap.",
-  },
-  {
-    step: "02",
-    title: "Brainstorm",
-    body: "Paired sessions with Claude, Gemini, and Cursor. Not a replacement for taste — the collaborator that never tires of the 20th variant.",
-  },
-  {
-    step: "03",
-    title: "Draw",
-    body: "Whiteboards, pens, and Figma. Many versions. Most are bad — that's the point.",
-  },
-  {
-    step: "04",
-    title: "Ship",
-    body: "Design in the repo, not away from it. Specs are conversations, not handoffs.",
-  },
-  {
-    step: "05",
-    title: "Measure",
-    body: "Ship small, measure, adjust. Ego goes in the drawer for at least two sprints.",
-  },
-];
-
 export default function GroundPage() {
   return (
     <main className="relative flex w-full flex-col overflow-x-hidden">
       <BackHome accent="var(--brand)" />
 
       {/* HERO */}
-      <section className="relative flex min-h-[85svh] w-full items-center px-4 pb-12 pt-24 sm:px-6 sm:pb-16 sm:pt-28">
-        <div className="dotted-grid pointer-events-none absolute inset-0 opacity-40" aria-hidden />
+      <section className="relative flex min-h-[88svh] w-full items-center px-4 pb-12 pt-24 sm:px-6 sm:pb-16 sm:pt-28">
+        <div
+          className="dotted-grid pointer-events-none absolute inset-0 opacity-40"
+          aria-hidden
+        />
 
         <div className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-10 sm:gap-14 lg:grid-cols-[1.3fr_1fr]">
           <div>
-            <p className="glass mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-black/70">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand)]" />
-              /ground · product work
+            <p className="glass mb-6 inline-flex items-center gap-2.5 rounded-full px-3.5 py-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--ink)]">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="live-dot absolute inset-0 rounded-full bg-[var(--brand)]" />
+              </span>
+              <span>/ground · product work</span>
+              <span
+                aria-hidden
+                className="text-[var(--ink-mute)]"
+              >
+                ·
+              </span>
+              <span className="serif-italic text-[var(--ink-soft)]">
+                dark dim.
+              </span>
             </p>
 
-            <h1 className="hero-word text-[clamp(2.6rem,8.5vw,6.6rem)]">
-              Design for
+            <h1 className="hero-word text-[clamp(2.6rem,8.5vw,6.6rem)] text-[var(--foreground)]">
+              Design <span className="serif-italic font-light">for</span>
               <br />
               <span className="brand-gradient-text">people, not pages.</span>
             </h1>
 
-            <p className="mt-8 max-w-xl text-base leading-relaxed text-black/60 md:text-lg">
+            <p className="mt-8 max-w-xl text-base leading-relaxed text-[var(--ink-base)] md:text-lg">
               I lead product work end-to-end — research, information
               architecture, interaction, and systems. I care about the
               unglamorous screens that make software actually work.
@@ -86,11 +73,14 @@ export default function GroundPage() {
 
             <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
               {stats.map((s) => (
-                <div key={s.k} className="border-t border-black/20 pt-3">
-                  <p className="text-2xl font-semibold leading-tight tracking-tight">
+                <div
+                  key={s.k}
+                  className="border-t border-[var(--line-strong)] pt-3"
+                >
+                  <p className="text-2xl font-semibold leading-tight tracking-tight text-[var(--foreground)]">
                     {s.k}
                   </p>
-                  <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-black/50">
+                  <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--ink-faint)]">
                     {s.v}
                   </p>
                 </div>
@@ -99,15 +89,25 @@ export default function GroundPage() {
           </div>
 
           <div className="relative">
+            {/* Frame around the orbit diagram in dark mode */}
             <div className="glass-strong rounded-[28px] p-6">
               <SystemDiagram />
+              <div className="mt-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--ink-faint)]">
+                <span>fig. 01</span>
+                <span className="serif-italic normal-case tracking-tight text-[var(--ink-soft)]">
+                  user at the center
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* MARQUEE */}
-      <section className="border-y border-black/10 bg-[var(--soft-blue)] py-3 text-black">
+      <section
+        className="border-y border-[var(--line)] py-3 text-[var(--foreground)]"
+        style={{ background: "var(--soft-blue)" }}
+      >
         <Marquee
           words={[
             "research",
@@ -122,56 +122,20 @@ export default function GroundPage() {
         />
       </section>
 
-      {/* PROCESS */}
-      <section className="relative px-4 py-16 sm:px-6 sm:py-24">
-        <div className="mx-auto max-w-6xl">
-          <header className="mb-14 flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-black/40">
-                01 — How I work
-              </p>
-              <h2 className="mt-3 text-[clamp(1.8rem,5vw,3rem)] font-semibold leading-tight tracking-tight">
-                A small, stubborn process.
-              </h2>
-            </div>
-            <p className="max-w-sm text-sm text-black/60 md:text-right">
-              The same five moves on every project — from AI security
-              tools to streetwear storefronts.
-            </p>
-          </header>
-
-          <ol className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
-            {process.map((p) => (
-              <li
-                key={p.step}
-                className="glass relative flex flex-col rounded-2xl p-6"
-              >
-                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--brand)]">
-                  {p.step}
-                </span>
-                <h3 className="mt-3 text-lg font-semibold tracking-tight">
-                  {p.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-black/60">
-                  {p.body}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+      {/* PROCESS — animated stagger via client component */}
+      <GroundProcess />
 
       {/* CASE STUDIES */}
       <section className="relative px-4 pb-16 sm:px-6 sm:pb-24">
         <div className="mx-auto max-w-6xl">
           <header className="mb-12 flex flex-col items-start gap-3">
-            <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-black/40">
+            <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-[var(--ink-faint)]">
               02 — Selected case studies
             </p>
-            <h2 className="text-[clamp(1.8rem,5vw,3rem)] font-semibold leading-tight tracking-tight">
-              Case studies, written properly.
+            <h2 className="text-[clamp(1.8rem,5vw,3rem)] font-semibold leading-tight tracking-tight text-[var(--foreground)]">
+              Case studies, <span className="serif-italic font-light">written properly.</span>
             </h2>
-            <p className="max-w-xl text-sm text-black/60">
+            <p className="max-w-xl text-sm text-[var(--ink-base)]">
               Each tile is a preview. Full case studies land here
               progressively through 2026.
             </p>
@@ -188,13 +152,14 @@ export default function GroundPage() {
       <section className="relative px-4 pb-16 sm:px-6 sm:pb-24">
         <div className="glass-strong mx-auto flex max-w-6xl flex-col items-start gap-6 rounded-[24px] p-6 sm:rounded-[28px] sm:p-10 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-black/50">
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--ink-soft)]">
               03 — When the screens go dark
             </p>
-            <h3 className="mt-2 text-[clamp(1.4rem,3vw,2.2rem)] font-semibold leading-tight tracking-tight">
-              Communities &amp; games I'm in.
+            <h3 className="mt-2 text-[clamp(1.4rem,3vw,2.2rem)] font-semibold leading-tight tracking-tight text-[var(--foreground)]">
+              Communities <span className="serif-italic font-light">&amp;</span>{" "}
+              games I'm in.
             </h3>
-            <p className="mt-2 max-w-md text-sm text-black/60">
+            <p className="mt-2 max-w-md text-sm text-[var(--ink-base)]">
               Design communities on Discord &amp; Behance, and the
               quiet games that keep my attention span working.
             </p>
@@ -207,13 +172,19 @@ export default function GroundPage() {
         </div>
       </section>
 
-      {/* CONTACT STRIP */}
-      <section className="relative mx-4 mb-20 overflow-hidden rounded-[24px] bg-black px-6 py-10 text-white sm:mx-6 sm:mb-24 sm:rounded-[28px] sm:px-10 sm:py-14">
-        <div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-[var(--brand)] opacity-40 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-[var(--accent)] opacity-30 blur-3xl" />
+      {/* CONTACT STRIP — flat brand-tinted panel. The two giant
+          blurred radial blobs were the heaviest paint on the page;
+          a single linear-gradient gives the same depth for free. */}
+      <section
+        className="relative mx-4 mb-20 overflow-hidden rounded-[24px] border border-[var(--line-strong)] px-6 py-10 text-[var(--foreground)] sm:mx-6 sm:mb-24 sm:rounded-[28px] sm:px-10 sm:py-14"
+        style={{
+          background:
+            "linear-gradient(135deg, color-mix(in oklab, var(--brand) 22%, var(--background)) 0%, var(--background) 60%, color-mix(in oklab, var(--accent) 14%, var(--background)) 100%)",
+        }}
+      >
         <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-start justify-between gap-8 md:flex-row md:items-end">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.22em] opacity-60">
+            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--ink-soft)]">
               let's work together
             </p>
             <h3 className="mt-3 text-[clamp(1.8rem,4.5vw,3rem)] font-semibold leading-[0.95] tracking-tight">
@@ -224,17 +195,22 @@ export default function GroundPage() {
           </div>
           <a
             href="mailto:hemangwason@gmail.com"
-            className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition-transform hover:-translate-y-0.5"
+            className="group inline-flex items-center gap-2 rounded-full bg-[var(--foreground)] px-6 py-3 text-sm font-semibold text-[var(--background)] transition-transform hover:-translate-y-0.5"
           >
             Email me
-            <span aria-hidden>→</span>
+            <span
+              aria-hidden
+              className="transition-transform duration-300 group-hover:translate-x-0.5"
+            >
+              →
+            </span>
           </a>
         </div>
-        <p className="relative z-10 mt-10 max-w-md text-sm opacity-70">
+        <p className="relative z-10 mt-10 max-w-md text-sm text-[var(--ink-base)]">
           Or see the visual side at{" "}
           <Link
             href="/play"
-            className="font-semibold underline decoration-[var(--accent)] decoration-[2px] underline-offset-[5px]"
+            className="font-semibold text-[var(--foreground)] underline decoration-[var(--accent)] decoration-[2px] underline-offset-[5px]"
           >
             /play
           </Link>

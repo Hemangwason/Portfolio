@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
 import type { Project } from "../data/projects";
 import { GradientMesh, variantFor } from "./GradientMesh";
 
@@ -19,7 +18,6 @@ const variantByProject: Record<string, number> = {
 };
 
 export function ProjectCard({ project, index, onOpen }: Props) {
-  const reduce = useReducedMotion();
   const kindLabel = project.kind === "play" ? "VISUALS" : "PRODUCT";
   const kindAccent =
     project.kind === "play" ? "var(--accent)" : "var(--brand)";
@@ -34,45 +32,45 @@ export function ProjectCard({ project, index, onOpen }: Props) {
   };
 
   return (
-    <motion.article
+    <article
       // content-visibility lets the browser skip layout/paint for off-screen
       // cards. contain-intrinsic-size reserves 420px so the scrollbar doesn't
-      // jump as cards below the fold render. Big win on the homepage's 11-card
-      // grid on low-end phones.
+      // jump as cards below the fold render.
       className="group relative [contain-intrinsic-size:auto_420px] [content-visibility:auto]"
     >
-      <motion.div
+      <div
         role="button"
         tabIndex={0}
         onClick={handleClick}
         onKeyDown={handleKey}
         aria-label={`Open ${project.title}`}
-        className="glass-strong relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[22px] text-left outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
-        whileHover={reduce ? undefined : { y: -5 }}
-        whileTap={reduce ? undefined : { scale: 0.99 }}
-        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        className="card-hover glass-strong relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[22px] text-left outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
       >
-        {/* Media area */}
+        {/* Media */}
         <div
           className="relative aspect-[16/9] w-full overflow-hidden rounded-t-[22px]"
-          style={{ backgroundColor: project.thumbnail?.bg ?? "rgba(0,0,0,0.04)" }}
+          style={{ backgroundColor: project.thumbnail?.bg ?? "var(--surface)" }}
         >
           <CardMedia project={project} seed={seed} />
 
-          {/* floating meta chip */}
-          <span className="pointer-events-none absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/70 px-2.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-black/75 backdrop-blur-md">
+          <span
+            className="pointer-events-none absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--ink)] backdrop-blur-md"
+            style={{
+              background: "var(--chip-bg)",
+              border: "1px solid var(--chip-border)",
+            }}
+          >
             <span
               className="h-1 w-1 rounded-full"
               style={{ background: kindAccent }}
             />
             {kindLabel}
-            <span className="text-black/30">·</span>
+            <span className="text-[var(--ink-mute)]">·</span>
             {project.year}
           </span>
 
-          {/* open affordance — peeks on hover */}
           <span
-            className="pointer-events-none absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-black/70 text-white opacity-0 transition-all duration-300 group-hover:-translate-y-0 group-hover:opacity-100"
+            className="pointer-events-none absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-[var(--foreground)] text-[var(--background)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
             aria-hidden
           >
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -86,25 +84,24 @@ export function ProjectCard({ project, index, onOpen }: Props) {
             </svg>
           </span>
 
-          {/* subtle inner stroke */}
           <span
             aria-hidden
-            className="pointer-events-none absolute inset-0 rounded-t-[22px] ring-1 ring-inset ring-white/40"
+            className="pointer-events-none absolute inset-0 rounded-t-[22px] ring-1 ring-inset ring-[var(--border)]"
           />
         </div>
 
         {/* Content */}
         <div className="flex flex-1 flex-col gap-4 p-6">
           <div>
-            <h3 className="text-[20px] font-semibold leading-tight tracking-tight text-black">
+            <h3 className="text-[20px] font-semibold leading-tight tracking-tight text-[var(--foreground)]">
               {project.title}
             </h3>
-            <p className="mt-1 text-sm font-medium text-black/50">
+            <p className="mt-1 text-sm font-medium text-[var(--ink-soft)]">
               {project.tagline}
             </p>
           </div>
 
-          <p className="text-sm leading-relaxed text-black/65">
+          <p className="text-sm leading-relaxed text-[var(--ink-base)]">
             {project.blurb}
           </p>
 
@@ -112,15 +109,19 @@ export function ProjectCard({ project, index, onOpen }: Props) {
             {project.tags.map((t) => (
               <span
                 key={t}
-                className="rounded-full border border-black/8 bg-white/60 px-2.5 py-0.5 text-[11px] font-medium text-black/60 backdrop-blur-sm"
+                className="rounded-full px-2.5 py-0.5 text-[11px] font-medium text-[var(--ink-base)] backdrop-blur-sm"
+                style={{
+                  background: "var(--tag-bg)",
+                  border: "1px solid var(--tag-border)",
+                }}
               >
                 {t}
               </span>
             ))}
           </div>
         </div>
-      </motion.div>
-    </motion.article>
+      </div>
+    </article>
   );
 }
 
@@ -157,12 +158,6 @@ function CardMedia({
   );
 }
 
-// Poster-first, deferred-mount video card. The <video> element doesn't even
-// enter the DOM until the card is within 200px of the viewport — so 11 cards
-// on the home page don't mean 11 decoders + 11 network fetches on load. Once
-// mounted, preload="none" keeps the network quiet until the user is actually
-// looking at it (40%+ in view), and we pause when they scroll away. The
-// static poster image carries the visual the whole time.
 function LazyCardVideo({ src, poster }: { src: string; poster?: string }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -175,11 +170,7 @@ function LazyCardVideo({ src, poster }: { src: string; poster?: string }) {
 
     const io = new IntersectionObserver(
       ([entry]) => {
-        // Once the card has come near the viewport, keep the video mounted
-        // so we don't flap DOM nodes on minor scrolls.
         if (entry.isIntersecting) setShouldMount(true);
-        // Only actually play when the card is meaningfully visible — keeps
-        // concurrent decoders down on phones in a 2-col grid.
         setInView(entry.isIntersecting && entry.intersectionRatio >= 0.4);
       },
       { threshold: [0, 0.4], rootMargin: "200px" },

@@ -90,11 +90,15 @@ export function LogoTile({
       {withLabel && (
         <div className="flex flex-col leading-tight">
           <span
-            className={`font-mono uppercase tracking-[0.16em] text-black/50 ${s.label}`}
+            className={`font-mono uppercase tracking-[0.16em] text-[var(--ink-soft)] ${s.label}`}
           >
             {label}
           </span>
-          <span className={`font-semibold text-black ${s.name}`}>{name}</span>
+          <span
+            className={`font-semibold text-[var(--foreground)] ${s.name}`}
+          >
+            {name}
+          </span>
         </div>
       )}
     </div>

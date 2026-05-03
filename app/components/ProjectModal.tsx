@@ -25,7 +25,6 @@ export function ProjectModal({ project, onClose }: Props) {
     };
     window.addEventListener("keydown", onKey);
 
-    // Focus the modal for screen readers
     queueMicrotask(() => contentRef.current?.focus());
 
     return () => {
@@ -52,12 +51,17 @@ export function ProjectModal({ project, onClose }: Props) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] as const }}
         >
-          {/* Backdrop */}
+          {/* Backdrop — uses the theme's --backdrop token, so it's a
+              warm white wash on the home page and a deep ink wash on
+              the dark dimension. */}
           <motion.button
             aria-label="Close project"
             onClick={onClose}
-            className="fixed inset-0 -z-10 bg-white/50 backdrop-blur-[18px]"
-            style={{ WebkitBackdropFilter: "blur(18px)" }}
+            className="fixed inset-0 -z-10 backdrop-blur-[18px]"
+            style={{
+              background: "var(--backdrop)",
+              WebkitBackdropFilter: "blur(18px)",
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -102,7 +106,7 @@ function ProjectModalBody({
         type="button"
         onClick={onClose}
         aria-label="Close"
-        className="glass absolute right-3 top-3 z-20 grid h-10 w-10 place-items-center rounded-full text-black/70 transition-colors hover:bg-black hover:text-white sm:right-4 sm:top-4 sm:h-9 sm:w-9"
+        className="glass absolute right-3 top-3 z-20 grid h-10 w-10 place-items-center rounded-full text-[var(--ink)] transition-colors hover:bg-[var(--foreground)] hover:text-[var(--background)] sm:right-4 sm:top-4 sm:h-9 sm:w-9"
       >
         <svg
           width="14"
@@ -125,26 +129,32 @@ function ProjectModalBody({
         className="relative aspect-video w-full overflow-hidden"
         style={{
           backgroundColor:
-            project.masthead?.bg ?? project.thumbnail?.bg ?? "rgba(0,0,0,0.04)",
+            project.masthead?.bg ?? project.thumbnail?.bg ?? "var(--surface)",
         }}
       >
         <MastheadMedia project={project} seed={meshSeed} />
 
         {/* overlay chip */}
-        <span className="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/80 px-3 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-black/75 backdrop-blur-md">
+        <span
+          className="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--ink)] backdrop-blur-md"
+          style={{
+            background: "var(--chip-bg)",
+            border: "1px solid var(--chip-border)",
+          }}
+        >
           <span
             className="h-1.5 w-1.5 rounded-full"
             style={{ background: kindAccent }}
           />
           {kindLabel}
-          <span className="text-black/30">·</span>
+          <span className="text-[var(--ink-mute)]">·</span>
           {project.year}
         </span>
 
         {/* subtle inner stroke */}
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/40"
+          className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[var(--border)]"
         />
       </div>
 
@@ -153,17 +163,17 @@ function ProjectModalBody({
         <header>
           <h2
             id={`modal-title-${project.id}`}
-            className="text-[clamp(1.5rem,2.6vw,2rem)] font-semibold leading-[1] tracking-tight text-black"
+            className="text-[clamp(1.5rem,2.6vw,2rem)] font-semibold leading-[1] tracking-tight text-[var(--foreground)]"
           >
             {project.title}
           </h2>
-          <p className="mt-1.5 text-[14px] text-black/55 md:text-[15px]">
+          <p className="mt-1.5 text-[14px] text-[var(--ink-soft)] md:text-[15px]">
             {project.tagline}
           </p>
         </header>
 
         {/* Meta grid */}
-        <dl className="mt-6 grid grid-cols-2 gap-x-5 gap-y-3 border-y border-black/8 py-4">
+        <dl className="mt-6 grid grid-cols-2 gap-x-5 gap-y-3 border-y border-[var(--line)] py-4">
           {project.role && (
             <MetaItem label="Role" value={project.role} />
           )}
@@ -182,7 +192,7 @@ function ProjectModalBody({
           {project.writeup.map((p, i) => (
             <p
               key={i}
-              className="text-[14px] leading-relaxed text-black/75 md:text-[15px]"
+              className="text-[14px] leading-relaxed text-[var(--ink)] md:text-[15px]"
             >
               {p}
             </p>
@@ -194,7 +204,11 @@ function ProjectModalBody({
           {project.tags.map((t) => (
             <span
               key={t}
-              className="rounded-full border border-black/8 bg-white/60 px-2.5 py-0.5 text-[11px] font-medium text-black/60 backdrop-blur-sm"
+              className="rounded-full px-2.5 py-0.5 text-[11px] font-medium text-[var(--ink-base)] backdrop-blur-sm"
+              style={{
+                background: "var(--tag-bg)",
+                border: "1px solid var(--tag-border)",
+              }}
             >
               {t}
             </span>
@@ -207,7 +221,7 @@ function ProjectModalBody({
             href={project.link.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-black px-4 py-2 text-[13px] font-semibold text-white transition-transform hover:-translate-y-0.5"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-[var(--foreground)] px-4 py-2 text-[13px] font-semibold text-[var(--background)] transition-transform hover:-translate-y-0.5"
           >
             {project.link.label}
             <span aria-hidden>→</span>
@@ -221,10 +235,12 @@ function ProjectModalBody({
 function MetaItem({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-black/40">
+      <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--ink-faint)]">
         {label}
       </dt>
-      <dd className="mt-1 text-sm font-medium text-black/85">{value}</dd>
+      <dd className="mt-1 text-sm font-medium text-[var(--ink-strong)]">
+        {value}
+      </dd>
     </div>
   );
 }
@@ -270,10 +286,10 @@ function MastheadMedia({
         className="absolute inset-0 h-full w-full"
       />
       <div className="absolute inset-0 flex items-end justify-start p-5">
-        <span className="glass inline-flex items-center gap-2 rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-black/60">
+        <span className="glass inline-flex items-center gap-2 rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--ink-base)]">
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-black/40 opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-black/70" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--ink-soft)] opacity-60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--ink)]" />
           </span>
           masthead coming soon
         </span>

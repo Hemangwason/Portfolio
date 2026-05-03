@@ -50,7 +50,7 @@ export default function RootLayout({
       className={`${hanken.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body
-        className="min-h-full flex flex-col bg-white text-black"
+        className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]"
         suppressHydrationWarning
       >
         <GhostProvider>

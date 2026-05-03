@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
+/* dual-dimension theme tokens — light default; dark applies to /play and /ground */
+
 :root {
+  /* ── Light dimension (the home page) ───────────────────────────── */
   --background: #ffffff;
   --foreground: #0a0a0a;
   --muted: #6b7280;
@@ -11,6 +14,66 @@
   --accent: #7c3aed;
   --soft-blue: #eef2ff;
   --soft-purple: #f5f3ff;
+
+  --ink-strong: rgba(10, 10, 10, 0.92);
+  --ink: rgba(10, 10, 10, 0.78);
+  --ink-base: rgba(10, 10, 10, 0.65);
+  --ink-soft: rgba(10, 10, 10, 0.5);
+  --ink-faint: rgba(10, 10, 10, 0.4);
+  --ink-mute: rgba(10, 10, 10, 0.3);
+
+  --line: rgba(10, 10, 10, 0.1);
+  --line-strong: rgba(10, 10, 10, 0.2);
+
+  --card: rgba(255, 255, 255, 0.55);
+  --card-strong: rgba(255, 255, 255, 0.82);
+  --chip-bg: rgba(255, 255, 255, 0.72);
+  --chip-border: rgba(255, 255, 255, 0.55);
+  --tag-bg: rgba(255, 255, 255, 0.6);
+  --tag-border: rgba(10, 10, 10, 0.08);
+
+  --backdrop: rgba(255, 255, 255, 0.5);
+
+  --grid-dot: rgba(10, 10, 10, 0.07);
+
+  --font-serif: "Times New Roman", "Times", "Georgia", serif;
+}
+
+/* ── Dark dimension (/ground & /play) — true-black, near-zero bloom ─ */
+[data-theme="dark"] {
+  --background: #000000;
+  --foreground: #f5f4ef;
+  --muted: #8a8f99;
+  --border: rgba(255, 255, 255, 0.07);
+  --surface: rgba(255, 255, 255, 0.03);
+  --brand: #5b78ff;
+  --brand-ink: #8aa1ff;
+  --accent: #b794ff;
+  --soft-blue: #050a1c;
+  --soft-purple: #0a0618;
+
+  --ink-strong: rgba(245, 244, 239, 0.96);
+  --ink: rgba(245, 244, 239, 0.82);
+  --ink-base: rgba(245, 244, 239, 0.66);
+  --ink-soft: rgba(245, 244, 239, 0.5);
+  --ink-faint: rgba(245, 244, 239, 0.38);
+  --ink-mute: rgba(245, 244, 239, 0.26);
+
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+
+  --card: rgba(255, 255, 255, 0.025);
+  --card-strong: rgba(12, 12, 18, 0.7);
+  --chip-bg: rgba(255, 255, 255, 0.04);
+  --chip-border: rgba(255, 255, 255, 0.1);
+  --tag-bg: rgba(255, 255, 255, 0.035);
+  --tag-border: rgba(255, 255, 255, 0.08);
+
+  --backdrop: rgba(0, 0, 0, 0.78);
+
+  --grid-dot: rgba(255, 255, 255, 0.06);
+
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -32,37 +95,42 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Horizontal-overflow guard. We use `clip` instead of `hidden` so the
-   document does NOT establish a scroll container. `overflow: hidden` on
-   html/body hijacks the scroll context and breaks `position: sticky`
-   for every descendant — that's how the carousel pin was failing.
-   `clip` blocks overflow without creating a scrollport, so sticky pins
-   continue to bind to the viewport as expected. */
+/* `clip` blocks horizontal overflow without creating a scroll container, so
+   sticky descendants still bind to the viewport. */
 html,
 body {
   overflow-x: clip;
 }
 
+/* Single low-cost radial bloom on light mode — kept very faint. */
 body {
-  background-image:
-    radial-gradient(circle at 12% 8%, rgba(61, 90, 254, 0.06), transparent 40%),
-    radial-gradient(circle at 88% 20%, rgba(124, 58, 237, 0.05), transparent 42%),
-    radial-gradient(circle at 80% 92%, rgba(61, 90, 254, 0.04), transparent 45%);
+  background-image: radial-gradient(
+    circle at 75% 10%,
+    rgba(124, 58, 237, 0.04),
+    transparent 50%
+  );
+}
+
+/* Dark mode body: just a single subtle pin of color so the canvas isn't
+   a flat slab, but no full-screen multi-layer blur stack. */
+[data-theme="dark"] body {
+  background-image: radial-gradient(
+    ellipse 60% 40% at 78% 6%,
+    rgba(91, 120, 255, 0.07),
+    transparent 70%
+  );
 }
 
 .hero-word {
   font-family: var(--font-sans), "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 800;
   letter-spacing: -0.045em;
-  /* 1.0 keeps the p-descender on line 1 clear of the g-ascender on line 2 */
   line-height: 1;
 }
 
 .hero-word .letter {
   display: inline-block;
   transform-origin: 50% 80%;
-  /* CSS-driven entrance so the letters are guaranteed to render even when a
-     JS animation scheduler is paused (tab opened in background, etc). */
   animation: letterIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: var(--letter-delay, 0s);
 }
@@ -122,22 +190,34 @@ body {
   opacity: 1;
 }
 
+/* ── Glass surfaces. Backdrop-filter is the expensive bit here, so we
+   keep blur values modest (12–14px) instead of 16–22px. ─────────── */
 .glass {
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(16px) saturate(1.2);
-  -webkit-backdrop-filter: blur(16px) saturate(1.2);
-  border: 1px solid rgba(10, 10, 10, 0.06);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.6) inset,
-    0 10px 30px -10px rgba(10, 10, 10, 0.08);
+  background: var(--card);
+  backdrop-filter: blur(12px) saturate(1.15);
+  -webkit-backdrop-filter: blur(12px) saturate(1.15);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 20px -10px rgba(10, 10, 10, 0.08);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(22px) saturate(1.3);
-  -webkit-backdrop-filter: blur(22px) saturate(1.3);
-  border: 1px solid rgba(10, 10, 10, 0.06);
-  box-shadow: 0 20px 50px -25px rgba(10, 10, 10, 0.15);
+  background: var(--card-strong);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid var(--border);
+  box-shadow: 0 14px 32px -18px rgba(10, 10, 10, 0.18);
+}
+
+[data-theme="dark"] .glass {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 8px 24px -12px rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="dark"] .glass-strong {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 18px 40px -20px rgba(0, 0, 0, 0.85);
 }
 
 .scroll-marquee {
@@ -178,13 +258,6 @@ body {
   }
 }
 
-/* Bobs the ghost's hat / crown / headphones group up and down so the
- * accessory looks like it's hovering just above the body instead of
- * being glued on. Targets an SVG <g> — modern browsers support CSS
- * transforms on SVG elements and translate in user-space units.
- * Long 4.2 s loop with a softly-held apex so the hover reads as
- * drifting, not bobbing — slower than the body so the two motions
- * stay visibly out of sync. */
 @keyframes ghostAccFloat {
   0%,
   100% {
@@ -208,7 +281,7 @@ body {
 }
 
 .dotted-grid {
-  background-image: radial-gradient(rgba(10, 10, 10, 0.07) 1px, transparent 1px);
+  background-image: radial-gradient(var(--grid-dot) 1px, transparent 1px);
   background-size: 22px 22px;
 }
 
@@ -217,4 +290,237 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+.serif-italic {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+/* ── Portal: "studio cut" transition. Five vertical stripes drop
+   in stagger from the top, hold long enough to stamp the route name,
+   then retract upward. transform: translateY only — compositor only,
+   no layout. Total ≈ 1.3s. ─────────────────────────────────────── */
+
+.portal-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.portal-stripes {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.portal-stripe {
+  position: relative;
+  height: 100%;
+  transform: translateY(-101%);
+  animation: stripeWipe 1.15s cubic-bezier(0.7, 0, 0.2, 1) forwards;
+  animation-delay: var(--stripe-delay, 0s);
+  will-change: transform;
+}
+
+@keyframes stripeWipe {
+  0% {
+    transform: translateY(-101%);
+  }
+  32% {
+    transform: translateY(0);
+  }
+  60% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(101%);
+  }
+}
+
+.portal-stripe-label {
+  position: absolute;
+  bottom: 1.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.32em;
+  color: rgba(245, 244, 239, 0.45);
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  animation: stripeLabel 1.15s ease-out forwards;
+  animation-delay: var(--stripe-delay, 0s);
+}
+
+@keyframes stripeLabel {
+  0%, 38% { opacity: 0; }
+  46%, 54% { opacity: 1; }
+  62%, 100% { opacity: 0; }
+}
+
+/* The wordmark sits above the stripes and runs slightly later so it
+   reads while every panel is fully covering. */
+.portal-wordmark {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  pointer-events: none;
+  color: #f5f4ef;
+  text-align: center;
+  opacity: 0;
+  animation: wordmarkPlay 1.3s cubic-bezier(0.65, 0, 0.2, 1) forwards;
+  animation-delay: 280ms;
+  will-change: opacity, transform;
+}
+
+@keyframes wordmarkPlay {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  18%, 56% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  82%, 100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(1.012);
+  }
+}
+
+.portal-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(245, 244, 239, 0.65);
+}
+
+.portal-meta-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--portal-accent, var(--brand));
+  box-shadow: 0 0 14px var(--portal-accent, var(--brand));
+}
+
+.portal-meta-rule {
+  display: inline-block;
+  width: 28px;
+  height: 1px;
+  background: rgba(245, 244, 239, 0.35);
+}
+
+.portal-route {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.04em;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.9;
+  font-size: clamp(3.2rem, 13vw, 9rem);
+}
+
+.portal-slash {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.85em;
+  color: rgba(245, 244, 239, 0.45);
+  transform: translateY(0.04em);
+}
+
+.portal-name {
+  background: linear-gradient(
+    90deg,
+    #f5f4ef 0%,
+    #f5f4ef 60%,
+    color-mix(in oklab, var(--portal-accent, #5b78ff) 70%, #f5f4ef) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.portal-tag {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(0.85rem, 1.4vw, 1.05rem);
+  color: rgba(245, 244, 239, 0.55);
+  letter-spacing: -0.005em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-stripe {
+    animation: portalFade 0.3s ease-out forwards;
+  }
+  .portal-stripe-label,
+  .portal-wordmark {
+    animation: portalFade 0.3s ease-out forwards;
+  }
+  @keyframes portalFade {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+}
+
+/* ── ProjectCard: cheap CSS hover (no JS, no spring, no per-frame
+   custom-property writes). transform/opacity only. ───────────────── */
+.card-hover {
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms ease;
+  will-change: transform;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+}
+[data-theme="dark"] .card-hover:hover {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 24px 48px -22px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(91, 120, 255, 0.18);
+}
+
+/* Live status dot — quiet pulse via opacity (compositor friendly). */
+@keyframes liveOpacity {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+.live-dot {
+  animation: liveOpacity 2.4s ease-in-out infinite;
+  will-change: opacity;
+}
+@media (prefers-reduced-motion: reduce) {
+  .live-dot { animation: none; }
+}
+
+/* Process cards: CSS-only fade+rise on initial paint. No scroll
+   listeners, no IntersectionObserver, no framer-motion. */
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.rise-in {
+  animation: riseIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--rise-delay, 0s);
+  will-change: opacity, transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise-in { animation: none; }
 }

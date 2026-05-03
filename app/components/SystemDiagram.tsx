@@ -30,66 +30,68 @@ export function SystemDiagram() {
 
   return (
     <div className="relative mx-auto aspect-square w-full max-w-md">
-      <svg viewBox="0 0 400 400" className="h-full w-full">
-        {/* orbits */}
-        {[80, 130, 180].map((r, i) => (
-          <motion.circle
+      <svg viewBox="0 0 400 400" className="relative h-full w-full">
+        <defs>
+          <radialGradient id="sd-core" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="var(--brand)" stopOpacity="1" />
+            <stop offset="100%" stopColor="var(--accent)" stopOpacity="0.85" />
+          </radialGradient>
+        </defs>
+
+        {/* Static orbits — kept dotted, no rotation. The previous infinite
+            rotate-on-three-rings animation was a constant compositor task
+            that produced visible scroll jitter. */}
+        {[80, 130, 180].map((r) => (
+          <circle
             key={r}
             cx={200}
             cy={200}
             r={r}
             fill="none"
-            stroke="black"
-            strokeOpacity={0.12}
+            stroke="var(--foreground)"
+            strokeOpacity={0.18}
             strokeDasharray="2 6"
-            initial={{ rotate: 0 }}
-            animate={reduce ? undefined : { rotate: 360 }}
-            transition={{
-              duration: 40 + i * 12,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-            style={{ transformOrigin: "200px 200px" }}
           />
         ))}
 
-        {/* center */}
-        <circle cx={200} cy={200} r={38} fill="var(--foreground)" />
+        {/* Center */}
+        <circle cx={200} cy={200} r={38} fill="url(#sd-core)" />
+        <circle
+          cx={200}
+          cy={200}
+          r={38}
+          fill="none"
+          stroke="var(--foreground)"
+          strokeOpacity={0.25}
+        />
         <text
           x={200}
           y={205}
           fontSize={11}
           fontWeight={700}
           textAnchor="middle"
-          fill="var(--background)"
+          fill="white"
           letterSpacing={1.2}
         >
           USER
         </text>
 
-        {/* satellites */}
+        {/* Satellites — single-shot entry only, no infinite loops. */}
         {satellites.map((s, i) => (
           <motion.g
             key={i}
-            initial={{ scale: 0, opacity: 0 }}
+            initial={reduce ? false : { scale: 0, opacity: 0 }}
             whileInView={{ scale: 1, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ type: "spring", stiffness: 200, delay: i * 0.12 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{
+              type: "spring",
+              stiffness: 200,
+              damping: 18,
+              delay: i * 0.08,
+            }}
+            style={{ transformBox: "fill-box", transformOrigin: "center" }}
           >
-            <motion.circle
-              cx={s.cx}
-              cy={s.cy}
-              r={20}
-              fill={s.color}
-              animate={reduce ? undefined : { scale: [1, 1.08, 1] }}
-              transition={{
-                duration: 2.8,
-                repeat: Infinity,
-                delay: i * 0.3,
-                ease: "easeInOut",
-              }}
-              style={{ transformBox: "fill-box", transformOrigin: "center" }}
-            />
+            <circle cx={s.cx} cy={s.cy} r={20} fill={s.color} />
             <text
               x={s.cx}
               y={s.cy + 3}
