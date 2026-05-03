@@ -56,17 +56,19 @@ export function ProjectCard({ project, index, onOpen }: Props) {
         />
 
         {/* Category chip — sits bottom-right inside the thumbnail.
-            Uses the same bespoke 3D-style icon as the home page bar. */}
-        <span className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 py-1 pl-1.5 pr-2.5 text-[11px] font-semibold text-black shadow-[0_4px_14px_rgba(0,0,0,0.18)] backdrop-blur-md">
+            Uses the same bespoke 3D-style icon as the home page bar.
+            Icon is sized large enough to actually read (the 32×32 viewBox
+            icons lose all detail below ~20px). */}
+        <span className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-2 rounded-full bg-white/95 py-1.5 pl-2 pr-3 text-[12px] font-semibold text-black shadow-[0_4px_14px_rgba(0,0,0,0.18)] backdrop-blur-md">
           <span
             aria-hidden
-            className="leading-none"
+            className="inline-flex shrink-0 leading-none"
             style={{
               filter:
                 "drop-shadow(0 1px 1px rgba(15,23,42,0.22)) drop-shadow(0 2px 4px rgba(15,23,42,0.18))",
             }}
           >
-            <ProjectIcon id={project.id} size={16} />
+            <ProjectIcon id={project.id} size={22} />
           </span>
           <span>{chipLabel}</span>
         </span>
