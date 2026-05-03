@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Project } from "../data/projects";
 import { GradientMesh, variantFor } from "./GradientMesh";
-import { ProjectIcon } from "./ProjectIcon";
 
 type Props = {
   project: Project;
@@ -20,10 +19,6 @@ const variantByProject: Record<string, number> = {
 
 export function ProjectCard({ project, index, onOpen }: Props) {
   const seed = variantByProject[project.id] ?? index;
-  const chipLabel =
-    project.chip?.label ??
-    project.tags[0] ??
-    (project.kind === "play" ? "Play" : "Ground");
   // Brucira pattern: small label above the headline is the parent
   // company / org. Falls back to project title when client isn't set.
   const company = project.client ?? project.title;
@@ -54,24 +49,6 @@ export function ProjectCard({ project, index, onOpen }: Props) {
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-[22px] ring-1 ring-inset ring-[var(--border)]"
         />
-
-        {/* Category chip — sits bottom-right inside the thumbnail.
-            Uses the same bespoke 3D-style icon as the home page bar.
-            Icon is sized large enough to actually read (the 32×32 viewBox
-            icons lose all detail below ~20px). */}
-        <span className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-2 rounded-full bg-white/95 py-1.5 pl-2 pr-3 text-[12px] font-semibold text-black shadow-[0_4px_14px_rgba(0,0,0,0.18)] backdrop-blur-md">
-          <span
-            aria-hidden
-            className="inline-flex shrink-0 leading-none"
-            style={{
-              filter:
-                "drop-shadow(0 1px 1px rgba(15,23,42,0.22)) drop-shadow(0 2px 4px rgba(15,23,42,0.18))",
-            }}
-          >
-            <ProjectIcon id={project.id} size={22} />
-          </span>
-          <span>{chipLabel}</span>
-        </span>
 
         {/* Hover open-arrow */}
         <span
