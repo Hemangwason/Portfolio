@@ -1,0 +1,12 @@
+# Loose source recordings + working media at the repo root — never
+# served by the site, just sitting on disk while editing.
+*.mp4
+*.mov
+*.m4v
+*.MOV
+!public/**/*.mp4
+!public/**/*.mov
+
+# Local dev artifacts
+.DS_Store
+*.log
