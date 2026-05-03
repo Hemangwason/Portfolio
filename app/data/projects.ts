@@ -2,7 +2,7 @@ export type ProjectMedia =
   | { type: "image"; src: string; alt?: string; bg?: string }
   | { type: "video"; src: string; poster?: string; bg?: string };
 
-export type ProjectCountry = { flag: string; label: string };
+export type ProjectChip = { label: string };
 
 export type Project = {
   id: string;
@@ -25,8 +25,10 @@ export type Project = {
   client?: string;
   /** Override the meta label for `client` (default: "Client"). */
   clientLabel?: string;
-  /** Origin chip shown bottom-right of the card thumbnail. Defaults to India. */
-  country?: ProjectCountry;
+  /** Override the label of the category chip shown bottom-right of the
+   *  card thumbnail. The icon is the bespoke `ProjectIcon` keyed by id;
+   *  the label defaults to `tags[0]` if omitted. */
+  chip?: ProjectChip;
   link?: { label: string; href: string };
 };
 
@@ -98,6 +100,7 @@ export const projects: Project[] = [
     tags: ["AI", "B2B", "Hiring", "Hackathon"],
     accent: "var(--brand)",
     emoji: "🪃",
+    chip: { label: "Hiring" },
     blurb:
       "AI scores every former employee 0\u2013100, surfaces a \u201Cwhy now\u201D signal, and drafts the re-engagement message \u2014 designed and shipped in under five hours at ContextCon.",
     role: "Solo designer \u00B7 front-end",
@@ -156,6 +159,7 @@ export const projects: Project[] = [
     tags: ["AI", "Security", "B2B"],
     accent: "var(--brand)",
     emoji: "🛡️",
+    chip: { label: "Security" },
     blurb:
       "A live risk-intelligence layer that detects AI tool usage across browsers, apps, and extensions \u2014 and warns users in the moment of risk instead of after the breach.",
     role: "Founding designer",
@@ -213,6 +217,7 @@ export const projects: Project[] = [
     tags: ["Motion", "3D", "Identity", "Lottie"],
     accent: "var(--accent)",
     emoji: "🖐️",
+    chip: { label: "3D" },
     blurb:
       "Full-funnel in-app reward loop for Zomato's Healthy Mode — four healthy orders in, the fifth is free.",
     role: "Visual + motion designer",
@@ -242,6 +247,7 @@ export const projects: Project[] = [
     tags: ["Motion", "Banner", "Illustration", "Lottie"],
     accent: "var(--accent)",
     emoji: "🇮🇳",
+    chip: { label: "Banner" },
     blurb:
       "Homepage banner stitching India's milestones into a single celebratory motion journey — anchored by Chandrayaan.",
     role: "Visual + motion designer",
@@ -271,6 +277,7 @@ export const projects: Project[] = [
     tags: ["Motion", "AI", "Banner", "Comic"],
     accent: "var(--accent)",
     emoji: "🏏",
+    chip: { label: "Comic" },
     blurb:
       "Turning Zomato's home feed into a mini sports storyboard — powered by AI + motion.",
     role: "Visual + motion designer",
@@ -301,6 +308,7 @@ export const projects: Project[] = [
     tags: ["Motion", "Celebrity", "Banner", "Offers"],
     accent: "var(--accent)",
     emoji: "🔥",
+    chip: { label: "Celebrity" },
     blurb:
       "Collab homepage moment that made the offer feel fast, focused, and unmissable — with Jasprit Bumrah as the visual anchor.",
     role: "Visual + motion designer",
@@ -330,6 +338,7 @@ export const projects: Project[] = [
     tags: ["Motion", "Banner", "Illustration", "Lottie"],
     accent: "var(--accent)",
     emoji: "🪔",
+    chip: { label: "Illustration" },
     blurb:
       "Homepage animation built as a mini entrance — from pandal gates to deity reveal, looping like a real celebration.",
     role: "Visual + motion designer",

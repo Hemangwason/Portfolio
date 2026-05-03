@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { Project, ProjectCountry } from "../data/projects";
+import type { Project } from "../data/projects";
 import { GradientMesh, variantFor } from "./GradientMesh";
+import { ProjectIcon } from "./ProjectIcon";
 
 type Props = {
   project: Project;
@@ -17,11 +18,12 @@ const variantByProject: Record<string, number> = {
   crater: 5,
 };
 
-const DEFAULT_COUNTRY: ProjectCountry = { flag: "🇮🇳", label: "India" };
-
 export function ProjectCard({ project, index, onOpen }: Props) {
   const seed = variantByProject[project.id] ?? index;
-  const country = project.country ?? DEFAULT_COUNTRY;
+  const chipLabel =
+    project.chip?.label ??
+    project.tags[0] ??
+    (project.kind === "play" ? "Play" : "Ground");
   // Brucira pattern: small label above the headline is the parent
   // company / org. Falls back to project title when client isn't set.
   const company = project.client ?? project.title;
@@ -53,12 +55,20 @@ export function ProjectCard({ project, index, onOpen }: Props) {
           className="pointer-events-none absolute inset-0 rounded-[22px] ring-1 ring-inset ring-[var(--border)]"
         />
 
-        {/* Country chip — sits bottom-right inside the thumbnail. */}
-        <span className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-black shadow-[0_4px_14px_rgba(0,0,0,0.18)] backdrop-blur-md">
-          <span className="text-[14px] leading-none" aria-hidden>
-            {country.flag}
+        {/* Category chip — sits bottom-right inside the thumbnail.
+            Uses the same bespoke 3D-style icon as the home page bar. */}
+        <span className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 py-1 pl-1.5 pr-2.5 text-[11px] font-semibold text-black shadow-[0_4px_14px_rgba(0,0,0,0.18)] backdrop-blur-md">
+          <span
+            aria-hidden
+            className="leading-none"
+            style={{
+              filter:
+                "drop-shadow(0 1px 1px rgba(15,23,42,0.22)) drop-shadow(0 2px 4px rgba(15,23,42,0.18))",
+            }}
+          >
+            <ProjectIcon id={project.id} size={16} />
           </span>
-          <span>{country.label}</span>
+          <span>{chipLabel}</span>
         </span>
 
         {/* Hover open-arrow */}
