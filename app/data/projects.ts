@@ -259,6 +259,37 @@ export const projects: Project[] = [
     ],
   },
   {
+    id: "halloween-zomato",
+    title: "Zomato Halloween",
+    tagline: "A graveyard on the homepage, without scaring anyone off",
+    kind: "play",
+    year: "2024",
+    tags: ["Motion", "Banner", "Illustration", "Lottie"],
+    accent: "var(--accent)",
+    emoji: "\u{1F383}",
+    blurb:
+      "Homepage banner that opens on a moonlit graveyard, then pulls back to a witch and her ghost guests at the dinner table — spooky, festive, and unmistakably Zomato.",
+    role: "Visual + motion designer",
+    client: "Zomato",
+    clientLabel: "Company",
+    thumbnail: {
+      type: "video",
+      src: "/projects/thumbs/halloween-zomato.mp4",
+      poster: "/projects/thumbs/halloween-zomato-poster.jpg",
+      bg: "#1B1240",
+    },
+    masthead: {
+      type: "video",
+      src: "/projects/halloween-zomato.mp4",
+      poster: "/projects/halloween-zomato-poster.jpg",
+      bg: "#1B1240",
+    },
+    writeup: [
+      "Halloween in India is mostly costume photos and a couple of pumpkins — there's no shared visual language to lean on. The brief was to put the festival on Zomato's homepage in a way that felt unmistakably Halloween without going horror, because the next tap is still “order dinner.” So we anchored on graveyard atmosphere instead of jump scares: a moonlit cemetery framed by gnarled bare branches, a glowing-eyed bat watching from above, wrought-iron gates, leaning crosses, a black cat in the corner. The “HAPPY HALLOWEEN” wordmark glows in that classic eerie green so the mood lands in the first frame, before any other element loads in.",
+      "The trick was the second beat. A graveyard is the hook, but a graveyard alone is too cold to sit on a food app. So the camera pulls back through the gate into a warm crypt-side dinner scene — a witch hosting two ghosts at a table, pizza and cake on the spread, jack-o'-lantern and skull guests on the floor, fairy lights overhead. Same world, different temperature: spooky exterior, hospitable interior — which is also the brand promise of Zomato on a festival night. The whole thing loops cleanly inside the home feed banner so users dropping in mid-animation still catch the punchline. Built in After Effects and Illustrator, composed in Figma, shipped as Lottie.",
+    ],
+  },
+  {
     id: "asia-cup-2025",
     title: "Asia Cup 2025",
     tagline: "A comic-style match in one homepage banner",
