@@ -26,8 +26,9 @@ export default function Home() {
           <PlaygroundTitle />
 
           <p className="mx-auto mt-8 max-w-2xl text-balance px-2 text-center text-[15px] leading-relaxed text-black/60 sm:mt-10 sm:px-0 sm:text-base md:text-lg">
+            Ex-<span className="font-semibold text-[#E23744]">Zomato</span>.
             Currently at{" "}
-            <span className="font-semibold text-[#E23744]">Zomato</span>{" "}
+            <span className="font-semibold text-[#7C3AED]">Zepto</span>{" "}
             as a product &amp; visual designer. Working across research,
             systems, and the boring screens no one ships. Click{" "}
             <Link
