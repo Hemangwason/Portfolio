@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Hanken_Grotesk, Geist_Mono } from "next/font/google";
+import { Analytics } from "./components/Analytics";
 import { Ghost } from "./components/Ghost";
 import { GhostProvider } from "./components/GhostContext";
 import "./globals.css";
@@ -57,6 +58,7 @@ export default function RootLayout({
           {children}
           <Ghost />
         </GhostProvider>
+        <Analytics />
       </body>
     </html>
   );
