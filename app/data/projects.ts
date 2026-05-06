@@ -2,6 +2,18 @@ export type ProjectMedia =
   | { type: "image"; src: string; alt?: string; bg?: string }
   | { type: "video"; src: string; poster?: string; bg?: string };
 
+export type ProjectScreen = {
+  src: string;
+  title: string;
+  problem: string;
+  rationale: string;
+};
+
+export type ProjectExploration = {
+  src: string;
+  caption: string;
+};
+
 export type Project = {
   id: string;
   title: string;
@@ -18,6 +30,10 @@ export type Project = {
   masthead?: ProjectMedia;
   /** Long-form paragraphs shown in the modal body. */
   writeup: string[];
+  /** Individual app screens with design rationale, shown in the modal. */
+  screens?: ProjectScreen[];
+  /** Early iterations / exploration shown as a quick horizontal strip. */
+  explorations?: ProjectExploration[];
   role?: string;
   team?: string;
   client?: string;
@@ -54,6 +70,44 @@ export const projects: Project[] = [
     },
     writeup: [
       "Sidetake hangs on one decision: stop logging tasks, start logging five stages of creative process \u2014 Referencing, Ideation, Execution, Editing, Drift. The Learn-from-the-Best layer turns those stages into something social \u2014 you can browse a real creator\u2019s actual day, see exactly how their twelve hours split, and book the time to talk to the person whose flow you want to copy. Three months in, testers had stopped asking for streaks and started describing themselves in Gem vocabulary \u2014 \u2018crashed to Calibrate this morning.\u2019 That private language was the point.",
+    ],
+    screens: [
+      {
+        src: "/projects/sidetake-screens/home.png",
+        title: "Project Flow Map",
+        problem: "Creatives don\u2019t know what state they\u2019re in or when their best hours actually land. Most focus apps show streaks or timers \u2014 neither tells you anything about the shape of your energy.",
+        rationale: "The home screen is a live signal, not a log. The Gem (here: Calibrate 54) shows current creative state in real time. Daily Insights surface two numbers that matter \u2014 your deepest window (10:40am) and your average time before distraction kicks in (14 min). Learn from the Best sits below so the path from self-awareness to someone else\u2019s workflow is one scroll, not a separate app.",
+      },
+      {
+        src: "/projects/sidetake-screens/project.png",
+        title: "Active Project Detail",
+        problem: "Hours logged on a project don\u2019t tell you whether you were actually present. You can put in four hours and barely move the needle if most of it was comms and drift.",
+        rationale: "Depth % replaces raw time as the headline metric \u2014 91% means 91% of logged time was in a high-focus state, not bouncing between tabs or context-switching. The Quick Breakdown separates Creating, Research, Comms, and Drift so you can see exactly where the hours went, not just how many. Start New Session is a persistent CTA because the point is always to get back in, not to admire the numbers.",
+      },
+      {
+        src: "/projects/sidetake-screens/creator.png",
+        title: "Creator Workflow",
+        problem: "Following a creator on social gives you their output, not their process. You have no idea how they actually split their time, what phase they front-load, or what their working language even is.",
+        rationale: "Ananya\u2019s profile is built from her real session data, not a bio she wrote. The donut shows her 12-hour budget broken into the five Sidetake stages (Reference, Ideate, Make, Review, Drift) on a real brand project. Her tagline \u2014 \u201cReference hard. Decide fast. Make before the energy drops.\u201d \u2014 is derived from her workflow signature, not a self-description. Stage Breakdown adds one line of plain text per phase so the numbers have intent, not just weight.",
+      },
+      {
+        src: "/projects/sidetake-screens/book-date.png",
+        title: "Book a 1-on-1 \u2014 Date",
+        problem: "Booking a session with a mentor is usually a cold ask: pick any date, hope they\u2019re free, figure out the agenda later. The friction is high enough that most people never follow through.",
+        rationale: "Availability is resolved upfront \u2014 only real open dates are highlighted so there\u2019s no back-and-forth. Session Focus is chosen before you confirm a date, so the meeting has an agenda before it\u2019s booked. Naming the focus options (Portfolio & Project Review, Workflow & Process Deep-Dive) signals what kind of conversation is being purchased, not just a timeslot.",
+      },
+      {
+        src: "/projects/sidetake-screens/book-time.png",
+        title: "Book a 1-on-1 \u2014 Time",
+        problem: "Most booking flows hand off to a third-party scheduler mid-flow, which breaks the context and makes it feel like an admin task rather than a continuation of the product.",
+        rationale: "Time selection stays inside the same visual language \u2014 same card, same green accent, same tone. The CTA reads \u201cConfirm Booking\u201d with the exact date and time already resolved (March 8 \u00b7 2:00 PM) so there\u2019s no ambiguity about what you\u2019re committing to before you tap.",
+      },
+      {
+        src: "/projects/sidetake-screens/confirm.png",
+        title: "Session Requested",
+        problem: "After booking, most apps show a generic \u201cyou\u2019re all set\u201d screen that tells you nothing about what comes next. The moment the action is complete, the product goes quiet.",
+        rationale: "The confirmation screen acts as a receipt and a handoff note. It surfaces all four booking details (mentor, date, time, format) so nothing needs to be cross-checked in email. The subline \u2014 \u201cWe\u2019ll notify you once Ananya confirms the booking.\u201d \u2014 sets the expectation that this is a request, not a guaranteed slot, so there\u2019s no confusion if timing shifts. Done ends the flow cleanly rather than routing back into the feed.",
+      },
     ],
   },
   {
@@ -227,6 +281,24 @@ export const projects: Project[] = [
     },
     writeup: [
       "Healthy High-Five was a full-funnel in-app reward built to push adoption of Zomato's Healthy Mode — order four healthy meals, the fifth is free. The challenge wasn't visuals, it was clarity: users needed to get the mechanic in seconds, see where they stand, and feel nudged not nagged. I owned the end-to-end visual system — naming and identity, a badge language that literally shows the \u201Chi-fi / high-five\u201D idea in the collectible itself, a green-forward palette, and a 3D icon set (Blender + Substance Painter) so progress feels tactile rather than ticked. Animated in After Effects, shipped as Lottie. You're not told to order healthy — you're shown your path to the win.",
+    ],
+    explorations: [
+      {
+        src: "/projects/h5-iterations/01-streaks-logo.png",
+        caption: "Started as Healthy Streaks — fire metaphor, streak counter.",
+      },
+      {
+        src: "/projects/h5-iterations/02-streaks-screen.png",
+        caption: "First app pass: a tomato streak, dish unlocks at five.",
+      },
+      {
+        src: "/projects/h5-iterations/03-h5-screen.png",
+        caption: "Pivot — replaced flames with a collectible badge.",
+      },
+      {
+        src: "/projects/h5-iterations/04-h5-wordmark.png",
+        caption: "Final identity: Hi-Fi → High-Five.",
+      },
     ],
   },
   {

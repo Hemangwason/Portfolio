@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import type { Project } from "../data/projects";
+import type { Project, ProjectScreen, ProjectExploration } from "../data/projects";
 import { GradientMesh, variantFor } from "./GradientMesh";
 
 type Props = {
@@ -199,6 +199,16 @@ function ProjectModalBody({
           ))}
         </div>
 
+        {/* Screen gallery */}
+        {project.screens && project.screens.length > 0 && (
+          <ScreenGallery screens={project.screens} />
+        )}
+
+        {/* Explorations strip */}
+        {project.explorations && project.explorations.length > 0 && (
+          <ExplorationStrip items={project.explorations} />
+        )}
+
         {/* Tags */}
         <div className="mt-6 flex flex-wrap gap-1.5">
           {project.tags.map((t) => (
@@ -229,6 +239,112 @@ function ProjectModalBody({
         )}
       </div>
     </>
+  );
+}
+
+function ScreenGallery({ screens }: { screens: ProjectScreen[] }) {
+  return (
+    <div className="mt-8">
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--ink-faint)]">
+        Screens
+      </p>
+      <div className="mt-4 space-y-8">
+        {screens.map((screen, i) => (
+          <div
+            key={i}
+            className="grid grid-cols-1 gap-5 sm:grid-cols-[140px_1fr] sm:gap-6"
+          >
+            {/* Screen */}
+            <img
+              src={screen.src}
+              alt={screen.title}
+              loading="lazy"
+              decoding="async"
+              className="mx-auto w-[120px] shrink-0 rounded-[14px] sm:mx-0 sm:w-[140px]"
+            />
+
+            {/* Copy */}
+            <div className="flex flex-col gap-2.5">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] text-[var(--ink-faint)]">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h4 className="text-[13px] font-semibold text-[var(--foreground)]">
+                  {screen.title}
+                </h4>
+              </div>
+              <div
+                className="rounded-xl p-3"
+                style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
+              >
+                <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--ink-faint)]">
+                  Problem
+                </p>
+                <p className="mt-1 text-[12px] leading-relaxed text-[var(--ink)]">
+                  {screen.problem}
+                </p>
+              </div>
+              <div
+                className="rounded-xl p-3"
+                style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
+              >
+                <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--ink-faint)]">
+                  Why this way
+                </p>
+                <p className="mt-1 text-[12px] leading-relaxed text-[var(--ink)]">
+                  {screen.rationale}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ExplorationStrip({ items }: { items: ProjectExploration[] }) {
+  return (
+    <div className="mt-8">
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--ink-faint)]">
+        Exploration
+      </p>
+      <p className="mt-1 text-[12px] text-[var(--ink-soft)]">
+        Where it started → where it landed.
+      </p>
+      <div
+        className="mt-4 -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-3 sm:-mx-6 sm:px-6 [scrollbar-width:thin]"
+      >
+        {items.map((item, i) => (
+          <figure
+            key={i}
+            className="flex w-[180px] shrink-0 snap-start flex-col gap-2"
+          >
+            <div
+              className="flex h-[200px] w-full items-center justify-center overflow-hidden rounded-xl"
+              style={{
+                background: "var(--surface)",
+                border: "1px solid var(--line)",
+              }}
+            >
+              <img
+                src={item.src}
+                alt={item.caption}
+                loading="lazy"
+                decoding="async"
+                className="max-h-full max-w-full object-contain"
+              />
+            </div>
+            <figcaption className="text-[11px] leading-snug text-[var(--ink-soft)]">
+              <span className="mr-1.5 font-mono text-[var(--ink-faint)]">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              {item.caption}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
   );
 }
 
