@@ -312,30 +312,17 @@ function ExplorationStrip({ items }: { items: ProjectExploration[] }) {
       <p className="mt-1 text-[12px] text-[var(--ink-soft)]">
         Where it started → where it landed.
       </p>
-      <div
-        className="mt-4 -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-3 sm:-mx-6 sm:px-6 [scrollbar-width:thin]"
-      >
+      <div className="mt-5 flex flex-col gap-7">
         {items.map((item, i) => (
-          <figure
-            key={i}
-            className="flex w-[180px] shrink-0 snap-start flex-col gap-2"
-          >
-            <div
-              className="flex h-[200px] w-full items-center justify-center overflow-hidden rounded-xl"
-              style={{
-                background: "var(--surface)",
-                border: "1px solid var(--line)",
-              }}
-            >
-              <img
-                src={item.src}
-                alt={item.caption}
-                loading="lazy"
-                decoding="async"
-                className="max-h-full max-w-full object-contain"
-              />
-            </div>
-            <figcaption className="text-[11px] leading-snug text-[var(--ink-soft)]">
+          <figure key={i} className="flex flex-col items-center gap-2.5">
+            <img
+              src={item.src}
+              alt={item.caption}
+              loading="lazy"
+              decoding="async"
+              className="block max-h-[360px] w-auto max-w-full rounded-lg"
+            />
+            <figcaption className="self-stretch text-center text-[12px] leading-snug text-[var(--ink-soft)]">
               <span className="mr-1.5 font-mono text-[var(--ink-faint)]">
                 {String(i + 1).padStart(2, "0")}
               </span>
