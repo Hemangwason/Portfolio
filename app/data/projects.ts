@@ -282,24 +282,6 @@ export const projects: Project[] = [
     writeup: [
       "Healthy High-Five was a full-funnel in-app reward built to push adoption of Zomato's Healthy Mode — order four healthy meals, the fifth is free. The challenge wasn't visuals, it was clarity: users needed to get the mechanic in seconds, see where they stand, and feel nudged not nagged. I owned the end-to-end visual system — naming and identity, a badge language that literally shows the \u201Chi-fi / high-five\u201D idea in the collectible itself, a green-forward palette, and a 3D icon set (Blender + Substance Painter) so progress feels tactile rather than ticked. Animated in After Effects, shipped as Lottie. You're not told to order healthy — you're shown your path to the win.",
     ],
-    explorations: [
-      {
-        src: "/projects/h5-iterations/01-streaks-logo.png",
-        caption: "Started as Healthy Streaks — fire metaphor, streak counter.",
-      },
-      {
-        src: "/projects/h5-iterations/02-streaks-screen.png",
-        caption: "First app pass: a tomato streak, dish unlocks at five.",
-      },
-      {
-        src: "/projects/h5-iterations/03-h5-screen.png",
-        caption: "Pivot — replaced flames with a collectible badge.",
-      },
-      {
-        src: "/projects/h5-iterations/04-h5-wordmark.png",
-        caption: "Final identity: Hi-Fi → High-Five.",
-      },
-    ],
   },
   {
     id: "independence-day-banner",
