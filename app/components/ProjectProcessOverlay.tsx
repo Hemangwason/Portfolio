@@ -297,26 +297,93 @@ function ProcessCanvas({ process }: { process: ProjectProcess }) {
     return () => el.removeEventListener("wheel", onWheel);
   }, []);
 
-  // Pointer drag: standard "grab the canvas and pan it" behavior.
+  // Pointer state: a Map of active pointers lets us run two distinct
+  // gestures off the same handler set — single-pointer = pan, two
+  // pointers = pinch zoom + pan in one motion (touchpads, touchscreens).
+  const pointersRef = useRef(new Map<number, { x: number; y: number }>());
   const dragRef = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number } | null>(null);
+  const pinchRef = useRef<{
+    startDistance: number;
+    startZoom: number;
+    startMidX: number;
+    startMidY: number;
+    startTx: number;
+    startTy: number;
+  } | null>(null);
 
   const onPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 && e.pointerType === "mouse") return;
     const el = wrapRef.current;
-    if (!el) return;
+    const stageEl = stageRef.current;
+    if (!el || !stageEl) return;
     el.setPointerCapture(e.pointerId);
     isFittedRef.current = false;
-    dragRef.current = {
-      id: e.pointerId,
-      sx: e.clientX,
-      sy: e.clientY,
-      ox: transform.x,
-      oy: transform.y,
-    };
-    setGrabbing(true);
-  }, [transform.x, transform.y]);
+
+    pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointersRef.current.size === 1) {
+      // Single-pointer: start drag.
+      dragRef.current = {
+        id: e.pointerId,
+        sx: e.clientX,
+        sy: e.clientY,
+        ox: transform.x,
+        oy: transform.y,
+      };
+      pinchRef.current = null;
+      setGrabbing(true);
+    } else if (pointersRef.current.size === 2) {
+      // Second pointer down: drop drag, lock in pinch baseline. The
+      // midpoint is captured in stage-local coordinates so we can
+      // anchor zoom at the user's fingers, just like the cursor for
+      // wheel zoom.
+      dragRef.current = null;
+      const pts = Array.from(pointersRef.current.values());
+      const [p1, p2] = pts;
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const distance = Math.hypot(dx, dy) || 1;
+      const stageRect = stageEl.getBoundingClientRect();
+      const midX = (p1.x + p2.x) / 2 - stageRect.left - stageRect.width / 2;
+      const midY = (p1.y + p2.y) / 2 - stageRect.top - stageRect.height / 2;
+      pinchRef.current = {
+        startDistance: distance,
+        startZoom: transform.zoom,
+        startMidX: midX,
+        startMidY: midY,
+        startTx: transform.x,
+        startTy: transform.y,
+      };
+      setGrabbing(false);
+    }
+  }, [transform.x, transform.y, transform.zoom]);
 
   const onPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!pointersRef.current.has(e.pointerId)) return;
+    pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointersRef.current.size === 2 && pinchRef.current) {
+      // Pinch: scale = newDistance / startDistance, anchor at the
+      // initial midpoint. Translation rides on top so the canvas
+      // stays under the user's fingers cleanly.
+      const pts = Array.from(pointersRef.current.values());
+      const [p1, p2] = pts;
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const distance = Math.hypot(dx, dy) || 1;
+      const pinch = pinchRef.current;
+      const nextZoom = clamp(
+        pinch.startZoom * (distance / pinch.startDistance),
+        MIN_ZOOM,
+        MAX_ZOOM,
+      );
+      const k = nextZoom / pinch.startZoom;
+      const nx = pinch.startMidX - (pinch.startMidX - pinch.startTx) * k;
+      const ny = pinch.startMidY - (pinch.startMidY - pinch.startTy) * k;
+      setTransform({ x: nx, y: ny, zoom: nextZoom });
+      return;
+    }
+
     const drag = dragRef.current;
     if (!drag || drag.id !== e.pointerId) return;
     const dx = e.clientX - drag.sx;
@@ -325,10 +392,18 @@ function ProcessCanvas({ process }: { process: ProjectProcess }) {
   }, []);
 
   const onPointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    pointersRef.current.delete(e.pointerId);
+
+    if (pointersRef.current.size < 2) {
+      pinchRef.current = null;
+    }
+
     const drag = dragRef.current;
-    if (!drag || drag.id !== e.pointerId) return;
-    dragRef.current = null;
-    setGrabbing(false);
+    if (drag && drag.id === e.pointerId) {
+      dragRef.current = null;
+      setGrabbing(false);
+    }
+
     try {
       wrapRef.current?.releasePointerCapture(e.pointerId);
     } catch {

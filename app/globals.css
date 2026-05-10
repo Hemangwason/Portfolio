@@ -97,6 +97,7 @@ body {
   font-family: var(--font-sans), "Helvetica Neue", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* `clip` blocks horizontal overflow without creating a scroll container, so
@@ -104,6 +105,37 @@ body {
 html,
 body {
   overflow-x: clip;
+}
+
+/* Kill the iOS double-tap delay and the grey/blue tap flash on every
+   tappable surface. We still keep :focus-visible rings for keyboard
+   users — only the touch flash is suppressed. */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Allow long words to break inside narrow containers (especially
+   modals on 320–360px screens) instead of pushing the layout
+   horizontally. */
+h1, h2, h3, h4, p, li, dd {
+  overflow-wrap: anywhere;
+}
+
+/* iOS momentum scroll on every internal scroller so modal bodies and
+   horizontal strips feel native instead of clipped-stiff. */
+.glass-strong [class*="overflow-y-auto"],
+[data-scroll-momentum] {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Honor the system preference: when the user opts into reduced
+   motion we drop scroll-behavior smoothing as well. */
+@media (prefers-reduced-motion: reduce) {
+  .glass-strong [class*="overflow-y-auto"],
+  [data-scroll-momentum] {
+    scroll-behavior: auto;
+  }
 }
 
 /* Single low-cost radial bloom on light mode — kept very faint. */
