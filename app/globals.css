@@ -528,3 +528,29 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .rise-in { animation: none; }
 }
+
+/* Process flow overlay — single keyframed fade so we don't need
+   framer-motion (which fights with the modal's AnimatePresence on
+   certain re-render paths). Two states: data-open="true" plays the
+   entry, data-open="false" plays the exit and the wrapper handles
+   unmount via setTimeout. */
+@keyframes processOverlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes processOverlayOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+.process-overlay[data-open="true"] {
+  animation: processOverlayIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity;
+}
+.process-overlay[data-open="false"] {
+  animation: processOverlayOut 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .process-overlay { animation: none; }
+}

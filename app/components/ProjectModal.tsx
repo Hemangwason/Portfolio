@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Project, ProjectScreen, ProjectExploration } from "../data/projects";
 import { GradientMesh, variantFor } from "./GradientMesh";
+import { ProjectProcessOverlay } from "./ProjectProcessOverlay";
 
 type Props = {
   project: Project | null;
@@ -13,15 +14,18 @@ type Props = {
 
 export function ProjectModal({ project, onClose }: Props) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const [showProcess, setShowProcess] = useState(false);
 
-  // Scroll lock + ESC close
+  // Scroll lock + ESC close. While the process overlay is open we let
+  // it own the ESC key — the modal stays mounted underneath so the
+  // case study reappears the moment the overlay closes.
   useEffect(() => {
     if (!project) return;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape" && !showProcess) onClose();
     };
     window.addEventListener("keydown", onKey);
 
@@ -31,57 +35,73 @@ export function ProjectModal({ project, onClose }: Props) {
       document.body.style.overflow = prevOverflow;
       window.removeEventListener("keydown", onKey);
     };
-  }, [project, onClose]);
+  }, [project, onClose, showProcess]);
+
+  // When the parent project closes, drop any layered overlay too.
+  useEffect(() => {
+    if (!project) setShowProcess(false);
+  }, [project]);
 
   // Render to a portal on <body> so it overlays everything, regardless of
   // parent stacking contexts / backdrop-filters elsewhere on the page.
   if (typeof document === "undefined") return null;
 
   return createPortal(
-    <AnimatePresence>
-      {project && (
-        <motion.div
-          key={project.id}
-          className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto overscroll-contain px-3 py-4 sm:px-4 sm:py-6 md:items-center md:px-6 md:py-10"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby={`modal-title-${project.id}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] as const }}
-        >
-          {/* Backdrop — uses the theme's --backdrop token, so it's a
-              warm white wash on the home page and a deep ink wash on
-              the dark dimension. */}
-          <motion.button
-            aria-label="Close project"
-            onClick={onClose}
-            className="fixed inset-0 -z-10 backdrop-blur-[18px]"
-            style={{
-              background: "var(--backdrop)",
-              WebkitBackdropFilter: "blur(18px)",
-            }}
+    <>
+      <AnimatePresence>
+        {project && (
+          <motion.div
+            key={project.id}
+            className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto overscroll-contain px-3 py-4 sm:px-4 sm:py-6 md:items-center md:px-6 md:py-10"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`modal-title-${project.id}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-          />
-
-          {/* Modal card */}
-          <motion.div
-            ref={contentRef}
-            tabIndex={-1}
-            className="glass-strong relative my-auto w-full max-w-[560px] overflow-hidden rounded-[20px] outline-none sm:rounded-[22px]"
-            initial={{ opacity: 0, y: 30, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.98 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] as const }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] as const }}
           >
-            <ProjectModalBody project={project} onClose={onClose} />
+            {/* Backdrop — uses the theme's --backdrop token, so it's a
+                warm white wash on the home page and a deep ink wash on
+                the dark dimension. */}
+            <motion.button
+              aria-label="Close project"
+              onClick={onClose}
+              className="fixed inset-0 -z-10 backdrop-blur-[18px]"
+              style={{
+                background: "var(--backdrop)",
+                WebkitBackdropFilter: "blur(18px)",
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
+
+            {/* Modal card */}
+            <motion.div
+              ref={contentRef}
+              tabIndex={-1}
+              className="glass-strong relative my-auto w-full max-w-[560px] overflow-hidden rounded-[20px] outline-none sm:rounded-[22px]"
+              initial={{ opacity: 0, y: 30, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.98 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] as const }}
+            >
+              <ProjectModalBody
+                project={project}
+                onClose={onClose}
+                onOpenProcess={() => setShowProcess(true)}
+              />
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>,
+        )}
+      </AnimatePresence>
+
+      <ProjectProcessOverlay
+        project={showProcess ? project : null}
+        onClose={() => setShowProcess(false)}
+      />
+    </>,
     document.body,
   );
 }
@@ -89,9 +109,11 @@ export function ProjectModal({ project, onClose }: Props) {
 function ProjectModalBody({
   project,
   onClose,
+  onOpenProcess,
 }: {
   project: Project;
   onClose: () => void;
+  onOpenProcess: () => void;
 }) {
   const kindLabel = project.kind === "play" ? "VISUALS" : "PRODUCT";
   const kindAccent =
@@ -198,6 +220,17 @@ function ProjectModalBody({
             </p>
           ))}
         </div>
+
+        {/* Process flow CTA — only renders when the project has a
+            design board / flow image attached. Sits between the
+            writeup and the screen gallery so it reads as the natural
+            "go deeper" entry point. */}
+        {project.process && (
+          <ProcessCallout
+            project={project}
+            onOpen={onOpenProcess}
+          />
+        )}
 
         {/* Screen gallery */}
         {project.screens && project.screens.length > 0 && (
@@ -332,6 +365,93 @@ function ExplorationStrip({ items }: { items: ProjectExploration[] }) {
         ))}
       </div>
     </div>
+  );
+}
+
+function ProcessCallout({
+  project,
+  onOpen,
+}: {
+  project: Project;
+  onOpen: () => void;
+}) {
+  const process = project.process;
+  if (!process) return null;
+
+  const accent = project.kind === "play" ? "var(--accent)" : "var(--brand)";
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="group mt-7 flex w-full items-stretch gap-4 overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-3 text-left transition-all hover:-translate-y-0.5 hover:border-[var(--line-strong)] sm:p-3.5"
+      style={{ backdropFilter: "blur(10px)" }}
+      aria-label={`See the flow behind ${project.title}`}
+    >
+      {/* Thumbnail of the board itself — gives the viewer a peek at
+          the canvas before they commit to opening it. */}
+      <span
+        aria-hidden
+        className="relative block h-[68px] w-[96px] shrink-0 overflow-hidden rounded-xl sm:h-[76px] sm:w-[108px]"
+        style={{ background: process.bg ?? "#0e0e0e" }}
+      >
+        <img
+          src={process.poster ?? process.src}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-[1.04]"
+          draggable={false}
+        />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.45) 100%)",
+          }}
+        />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[var(--border)]"
+        />
+      </span>
+
+      {/* Copy + arrow */}
+      <span className="flex min-w-0 flex-1 flex-col justify-center gap-1">
+        <span className="flex items-center gap-2">
+          <span
+            className="inline-block h-1.5 w-1.5 rounded-full"
+            style={{ background: accent }}
+          />
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--ink-faint)]">
+            {process.label ?? "The flow"}
+          </span>
+        </span>
+        <span className="text-[13px] font-semibold leading-snug text-[var(--foreground)] sm:text-[14px]">
+          See how this came together
+        </span>
+        <span className="text-[11.5px] leading-snug text-[var(--ink-soft)] sm:text-[12px]">
+          Open the design board — explorations, naming, and the screens
+          that landed.
+        </span>
+      </span>
+
+      <span
+        aria-hidden
+        className="grid h-9 w-9 shrink-0 self-center place-items-center rounded-full border border-[var(--line)] text-[var(--ink)] transition-all group-hover:border-transparent group-hover:bg-[var(--foreground)] group-hover:text-[var(--background)]"
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path
+            d="M2 7H12 M8 3L12 7L8 11"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
+    </button>
   );
 }
 

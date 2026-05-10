@@ -14,6 +14,22 @@ export type ProjectExploration = {
   caption: string;
 };
 
+export type ProjectProcess = {
+  /** Wide image (≤ 1MB recommended) showing the design board / flow. */
+  src: string;
+  /** Tiny poster used for first paint while the full image streams in. */
+  poster?: string;
+  /** Native intrinsic dimensions of `src` — used to compute layout fits. */
+  width: number;
+  height: number;
+  /** Canvas background that bleeds out to the viewport edges. */
+  bg?: string;
+  /** Header label inside the overlay (e.g. "The flow"). */
+  label?: string;
+  /** Sentence under the title. */
+  blurb?: string;
+};
+
 export type Project = {
   id: string;
   title: string;
@@ -34,6 +50,8 @@ export type Project = {
   screens?: ProjectScreen[];
   /** Early iterations / exploration shown as a quick horizontal strip. */
   explorations?: ProjectExploration[];
+  /** Full-screen design-board / flow viewer. Opens from a modal CTA. */
+  process?: ProjectProcess;
   role?: string;
   team?: string;
   client?: string;
@@ -109,6 +127,16 @@ export const projects: Project[] = [
         rationale: "The confirmation screen acts as a receipt and a handoff note. It surfaces all four booking details (mentor, date, time, format) so nothing needs to be cross-checked in email. The subline \u2014 \u201cWe\u2019ll notify you once Ananya confirms the booking.\u201d \u2014 sets the expectation that this is a request, not a guaranteed slot, so there\u2019s no confusion if timing shifts. Done ends the flow cleanly rather than routing back into the feed.",
       },
     ],
+    process: {
+      src: "/projects/sidetake-process.webp?v=2",
+      poster: "/projects/sidetake-process-poster.webp?v=2",
+      width: 2800,
+      height: 3564,
+      bg: "#101010",
+      label: "The flow",
+      blurb:
+        "How Sidetake came together \u2014 from the first scattered screens to the Gem-driven home, project, and creator views. Scroll to pan, \u2318/Ctrl + scroll to zoom.",
+    },
   },
   {
     id: "sidetalk",
@@ -282,6 +310,16 @@ export const projects: Project[] = [
     writeup: [
       "Healthy High-Five was a full-funnel in-app reward built to push adoption of Zomato's Healthy Mode — order four healthy meals, the fifth is free. The challenge wasn't visuals, it was clarity: users needed to get the mechanic in seconds, see where they stand, and feel nudged not nagged. I owned the end-to-end visual system — naming and identity, a badge language that literally shows the \u201Chi-fi / high-five\u201D idea in the collectible itself, a green-forward palette, and a 3D icon set (Blender + Substance Painter) so progress feels tactile rather than ticked. Animated in After Effects, shipped as Lottie. You're not told to order healthy — you're shown your path to the win.",
     ],
+    process: {
+      src: "/projects/h5-process.webp?v=3",
+      poster: "/projects/h5-process-poster.webp?v=3",
+      width: 3000,
+      height: 3869,
+      bg: "#101010",
+      label: "The flow",
+      blurb:
+        "How Healthy High-Five came together — explorations, naming, and the seven screens behind the reward loop. Scroll to pan, ⌘/Ctrl + scroll to zoom.",
+    },
   },
   {
     id: "independence-day-banner",
