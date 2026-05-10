@@ -9,8 +9,12 @@ type Props = {
   onClose: () => void;
 };
 
-const MIN_ZOOM = 0.4;
-const MAX_ZOOM = 3;
+const MIN_ZOOM = 0.05;
+// Cap absolute zoom at 1× source pixel — beyond that we're upsampling
+// and the board goes soft. With a board rendered close to native SVG
+// resolution this still gives the user 5–10× zoom relative to fit,
+// which is plenty for reading any screen on the board.
+const MAX_ZOOM = 1;
 const WHEEL_SENSITIVITY = 0.0018;
 
 // Full-bleed canvas viewer for a project's design board / flow image.

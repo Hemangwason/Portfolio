@@ -128,10 +128,10 @@ export const projects: Project[] = [
       },
     ],
     process: {
-      src: "/projects/sidetake-process.webp?v=3",
-      poster: "/projects/sidetake-process-poster.webp?v=3",
-      width: 5500,
-      height: 7001,
+      src: "/projects/sidetake-process.webp?v=4",
+      poster: "/projects/sidetake-process-poster.webp?v=4",
+      width: 12591,
+      height: 16026,
       bg: "#101010",
       label: "The flow",
       blurb:
@@ -311,10 +311,10 @@ export const projects: Project[] = [
       "Healthy High-Five was a full-funnel in-app reward built to push adoption of Zomato's Healthy Mode — order four healthy meals, the fifth is free. The challenge wasn't visuals, it was clarity: users needed to get the mechanic in seconds, see where they stand, and feel nudged not nagged. I owned the end-to-end visual system — naming and identity, a badge language that literally shows the \u201Chi-fi / high-five\u201D idea in the collectible itself, a green-forward palette, and a 3D icon set (Blender + Substance Painter) so progress feels tactile rather than ticked. Animated in After Effects, shipped as Lottie. You're not told to order healthy — you're shown your path to the win.",
     ],
     process: {
-      src: "/projects/h5-process.webp?v=4",
-      poster: "/projects/h5-process-poster.webp?v=4",
-      width: 5950,
-      height: 7672,
+      src: "/projects/h5-process.webp?v=5",
+      poster: "/projects/h5-process-poster.webp?v=5",
+      width: 7018,
+      height: 9049,
       bg: "#101010",
       label: "The flow",
       blurb:
