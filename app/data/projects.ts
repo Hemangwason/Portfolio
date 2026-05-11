@@ -128,10 +128,10 @@ export const projects: Project[] = [
       },
     ],
     process: {
-      src: "/projects/sidetake-process.webp?v=4",
-      poster: "/projects/sidetake-process-poster.webp?v=4",
-      width: 12591,
-      height: 16026,
+      src: "/projects/sidetake-process.webp?v=5",
+      poster: "/projects/sidetake-process-poster.webp?v=5",
+      width: 8000,
+      height: 10183,
       bg: "#101010",
       label: "The flow",
       blurb:

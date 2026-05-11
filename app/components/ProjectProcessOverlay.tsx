@@ -181,6 +181,17 @@ function ProcessCanvas({ process }: { process: ProjectProcess }) {
   const [transform, setTransform] = useState({ x: 0, y: 0, zoom: 1 });
   const [loaded, setLoaded] = useState(false);
   const [grabbing, setGrabbing] = useState(false);
+  // Snap transitions are reserved for Reset / +/- clicks — short
+  // discrete jumps. Wheel pan, drag, and pinch all run at 60fps
+  // already; layering a 220ms transition on top of those queues an
+  // animation per frame which produces visible jerk on large boards.
+  const [snapAnim, setSnapAnim] = useState(false);
+  const snapTimer = useRef<number | null>(null);
+  const startSnap = useCallback(() => {
+    setSnapAnim(true);
+    if (snapTimer.current) window.clearTimeout(snapTimer.current);
+    snapTimer.current = window.setTimeout(() => setSnapAnim(false), 240);
+  }, []);
   // True until the user manually pans or zooms. While true, every
   // viewport resize re-fits the board so it never drifts off-frame
   // (e.g. phone rotation, browser resize). Pan or zoom flips this to
@@ -242,8 +253,9 @@ function ProcessCanvas({ process }: { process: ProjectProcess }) {
 
   const resetTransform = useCallback(() => {
     isFittedRef.current = true;
+    startSnap();
     setTransform({ x: fitOrigin.x, y: fitOrigin.y, zoom: fitZoom });
-  }, [fitZoom, fitOrigin.x, fitOrigin.y]);
+  }, [fitZoom, fitOrigin.x, fitOrigin.y, startSnap]);
 
   // Re-fit while the user hasn't taken control. Covers first paint,
   // late-arriving stage size, and viewport resizes.
@@ -417,12 +429,13 @@ function ProcessCanvas({ process }: { process: ProjectProcess }) {
 
   const zoomBy = useCallback((factor: number) => {
     isFittedRef.current = false;
+    startSnap();
     setTransform((prev) => {
       const nextZoom = clamp(prev.zoom * factor, MIN_ZOOM, MAX_ZOOM);
       const k = nextZoom / prev.zoom;
       return { x: prev.x * k, y: prev.y * k, zoom: nextZoom };
     });
-  }, []);
+  }, [startSnap]);
 
   const zoomPercent = stageSize ? Math.round((transform.zoom / fitZoom) * 100) : 100;
 
@@ -460,10 +473,14 @@ function ProcessCanvas({ process }: { process: ProjectProcess }) {
             style={{
               width: process.width,
               height: process.height,
-              transform: `translate(-50%, -50%) translate(${transform.x}px, ${transform.y}px) scale(${transform.zoom})`,
+              transform: `translate3d(-50%, -50%, 0) translate3d(${transform.x}px, ${transform.y}px, 0) scale(${transform.zoom})`,
               transformOrigin: "center center",
               willChange: "transform",
-              transition: dragRef.current ? "none" : "transform 220ms cubic-bezier(0.22, 1, 0.36, 1)",
+              transition: snapAnim
+                ? "transform 220ms cubic-bezier(0.22, 1, 0.36, 1)"
+                : "none",
+              backfaceVisibility: "hidden",
+              contain: "layout paint",
             }}
           >
             {/* Soft border so the board reads as an artifact on the
