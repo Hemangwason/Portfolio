@@ -304,8 +304,8 @@ export const projects: Project[] = [
     },
     masthead: {
       type: "video",
-      src: "/projects/street-football.mp4",
-      poster: "/projects/street-football-poster.jpg",
+      src: "/projects/street-football.mp4?v=2",
+      poster: "/projects/street-football-poster.jpg?v=2",
       bg: "#7A8AB8",
     },
     writeup: [
@@ -336,8 +336,8 @@ export const projects: Project[] = [
     },
     masthead: {
       type: "video",
-      src: "/projects/zepto-turns-5.mp4",
-      poster: "/projects/zepto-turns-5-poster.jpg",
+      src: "/projects/zepto-turns-5.mp4?v=2",
+      poster: "/projects/zepto-turns-5-poster.jpg?v=2",
       bg: "#5435A5",
     },
     writeup: [

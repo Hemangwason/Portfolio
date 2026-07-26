@@ -51,6 +51,10 @@ function renderIcon(id: string): JSX.Element | null {
       return <DurgaPuja />;
     case "zomato-plus-identity":
       return <ZomatoPlus />;
+    case "street-football":
+      return <StreetFootball />;
+    case "zepto-turns-5":
+      return <ZeptoTurns5 />;
     default:
       return null;
   }
@@ -457,6 +461,81 @@ function DurgaPuja() {
       />
       <path d="M5 18 H27" stroke="white" strokeWidth={0.7} opacity={0.55} />
       <ellipse cx={16} cy={17.5} rx={1.5} ry={0.8} fill="#7c2d12" opacity={0.6} />
+    </>
+  );
+}
+
+// 13. Street Football — classic soccer ball: white sphere, black
+// centre pentagon, partial edge patches clipped to the ball, seam
+// lines radiating between them.
+function StreetFootball() {
+  return (
+    <>
+      <defs>
+        <radialGradient id="sf-ball" cx="0.35" cy="0.3" r="0.95">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="65%" stopColor="#e2e8f0" />
+          <stop offset="100%" stopColor="#94a3b8" />
+        </radialGradient>
+        <linearGradient id="sf-patch" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#334155" />
+          <stop offset="100%" stopColor="#0f172a" />
+        </linearGradient>
+        <clipPath id="sf-clip">
+          <circle cx={16} cy={16} r={13} />
+        </clipPath>
+      </defs>
+      <circle cx={16} cy={16} r={13} fill="url(#sf-ball)" />
+      <g clipPath="url(#sf-clip)">
+        {/* Centre pentagon. */}
+        <path d="M16 11 L20.8 14.5 L19 20.2 L13 20.2 L11.2 14.5 Z" fill="url(#sf-patch)" />
+        {/* Partial patches at the rim. */}
+        <path d="M13 1.5 L19 1.5 L20.5 5.5 L16 8 L11.5 5.5 Z" fill="url(#sf-patch)" />
+        <path d="M1.5 11 L6 12.5 L6.5 17 L2.5 19.5 L0 15 Z" fill="url(#sf-patch)" />
+        <path d="M30.5 11 L26 12.5 L25.5 17 L29.5 19.5 L32 15 Z" fill="url(#sf-patch)" />
+        <path d="M9.5 30.5 L8 26 L11.5 23.5 L15 26 L14 30.5 Z" fill="url(#sf-patch)" />
+        <path d="M22.5 30.5 L24 26 L20.5 23.5 L17 26 L18 30.5 Z" fill="url(#sf-patch)" />
+        {/* Seams joining centre pentagon to the rim patches. */}
+        <g stroke="#475569" strokeWidth={0.7} opacity={0.6} fill="none">
+          <path d="M16 11 L16 8" />
+          <path d="M11.2 14.5 L6.5 13.5" />
+          <path d="M20.8 14.5 L25.5 13.5" />
+          <path d="M13 20.2 L11 24" />
+          <path d="M19 20.2 L21 24" />
+        </g>
+      </g>
+      <Shine cx={11} cy={9} rx={4} ry={2.5} opacity={0.65} />
+    </>
+  );
+}
+
+// 14. Zepto Turns 5 — film reel ("five years in a reel"): purple disc,
+// five sprocket holes for five years, dark hub.
+function ZeptoTurns5() {
+  return (
+    <>
+      <defs>
+        <radialGradient id="z5-a" cx="0.35" cy="0.3" r="0.95">
+          <stop offset="0%" stopColor="#c4b5fd" />
+          <stop offset="60%" stopColor="#7c3aed" />
+          <stop offset="100%" stopColor="#4c1d95" />
+        </radialGradient>
+        <radialGradient id="z5-hole" cx="0.4" cy="0.35" r="0.9">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="100%" stopColor="#ddd6fe" />
+        </radialGradient>
+      </defs>
+      <circle cx={16} cy={16} r={13} fill="url(#z5-a)" />
+      {/* Five sprocket holes — one per year. */}
+      <circle cx={16} cy={8.5} r={2.7} fill="url(#z5-hole)" />
+      <circle cx={23.1} cy={13.7} r={2.7} fill="url(#z5-hole)" />
+      <circle cx={20.4} cy={22.1} r={2.7} fill="url(#z5-hole)" />
+      <circle cx={11.6} cy={22.1} r={2.7} fill="url(#z5-hole)" />
+      <circle cx={8.9} cy={13.7} r={2.7} fill="url(#z5-hole)" />
+      {/* Hub. */}
+      <circle cx={16} cy={16} r={3.2} fill="#2e1065" />
+      <circle cx={16} cy={16} r={1.1} fill="#ddd6fe" />
+      <Shine cx={11} cy={9} rx={4} ry={2.2} opacity={0.45} />
     </>
   );
 }
