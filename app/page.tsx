@@ -1,5 +1,6 @@
 import { PlaygroundTitle } from "./components/PlaygroundTitle";
 import { FloatingLogos } from "./components/FloatingLogos";
+import { FeaturedReel } from "./components/FeaturedReel";
 import { Marquee } from "./components/Marquee";
 import { PinnedShowcase } from "./components/PinnedShowcase";
 import { GhostPicker } from "./components/GhostPicker";
@@ -81,6 +82,11 @@ export default function Home() {
           alternate ground / play. The full archive lives on the
           dedicated dimension routes via the doors below. */}
       <PinnedShowcase projects={featuredProjects} />
+
+      {/* FEATURED REEL — proof strip right under the featured work:
+          LottieFiles picked up Street Football + its engagement,
+          Adobe showcased the motion craft. */}
+      <FeaturedReel />
 
       {/* DIMENSION DOORS — last move before the page lets the visitor
           choose their own depth: full product archive on /ground or

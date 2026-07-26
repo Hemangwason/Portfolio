@@ -284,6 +284,12 @@ body {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .scroll-marquee-track {
+    animation: none;
+  }
+}
+
 @keyframes bob {
   0%,
   100% {

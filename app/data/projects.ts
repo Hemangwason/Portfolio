@@ -283,6 +283,70 @@ export const projects: Project[] = [
     ],
   },
   {
+    id: "street-football",
+    title: "Street Football",
+    tagline: "A penalty shootout that turned match nights into orders",
+    kind: "play",
+    year: "2026",
+    tags: ["Game", "Campaign", "Motion", "World Cup"],
+    accent: "var(--accent)",
+    emoji: "⚽",
+    blurb:
+      "A month-long penalty-shootout game inside Zepto for the FIFA World Cup — 940K players, 2.8M games, a 90.6% completion rate, and ₹40 lakh in sponsorship revenue.",
+    role: "Visual + motion designer",
+    client: "Zepto",
+    clientLabel: "Company",
+    thumbnail: {
+      type: "video",
+      src: "/projects/thumbs/street-football.mp4",
+      poster: "/projects/thumbs/street-football-poster.jpg",
+      bg: "#C7CEDF",
+    },
+    masthead: {
+      type: "video",
+      src: "/projects/street-football.mp4",
+      poster: "/projects/street-football-poster.jpg",
+      bg: "#7A8AB8",
+    },
+    writeup: [
+      "As the FIFA World Cup took over every screen in the country, Zepto wanted to be part of match night — not with a discount banner, but with something people would actually play. Street Football is a full penalty-shootout game living inside a quick-commerce app: you're matched against a rival keeper on a cartoon back-alley pitch, pick your corner, take your kicks, then swap gloves and defend your own goal. Wins climb a rewards ladder that unlocks real offers at 1, 5, 10, 20, and 50 wins, and a dedicated Match Hangout storefront — match-day deals, snacks, and cold drinks — sat right beside the game so cravings had somewhere to land.",
+      "The design bet was scrappy over stadium gloss: hand-painted alley walls, pink clouds over powerlines, a ball wrapped in rags — street football the way it's actually played — with a game loop legible in seconds. Three thumb-sized buttons (kick left, centre, right), bold GOAL / MISS / SAVE title cards, sudden-death deadlocks against named rivals, and a scoreboard strip that keeps the tension visible. The world was also built to carry partners without breaking fiction: presented-by placements and branded surfaces monetised the game for ₹40 lakh via the Nivia Men × Real Madrid sponsorship.",
+      "In one month, 9.4 lakh unique players played 2.8 million games — roughly three each, with a 90.6% completion rate. The game drove ~49.7K orders at ₹548 GMV per order, and playing deepened intent: add-to-cart conversion climbed from 27.5% to 37.8% to 49.9% as players progressed through the checkpoints. Users came for the rewards but built full, profitable baskets — non-campaign items contributed ~70% of order value — and the deepest milestone drove the highest GMV per order at ₹756. A game that paid for itself, then paid the company.",
+    ],
+  },
+  {
+    id: "zepto-turns-5",
+    title: "Zepto Turns 5",
+    tagline: "Five years of Zepto, retold as your own story",
+    kind: "play",
+    year: "2026",
+    tags: ["Story", "Personalisation", "Campaign", "Motion"],
+    accent: "var(--accent)",
+    emoji: "\u{1F389}",
+    blurb:
+      "A personalised in-app birthday story that reached 1.81M users — 1 in 6 shared their recap, and the Shuffle Deals widget drove 18.2K orders in three days.",
+    role: "Visual + motion designer",
+    client: "Zepto",
+    clientLabel: "Company",
+    thumbnail: {
+      type: "video",
+      src: "/projects/thumbs/zepto-turns-5.mp4",
+      poster: "/projects/thumbs/zepto-turns-5-poster.jpg",
+      bg: "#5435A5",
+    },
+    masthead: {
+      type: "video",
+      src: "/projects/zepto-turns-5.mp4",
+      poster: "/projects/zepto-turns-5-poster.jpg",
+      bg: "#5435A5",
+    },
+    writeup: [
+      "For Zepto's fifth birthday we turned the anniversary inward: instead of the brand talking about itself, the app showed each user their own five years. “Zepto's five years in a reel” is a tappable, Wrapped-style story rendered as an illustrated film strip — the first delivery at your door, the golden retriever greeting the grocery bag, a Zepto Café evening on the couch, the pharmacy order that rescued a sick day. Every frame was drawn like a memory rather than a marketing asset, in a warm storybook style wrapped in Zepto purple.",
+      "Under the warmth sat a personalisation engine. The story pulled each user's real history — the year their city launched, their first order, their order milestones — and assembled the journey from it. Nearly 70% of the 554.7K story viewers saw three or more personalised insights, and 8.3% got a fully personalised five-insight journey. The nostalgia beats were tuned by cohort: Year-1 veterans responded hardest to the memory of Zepto launching in their city (61.2%), Year-4 users lit up at their own first order (41.9%), and the Year-5 cohort got the richest personalisation of all, with only 12.1% fallback content.",
+      "The story reached 1.81M users — 1.41M played and 667K completed the full journey, a 47.3% completion rate. A 16.1% share CTR meant one in six players pushed their personalised recap beyond the app: organic amplification on top of paid reach. And the celebration converted — the Shuffle Deals widget drove 18,234 orders in three days, growing +75% from Day 1 to Day 3 (4.4K to 6.1K to 7.7K daily) as users came back to spin at 2.6 clicks per session.",
+    ],
+  },
+  {
     id: "healthy-high-five",
     title: "Healthy High-Five",
     tagline: "Making \u201Ceat better\u201D feel like a game you can win",
@@ -574,7 +638,7 @@ const FEATURED_IDS = [
   "sidetalk", // ground
   "asia-cup-2025", // play
   "jexlin", // ground
-  "independence-day-banner", // play
+  "street-football", // play
 ] as const;
 
 export const featuredProjects: Project[] = FEATURED_IDS.map((id) =>

@@ -216,6 +216,36 @@ export function FigmaLogo(props: IconProps) {
   );
 }
 
+// Adobe — the triangular "A" mark.
+export function AdobeLogo(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden {...props}>
+      <path
+        fill="currentColor"
+        d="M13.966 22.624l-1.69-4.281H8.122l3.892-9.144 5.662 13.425zM8.884 1.376H0v21.248zm15.116 0h-8.884L24 22.624z"
+      />
+    </svg>
+  );
+}
+
+// LottieFiles — a motion-path wave with keyframe dots at both ends;
+// reads as "animation curve" at tile size without lifting their mark.
+export function LottieFilesLogo(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden {...props}>
+      <path
+        d="M4.6 16.9c4.6 0 4.3-9.8 8.9-9.8 3.1 0 2.9 6.3 5.9 6.3"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+      <circle cx="4.6" cy="16.9" r="1.7" fill="currentColor" />
+      <circle cx="19.4" cy="13.4" r="1.7" fill="currentColor" />
+    </svg>
+  );
+}
+
 export type PlatformKey =
   | "spotify"
   | "vimeo"
@@ -234,7 +264,9 @@ export type PlatformKey =
   | "gemini"
   | "grok"
   | "vercel"
-  | "figma";
+  | "figma"
+  | "adobe"
+  | "lottiefiles";
 
 export type Platform = {
   key: PlatformKey;
@@ -392,6 +424,23 @@ export const platforms: Platform[] = [
     brand: "#0F0F0F",
     href: "https://figma.com/",
     Icon: FigmaLogo,
+  },
+  {
+    key: "adobe",
+    name: "Adobe",
+    label: "featured by",
+    brand: "#FA0F00",
+    href: "https://www.adobe.com/",
+    Icon: AdobeLogo,
+  },
+  {
+    key: "lottiefiles",
+    name: "LottieFiles",
+    label: "featured by",
+    brand: "#00DDB3",
+    textOnBrand: "#00291F",
+    href: "https://lottiefiles.com/",
+    Icon: LottieFilesLogo,
   },
 ];
 

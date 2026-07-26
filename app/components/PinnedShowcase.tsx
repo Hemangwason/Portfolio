@@ -576,7 +576,10 @@ function PanelMedia({
       // already has frames buffered. Without this, the video shows
       // a blank black frame for a beat after activation.
       preload="auto"
-      className="absolute inset-0 h-full w-full object-cover"
+      // contain (not cover): non-16:9 mastheads — Street Football is
+      // square — letterbox against the panel's bg colour instead of
+      // cropping. For the 16:9 sources contain renders identically.
+      className="absolute inset-0 h-full w-full object-contain"
       // Promote to its own compositor layer so the browser uses the
       // higher-quality scaler path. Combined with the tighter 960-px
       // card cap, this kills the visible blur on the source files.

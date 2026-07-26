@@ -50,3 +50,4 @@ next-env.d.ts
 /Screen Recording*.mp4
 /Comp*.mp4
 /Demo walkthrough*.mp4
+.claude/worktrees/
