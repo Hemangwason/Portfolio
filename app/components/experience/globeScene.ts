@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { DEG, R, gridLines, pearlMaterial, sphericalPoint } from "./globeSurface";
+import { createSheen, SHEEN_GESTURE_GAP_MS, SHEEN_TRIGGER_PX } from "./globeSheen";
 
 export type GlobeTile = { id: string; still: string; aspect: number; loop?: string };
 
@@ -23,11 +25,9 @@ export type GlobeHandle = {
   dispose: () => void;
 };
 
-const R = 10;
-const DEG = Math.PI / 180;
 
 /* ── layout: every project exactly once ──────────────────────────
-   17 tiles on the face of the globe in three rows (6·6·5), spaced
+   18 tiles on the face of the globe in three rows of six, spaced
    like Griflan's clusters. Slots are ranked by how central they sit
    in the resting view and handed out in `tiles` order — so the first
    tiles (the illustrative work) land in the middle and the last ones
@@ -36,7 +36,7 @@ const DEG = Math.PI / 180;
 const ROWS: Array<{ lat: number; count: number }> = [
   { lat: 7, count: 6 },
   { lat: 22, count: 6 },
-  { lat: -8, count: 5 },
+  { lat: -8, count: 6 },
 ];
 const LON_PITCH = 20;
 const TILE_WIDTH_DEG = 16.5; // at the equator
@@ -45,11 +45,6 @@ const TILE_RADIUS = R * 1.002;
 /** Where the eye lands at rest; slots nearest it are the most central. */
 const FOCUS_LAT = 1;
 const FOCUS_LAT_WEIGHT = 1.3;
-
-/* ── grid ────────────────────────────────────────────────────────── */
-const LON_CELL = 6;
-const LAT_CELL = 4.5;
-const LAT_EDGE = 81;
 
 /* ── camera: close in, Griflan-style — horizon under the header,
    the sphere's sides beyond the frame ─────────────────────────── */
@@ -97,16 +92,6 @@ const smoothstep = (a: number, b: number, x: number) => {
 };
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
-
-function sphericalPoint(lonDeg: number, latDeg: number, r: number): THREE.Vector3 {
-  const phi = lonDeg * DEG;
-  const theta = (90 - latDeg) * DEG;
-  return new THREE.Vector3(
-    -r * Math.cos(phi) * Math.sin(theta),
-    r * Math.cos(theta),
-    r * Math.sin(phi) * Math.sin(theta),
-  );
-}
 
 type Placement = { lon: number; lat: number; wDeg: number; hDeg: number };
 
@@ -180,98 +165,12 @@ function tileGeometry(p: Placement): THREE.BufferGeometry {
   return geo;
 }
 
-/* Grid lines carry a colour gradient across the globe — blush at the
-   top, violet and sky through the middle, peach at the bottom. */
-const LINE_STOPS = ["#ff5aa5", "#9a7bff", "#4aa8ff", "#ff9b62"].map((c) => new THREE.Color(c));
-const LINE_OPACITY = 0.9;
-
-function lineColour(latDeg: number, lonDeg: number, out: THREE.Color): THREE.Color {
-  const t = Math.min(0.999, Math.max(0, (LAT_EDGE - latDeg) / (2 * LAT_EDGE)));
-  const shifted = Math.min(0.999, Math.max(0, t + 0.12 * Math.sin(lonDeg * DEG * 2)));
-  const seg = shifted * (LINE_STOPS.length - 1);
-  const i = Math.floor(seg);
-  return out.copy(LINE_STOPS[i]).lerp(LINE_STOPS[i + 1], seg - i);
-}
-
-function gridLines(): THREE.LineSegments {
-  const r = R * 0.9985;
-  const pts: number[] = [];
-  const cols: number[] = [];
-  const c = new THREE.Color();
-  const push = (lonA: number, latA: number, lonB: number, latB: number) => {
-    const a = sphericalPoint(lonA, latA, r);
-    const b = sphericalPoint(lonB, latB, r);
-    pts.push(a.x, a.y, a.z, b.x, b.y, b.z);
-    lineColour(latA, lonA, c);
-    cols.push(c.r, c.g, c.b);
-    lineColour(latB, lonB, c);
-    cols.push(c.r, c.g, c.b);
-  };
-  for (let lon = 0; lon < 360; lon += LON_CELL) {
-    for (let lat = -LAT_EDGE; lat < LAT_EDGE; lat += 1.5) push(lon, lat, lon, lat + 1.5);
-  }
-  for (let lat = -LAT_EDGE; lat <= LAT_EDGE + 0.01; lat += LAT_CELL) {
-    for (let lon = 0; lon < 360; lon += 2) push(lon, lat, lon + 2, lat);
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
-  geo.setAttribute("color", new THREE.Float32BufferAttribute(cols, 3));
-  return new THREE.LineSegments(
-    geo,
-    new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: LINE_OPACITY }),
-  );
-}
-
-/* A white, pearl-like globe: pure white face, a soft iridescent rim
-   where the surface turns away, and the scene fog toward the horizon. */
-function pearlMaterial(): THREE.ShaderMaterial {
-  return new THREE.ShaderMaterial({
-    fog: true,
-    uniforms: THREE.UniformsUtils.merge([
-      THREE.UniformsLib.fog,
-      {
-        uBase: { value: new THREE.Color("#ffffff") },
-        uRimTop: { value: new THREE.Color("#e9d9ff") },
-        uRimBottom: { value: new THREE.Color("#ffdcea") },
-      },
-    ]),
-    vertexShader: /* glsl */ `
-      #include <common>
-      #include <fog_pars_vertex>
-      varying vec3 vNormal;
-      varying vec3 vView;
-      void main() {
-        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-        vNormal = normalize(normalMatrix * normal);
-        vView = normalize(-mvPosition.xyz);
-        gl_Position = projectionMatrix * mvPosition;
-        #include <fog_vertex>
-      }
-    `,
-    fragmentShader: /* glsl */ `
-      #include <common>
-      #include <fog_pars_fragment>
-      uniform vec3 uBase;
-      uniform vec3 uRimTop;
-      uniform vec3 uRimBottom;
-      varying vec3 vNormal;
-      varying vec3 vView;
-      void main() {
-        float rim = pow(1.0 - max(dot(vNormal, vView), 0.0), 2.4);
-        vec3 rimColour = mix(uRimBottom, uRimTop, 0.5 + 0.5 * vNormal.y);
-        gl_FragColor = vec4(mix(uBase, rimColour, rim * 0.9), 1.0);
-        #include <tonemapping_fragment>
-        #include <colorspace_fragment>
-        #include <fog_fragment>
-      }
-    `,
-  });
-}
-
 export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts: GlobeOptions): GlobeHandle {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
   renderer.setClearColor(0x000000, 0);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  // Modest devices render at 1.5x — the grid stays crisp, the GPU stays cool.
+  const cores = navigator.hardwareConcurrency || 8;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, cores <= 4 ? 1.5 : 2));
 
   const scene = new THREE.Scene();
   const fog = new THREE.Fog(opts.background, FOG_NEAR, FOG_FAR);
@@ -285,9 +184,10 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
 
   const globe = new THREE.Group();
   scene.add(globe);
-  const core = new THREE.Mesh(new THREE.SphereGeometry(R * 0.996, 96, 64), pearlMaterial());
+  const sheen = createSheen(opts.reducedMotion);
+  const core = new THREE.Mesh(new THREE.SphereGeometry(R * 0.996, 96, 64), pearlMaterial(sheen.uniforms));
   globe.add(core);
-  globe.add(gridLines());
+  globe.add(gridLines(sheen.uniforms));
 
   /* ── tiles ─────────────────────────────────────────────────── */
   const loader = new THREE.TextureLoader();
@@ -417,6 +317,20 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
     }
   };
 
+  /* Scrolling or dragging far enough sends the sheen across the globe,
+     the way the surface is moving (tilt up = surface moves down). */
+  let gestureTravel = 0;
+  let gestureAt = 0;
+  const feelGesture = (tiltDelta: number, px: number) => {
+    const now = performance.now();
+    if (now - gestureAt > SHEEN_GESTURE_GAP_MS || Math.sign(tiltDelta) !== Math.sign(gestureTravel)) gestureTravel = 0;
+    gestureAt = now;
+    gestureTravel += Math.sign(tiltDelta) * px;
+    if (Math.abs(gestureTravel) < SHEEN_TRIGGER_PX) return;
+    sheen.kick(Math.sign(gestureTravel));
+    gestureTravel = 0;
+  };
+
   /* ── picking ───────────────────────────────────────────────── */
   const raycaster = new THREE.Raycaster();
   const ndc = new THREE.Vector2();
@@ -468,6 +382,7 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
       tiltSpeed = clamp(dy * DRAG_TILT * gain, -MAX_TILT_SPEED, MAX_TILT_SPEED);
       spin += spinSpeed;
       tilt += tiltSpeed;
+      if (dy !== 0) feelGesture(dy, Math.abs(dy));
       stopAtEdges();
       if (drag.travel > CLICK_SLOP_PX) {
         canvas.style.cursor = "grabbing";
@@ -535,6 +450,7 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
     }
     // Scrolling down rolls the rows up and away.
     tiltSpeed = clamp(tiltSpeed - delta * WHEEL_GAIN, -MAX_TILT_SPEED, MAX_TILT_SPEED);
+    if (delta !== 0) feelGesture(-delta, Math.abs(delta));
   };
 
   canvas.addEventListener("pointerdown", onDown);
@@ -697,6 +613,7 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
       applyRest();
     }
 
+    sheen.update(now);
     if (hovered && videoReady && hovered.material !== videoMat) hovered.material = videoMat;
 
     if (++frameCount % HOVER_RECHECK_FRAMES === 0) refreshHover();
@@ -724,6 +641,7 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
     setActive,
     enter: () => {
       depthTarget = 1;
+      sheen.kick(-1);
     },
     flyIn,
     flyOut,

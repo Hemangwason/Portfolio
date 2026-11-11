@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fieldLabel, filmFor, type Project } from "../../data/projects";
 import type { ReelPhase } from "./Experience";
+import { isConstrainedNetwork } from "./network";
 
 type Props = {
   projects: Project[];
@@ -26,6 +27,13 @@ const EXIT_SPAN = 0.4;
 const EXIT_MIN_OPACITY = 0.3;
 const PLAY_RATIO = 0.35;
 const VIDEO_START_DELAY_MS = 450;
+/** A section's text rises in once its top passes this share of the screen. */
+const TEXT_REVEAL_AT = 0.88;
+/** After the match cut, the first project's text follows the picture in. */
+const TEXT_REVEAL_DELAY_MS = 240;
+/** How far ahead videos start streaming: generous on good links only. */
+const PREFETCH_MARGIN = "60% 0px";
+const PREFETCH_MARGIN_LEAN = "5% 0px";
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
@@ -86,6 +94,7 @@ export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose, onS
         media.style.transform = `perspective(1400px) rotateX(${tilt.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
         const exit = clamp01((vh * EXIT_SPAN - r.bottom) / (vh * EXIT_SPAN));
         media.style.opacity = String(1 - exit * (1 - EXIT_MIN_OPACITY));
+        if (shownRef.current && !section.dataset.in && r.top < vh * TEXT_REVEAL_AT) section.dataset.in = "1";
 
         const s = section.getBoundingClientRect();
         if (s.top <= probe && s.bottom > probe) {
@@ -122,7 +131,7 @@ export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose, onS
           if (e.isIntersecting && !v.src && v.dataset.src) v.src = v.dataset.src;
         });
       },
-      { root: scroller, rootMargin: "60% 0px" },
+      { root: scroller, rootMargin: isConstrainedNetwork() ? PREFETCH_MARGIN_LEAN : PREFETCH_MARGIN },
     );
     const inView = new IntersectionObserver(
       (entries) => {
@@ -151,6 +160,13 @@ export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose, onS
     if (phase !== "shown") return;
     const scroller = scrollerRef.current;
     if (!scroller) return;
+    const reveal = setTimeout(() => {
+      const vh = scroller.clientHeight;
+      scroller.querySelectorAll<HTMLElement>("[data-reel-id]").forEach((section) => {
+        const media = section.querySelector<HTMLElement>(".reel-media");
+        if (media && media.getBoundingClientRect().top < vh * TEXT_REVEAL_AT) section.dataset.in = "1";
+      });
+    }, TEXT_REVEAL_DELAY_MS);
     const t = setTimeout(() => {
       const vh = scroller.clientHeight;
       scroller.querySelectorAll<HTMLVideoElement>("video").forEach((v) => {
@@ -158,7 +174,10 @@ export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose, onS
         if (r.bottom > 0 && r.top < vh) playFromStill(v);
       });
     }, VIDEO_START_DELAY_MS);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(reveal);
+      clearTimeout(t);
+    };
   }, [phase]);
 
   // Menu jumps.
@@ -200,13 +219,14 @@ function ReelSection({ project, eager }: { project: Project; eager: boolean }) {
   const aspect = film.width / film.height;
   const src = film.src;
   const bg = project.masthead?.bg ?? project.thumbnail?.bg ?? "#000";
+  const [lean] = useState(isConstrainedNetwork);
 
   return (
     <section data-reel-id={project.id} aria-labelledby={`reel-${project.id}`} className="px-4 pb-16 sm:px-6">
       <figure
         className="reel-media relative mx-auto overflow-hidden rounded-[10px]"
         style={{
-          width: `min(calc(100vw - 32px), calc((100svh - 200px) * ${aspect.toFixed(4)}), 1320px)`,
+          width: `min(calc(100vw - 32px), calc((100svh - var(--hdr-h) - 64px) * ${aspect.toFixed(4)}), 1320px)`,
           aspectRatio: `${film.width} / ${film.height}`,
           background: bg,
         }}
@@ -220,7 +240,7 @@ function ReelSection({ project, eager }: { project: Project; eager: boolean }) {
             muted
             loop
             playsInline
-            preload={eager ? "auto" : "none"}
+            preload={eager ? (lean ? "metadata" : "auto") : "none"}
             aria-label={`${project.title} — film`}
             className="absolute inset-0 h-full w-full object-contain"
           />
@@ -229,7 +249,7 @@ function ReelSection({ project, eager }: { project: Project; eager: boolean }) {
         )}
       </figure>
 
-      <div className="mx-auto mt-8 grid max-w-[1320px] grid-cols-1 gap-6 md:grid-cols-[1fr_1.15fr] md:gap-12">
+      <div className="reel-copy mx-auto mt-8 grid max-w-[1320px] grid-cols-1 gap-6 md:grid-cols-[1fr_1.15fr] md:gap-12">
         <div>
           <p className="label text-[11px] text-[var(--accent)]">
             {fieldLabel(project)} · {project.client ?? "Independent"} · {project.year}
@@ -264,6 +284,24 @@ function ReelSection({ project, eager }: { project: Project; eager: boolean }) {
           </div>
         </div>
       </div>
+
+      {project.gallery && project.gallery.length > 0 && (
+        <ul className="reel-copy mx-auto mt-10 grid max-w-[1320px] grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+          {project.gallery.map((img) => (
+            <li key={img.src} className="reel-still overflow-hidden rounded-[10px]" style={{ background: bg }}>
+              <img
+                src={img.src}
+                alt={img.alt}
+                width={img.width}
+                height={img.height}
+                loading="lazy"
+                decoding="async"
+                className="block h-auto w-full"
+              />
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

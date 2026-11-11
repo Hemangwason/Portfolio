@@ -30,6 +30,13 @@ export type ProjectProcess = {
   blurb?: string;
 };
 
+export type ProjectGalleryImage = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+};
+
 export type Project = {
   id: string;
   title: string;
@@ -52,6 +59,8 @@ export type Project = {
   explorations?: ProjectExploration[];
   /** Full-screen design-board / flow viewer. Opens from a modal CTA. */
   process?: ProjectProcess;
+  /** Key frames shown under the film in the open view. */
+  gallery?: ProjectGalleryImage[];
   role?: string;
   team?: string;
   client?: string;
@@ -61,6 +70,51 @@ export type Project = {
 };
 
 export const projects: Project[] = [
+  {
+    id: "diya-rush",
+    title: "Diya Rush",
+    tagline: "A twenty-second Diwali game, lit one diya at a time",
+    kind: "play",
+    year: "2026",
+    tags: ["Illustration", "Game", "Diwali", "Campaign"],
+    accent: "var(--accent)",
+    emoji: "\u{1FA94}",
+    blurb:
+      "An in-app Diwali game for Zepto, powered by Kinder Joy and Ferrero Rocher: carry the flame across a haveli and light all 22 diyas in under 20 seconds to win rewards. I illustrated every scene.",
+    role: "Illustrator + visual designer",
+    client: "Zepto",
+    clientLabel: "Company",
+    thumbnail: {
+      type: "video",
+      src: "/projects/thumbs/diya-rush.mp4",
+      poster: "/projects/thumbs/diya-rush-poster.jpg",
+      bg: "#1E1240",
+    },
+    masthead: {
+      type: "video",
+      src: "/projects/diya-rush.mp4",
+      poster: "/projects/diya-rush-poster.jpg",
+      bg: "#1E1240",
+    },
+    gallery: [
+      {
+        src: "/projects/diya-rush/key-art-screens.jpg",
+        alt: "Diya Rush title screen beside the fully lit haveli at the end of a round",
+        width: 1000,
+        height: 1000,
+      },
+      {
+        src: "/projects/diya-rush/key-art-scenes.jpg",
+        alt: "Diya Rush scenes: sky lanterns, the carved front door, the how-to-play arch and three windows of silhouettes holding diyas",
+        width: 1000,
+        height: 1000,
+      },
+    ],
+    writeup: [
+      "Diya Rush is a short tap-and-drag game that ran inside Zepto for Diwali. The whole game is one haveli at night: a carved wooden door marked शुभ and लाभ, a rangoli at the steps, marigold garlands in three arched windows, and families standing in them as silhouettes, each holding a diya. You pick up the flame and carry it from lamp to lamp. The clock reads 20 seconds and the counter reads 0/22, so the house starts dark and ends glowing.",
+      "I drew every piece of it: the building, the door, the lanterns drifting in the sky, the firefly bushes, the silhouettes, the how-to-play arch and the Diya Rush wordmark. The palette stays deep indigo and plum so that the only warm light on screen is the light the player makes. Each lit diya adds a little more orange to the walls, and when the last one catches, the whole facade is finally in colour.",
+    ],
+  },
   {
     id: "sidetake",
     title: "Sidetake",
@@ -633,6 +687,7 @@ export const projects: Project[] = [
    appears exactly once. */
 const SHOWCASE_IDS = [
   // illustrative — the centre
+  "diya-rush",
   "asia-cup-2025",
   "onam",
   "healthy-high-five",
@@ -666,6 +721,7 @@ export type ProjectStill = { src: string; width: number; height: number };
 const STILL_SIZES: Record<string, readonly [number, number]> = {
   "asia-cup-2025": [960, 540],
   boomerang: [960, 524],
+  "diya-rush": [960, 960],
   crater: [960, 576],
   "durga-puja-pandal": [960, 540],
   "goat-offers-bumrah": [960, 540],
@@ -683,13 +739,14 @@ const STILL_SIZES: Record<string, readonly [number, number]> = {
   "zomato-plus-identity": [960, 540],
 };
 
-const STILL_VERSION = 3;
+const STILL_VERSION = 4;
 
 /* Where in each full video its still was cut (fraction of duration).
    The open view starts playback from here, so the picture carries on
    from the very frame the globe tile showed. */
 const STILL_AT: Record<string, number> = {
   "asia-cup-2025": 0.36,
+  "diya-rush": 0.052,
   boomerang: 0.22,
   crater: 0.92,
   "durga-puja-pandal": 0.6,
@@ -718,6 +775,7 @@ export function stillFor(id: string): ProjectStill {
 const FILM_SIZES: Record<string, readonly [number, number]> = {
   "asia-cup-2025": [1280, 720],
   boomerang: [1280, 698],
+  "diya-rush": [1000, 1000],
   crater: [1280, 768],
   "durga-puja-pandal": [1280, 720],
   "goat-offers-bumrah": [1280, 720],

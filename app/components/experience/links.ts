@@ -1,3 +1,5 @@
+import { showcase } from "../../data/projects";
+
 export const EMAIL = "hemangwason@gmail.com";
 export const LINKEDIN_URL = "https://www.linkedin.com/in/hemang-wason-577205161/";
 export const X_URL = "https://x.com/Hemangsidetake";
@@ -22,11 +24,12 @@ export const LIVE_SITES = [
 
 /** Board-mode ticker: loading-screen style one-liners. */
 export const BOARD_TICKER = [
-  "Rendering 17 projects",
+  `Rendering ${showcase.length} projects`,
   "Kicking 2.8M penalties",
   "Warming up the After Effects render queue",
   "Teaching Lottie a new trick",
   "Hanging festival lights on the home feed",
   "Buffering 1.81M birthday wishes",
+  "Lighting 22 diyas in 20 seconds",
   "Scroll to spin · drag to turn · click to open",
 ];

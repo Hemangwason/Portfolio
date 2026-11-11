@@ -192,7 +192,7 @@ export function PillHeader({
       className={`pill-wrap pointer-events-none fixed inset-x-0 top-0 z-50 ${visible ? "opacity-100" : "opacity-0"}`}
       aria-hidden={!visible}
     >
-      <div className={`flex items-start justify-between ${visible ? "pointer-events-auto" : ""}`}>
+      <div className={`relative flex items-start justify-between ${visible ? "pointer-events-auto" : ""}`}>
         <div className="flex h-12">
           <NavLink href="/" label="Home" onClick={actions.onHome} />
           <NavLink href="/about" label="About" onClick={actions.onAbout} className="hidden sm:flex" />
@@ -250,7 +250,7 @@ export function PillHeader({
                       setMenuOpen(false);
                       onPick(p.id);
                     }}
-                    className={`block w-full py-1 text-left text-[13px] hover:text-[var(--accent)] ${p.id === current?.id ? "text-[var(--accent)]" : ""}`}
+                    className={`block w-full py-1 text-left text-[13px] transition-[color,translate] duration-200 hover:translate-x-[3px] hover:text-[var(--accent)] ${p.id === current?.id ? "text-[var(--accent)]" : ""}`}
                   >
                     {p.title}
                   </button>

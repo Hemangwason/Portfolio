@@ -6,6 +6,7 @@ import type { GlobeHandle } from "./globeScene";
 import { BoardHeader, PillHeader, type NavActions } from "./Headers";
 import { BOARD_TICKER } from "./links";
 import { Loader } from "./Loader";
+import { isConstrainedNetwork } from "./network";
 import { AboutPanel, ContactPanel } from "./Panels";
 import { ProjectReel } from "./ProjectReel";
 import { Ticker } from "./Ticker";
@@ -80,11 +81,13 @@ export function Experience({ initialView = "board", initialProject }: Props) {
     import("./globeScene")
       .then(({ createGlobe }) => {
         if (disposed) return;
+        // On Data Saver / slow links the tiles stay as stills on hover.
+        const lean = isConstrainedNetwork();
         const handle = createGlobe(
           canvas,
           showcase.map((p) => {
             const s = stillFor(p.id);
-            return { id: p.id, still: s.src, aspect: s.width / s.height, loop: loopFor(p) };
+            return { id: p.id, still: s.src, aspect: s.width / s.height, loop: lean ? undefined : loopFor(p) };
           }),
           {
             background: BG,
