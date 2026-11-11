@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { fieldLabel, type Project } from "../../data/projects";
 import { LINKEDIN_URL, SOCIAL_PRIMARY } from "./links";
-import { WireCube } from "./WireCube";
+import { GradientOrb } from "./GradientOrb";
 
 export type NavActions = {
   onHome: () => void;
@@ -57,7 +57,7 @@ function Wordmark({ className = "" }: { className?: string }) {
 export function BoardHeader({ actions, active, collapsed }: { actions: NavActions; active: Active; collapsed: boolean }) {
   return (
     <header
-      className={`hdr fixed inset-x-0 top-0 z-40 border-b border-[var(--rule)] bg-[var(--bg)] ${collapsed ? "hdr-collapsed" : ""}`}
+      className={`hdr fixed inset-x-0 top-0 z-40 glass-strong border-b border-[var(--rule)] ${collapsed ? "hdr-collapsed" : ""}`}
       style={{ height: "var(--hdr-h)" }}
     >
       {/* desktop */}
@@ -104,7 +104,7 @@ export function BoardHeader({ actions, active, collapsed }: { actions: NavAction
         </div>
 
         <div className="col-start-1 row-span-2 row-start-2 flex items-center justify-center border-r border-[var(--rule)]">
-          <WireCube size={40} />
+          <GradientOrb size={52} blur={1.5} />
         </div>
       </div>
 
@@ -119,7 +119,7 @@ export function BoardHeader({ actions, active, collapsed }: { actions: NavAction
         </div>
         <div className="flex flex-1 items-stretch">
           <div className="flex w-14 shrink-0 items-center justify-center border-r border-[var(--rule)]">
-            <WireCube size={24} />
+            <GradientOrb size={30} blur={1} />
           </div>
           <div className="flex flex-1 items-center justify-center">
             <Wordmark className="text-[1.9rem]" />
@@ -141,7 +141,7 @@ function SayHello({ onClick, className = "" }: { onClick: () => void; className?
         e.preventDefault();
         onClick();
       }}
-      className={`flex items-center justify-center rounded-[4px] bg-[var(--red)] px-3 font-semibold leading-none tracking-[-0.02em] text-white transition-transform hover:scale-[0.97] ${className}`}
+      className={`flex items-center justify-center cta-iris rounded-[6px] px-3 font-semibold leading-none tracking-[-0.02em] ${className}`}
     >
       Say Hello
     </a>
@@ -220,7 +220,7 @@ export function PillHeader({
           onClick={() => setMenuOpen((v) => !v)}
           aria-expanded={menuOpen}
           aria-haspopup="listbox"
-          className={`flex w-[150px] items-center justify-between gap-2 border-r border-[var(--rule-strong)] px-3 text-left text-[13px] sm:w-[170px] ${menuOpen ? "text-[var(--red)]" : ""}`}
+          className={`flex w-[150px] items-center justify-between gap-2 border-r border-[var(--rule-strong)] px-3 text-left text-[13px] sm:w-[170px] ${menuOpen ? "text-[var(--accent)]" : ""}`}
         >
           <span className="truncate">{current?.title ?? "Projects"}</span>
           <span aria-hidden className={`text-[11px] transition-transform ${menuOpen ? "rotate-180" : ""}`}>
@@ -235,11 +235,11 @@ export function PillHeader({
           <div
             role="listbox"
             data-scroll-momentum
-            className="absolute left-1/2 top-[52px] max-h-[60vh] w-[200px] -translate-x-1/2 overflow-y-auto rounded-[10px] border border-[var(--rule-strong)] bg-[var(--bg)] px-3 py-2 sm:left-[calc(50%-24px)]"
+            className="absolute left-1/2 top-[52px] max-h-[60vh] w-[200px] -translate-x-1/2 overflow-y-auto glass-strong rounded-[10px] border border-[var(--rule-strong)] px-3 py-2 sm:left-[calc(50%-24px)]"
           >
             {groups.map((g) => (
               <div key={g.label} className="py-1.5">
-                <p className="label py-1.5 text-[10px] text-[var(--cream-faint)]">{g.label}</p>
+                <p className="label py-1.5 text-[10px] text-[var(--ink-faint)]">{g.label}</p>
                 {g.items.map((p) => (
                   <button
                     key={p.id}
@@ -250,7 +250,7 @@ export function PillHeader({
                       setMenuOpen(false);
                       onPick(p.id);
                     }}
-                    className={`block w-full py-1 text-left text-[13px] hover:text-[var(--red)] ${p.id === current?.id ? "text-[var(--red)]" : ""}`}
+                    className={`block w-full py-1 text-left text-[13px] hover:text-[var(--accent)] ${p.id === current?.id ? "text-[var(--accent)]" : ""}`}
                   >
                     {p.title}
                   </button>

@@ -17,8 +17,8 @@ type Props = {
   initialProject?: string;
 };
 
-const BG = "#181616";
-const LINE = "#f5eedc";
+const BG = "#f6f4f2";
+const LINE = "#17151b";
 const LOADER_MIN_MS = 1300;
 const LOADER_MAX_MS = 5000;
 const REEL_FADE_MS = 520;
@@ -232,7 +232,7 @@ export function Experience({ initialView = "board", initialProject }: Props) {
     : BOARD_TICKER;
 
   return (
-    <main className="fixed inset-0 overflow-hidden bg-[var(--bg)]">
+    <main className="fixed inset-0 overflow-hidden">
       <div className="absolute inset-x-0 bottom-0" style={{ top: "var(--hdr-h)" }}>
         <canvas
           ref={canvasRef}
@@ -242,14 +242,14 @@ export function Experience({ initialView = "board", initialProject }: Props) {
         <span
           ref={uRef}
           aria-hidden
-          className="label pointer-events-none absolute left-8 top-12 hidden text-[12px] text-[var(--cream-faint)] md:block"
+          className="label pointer-events-none absolute left-8 top-12 hidden text-[12px] text-[var(--ink-faint)] md:block"
         >
           0.000000
         </span>
         <span
           ref={vRef}
           aria-hidden
-          className="label pointer-events-none absolute right-8 top-12 hidden text-[12px] text-[var(--cream-faint)] md:block"
+          className="label pointer-events-none absolute right-8 top-12 hidden text-[12px] text-[var(--ink-faint)] md:block"
         >
           0.000000
         </span>
@@ -338,7 +338,7 @@ function QuickView({ onOpen }: { onOpen: () => void }) {
           />
         ))}
       </span>
-      <span className="label whitespace-nowrap text-[var(--cream)]">All {showcase.length}</span>
+      <span className="label whitespace-nowrap text-[var(--ink)]">All {showcase.length}</span>
     </button>
   );
 }
@@ -346,7 +346,7 @@ function QuickView({ onOpen }: { onOpen: () => void }) {
 /** Flat grid of stills, used only if WebGL can't start. */
 function BoardFallback({ onOpen }: { onOpen: (id: string) => void }) {
   return (
-    <div className="absolute inset-0 overflow-y-auto bg-[var(--bg)] p-4 sm:p-8">
+    <div className="iris-bg absolute inset-0 overflow-y-auto p-4 sm:p-8">
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {showcase.map((p) => {
           const s = stillFor(p.id);

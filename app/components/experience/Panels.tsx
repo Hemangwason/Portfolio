@@ -28,7 +28,7 @@ function Shell({
       aria-hidden={!open}
       inert={!open}
       data-scroll-momentum
-      className={`panel fixed bottom-0 z-30 w-full overflow-y-auto overscroll-contain bg-[var(--bg)] px-6 pb-24 pt-12 sm:px-10 ${PANEL_WIDTH} ${
+      className={`panel fixed bottom-0 z-30 w-full overflow-y-auto overscroll-contain glass-strong px-6 pb-24 pt-12 sm:px-10 ${PANEL_WIDTH} ${
         side === "left" ? "left-0 md:border-r" : "right-0 md:border-l"
       } border-[var(--rule)] ${open ? "translate-x-0" : closed}`}
       style={{ top: "var(--hdr-h)" }}
@@ -42,7 +42,7 @@ export function AboutPanel({ open }: { open: boolean }) {
   return (
     <Shell side="left" open={open} label="About">
       <h2 className="display text-[clamp(2.6rem,4.6vw,4rem)] uppercase leading-[0.95]">I am Hemang</h2>
-      <div className="mt-8 max-w-[420px] space-y-5 text-[15px] leading-[1.4] text-[var(--cream)]">
+      <div className="mt-8 max-w-[420px] space-y-5 text-[15px] leading-[1.4] text-[var(--ink)]">
         <p>
           Hemang Wason is a product, visual and motion designer — ex-Zomato,
           currently at Zepto. This globe is a bird&rsquo;s-eye view of the work:
@@ -59,10 +59,10 @@ export function AboutPanel({ open }: { open: boolean }) {
       <div className="mt-12 max-w-[452px] space-y-10">
         {SERVICES.map((s) => (
           <div key={s.group}>
-            <p className="label text-[12px] font-medium text-[var(--red)]">{s.group}</p>
+            <p className="label text-[12px] font-medium text-[var(--accent)]">{s.group}</p>
             <ul className="mt-3">
               {s.items.map((item) => (
-                <li key={item} className="border-b border-[var(--rule)] py-1.5 text-[13px] text-[var(--cream-soft)]">
+                <li key={item} className="border-b border-[var(--rule)] py-1.5 text-[13px] text-[var(--ink-soft)]">
                   {item}
                 </li>
               ))}
@@ -93,23 +93,23 @@ export function ContactPanel({ open }: { open: boolean }) {
 
       <a
         href={`mailto:${EMAIL}`}
-        className="display mt-8 inline-flex h-14 items-center rounded-[4px] bg-[var(--red)] px-6 text-[24px] leading-none text-white transition-transform hover:scale-[0.97]"
+        className="display mt-8 inline-flex h-14 items-center cta-iris rounded-full px-7 text-[22px] leading-none"
       >
         Let&rsquo;s Connect!
       </a>
-      <p className="mt-4 text-[14px] text-[var(--cream-soft)]">
-        <a href={`mailto:${EMAIL}`} className="underline underline-offset-4 hover:text-[var(--red)]">
+      <p className="mt-4 text-[14px] text-[var(--ink-soft)]">
+        <a href={`mailto:${EMAIL}`} className="underline underline-offset-4 hover:text-[var(--accent)]">
           {EMAIL}
         </a>
       </p>
 
       <div className="mt-12 grid max-w-[452px] grid-cols-2 gap-8">
         <div>
-          <p className="label text-[12px] text-[var(--red)]">Elsewhere</p>
+          <p className="label text-[12px] text-[var(--accent)]">Elsewhere</p>
           <ul className="mt-3">
             {socials.map((s) => (
               <li key={s.label} className="border-b border-[var(--rule)] py-1.5">
-                <a href={s.href} target="_blank" rel="noopener noreferrer" className="text-[13px] hover:text-[var(--red)]">
+                <a href={s.href} target="_blank" rel="noopener noreferrer" className="text-[13px] hover:text-[var(--accent)]">
                   {s.label}
                 </a>
               </li>
@@ -117,11 +117,11 @@ export function ContactPanel({ open }: { open: boolean }) {
           </ul>
         </div>
         <div>
-          <p className="label text-[12px] text-[var(--red)]">Live</p>
+          <p className="label text-[12px] text-[var(--accent)]">Live</p>
           <ul className="mt-3">
             {LIVE_SITES.map((s) => (
               <li key={s.href} className="border-b border-[var(--rule)] py-1.5">
-                <a href={s.href} target="_blank" rel="noopener noreferrer" className="text-[13px] hover:text-[var(--red)]">
+                <a href={s.href} target="_blank" rel="noopener noreferrer" className="text-[13px] hover:text-[var(--accent)]">
                   {s.label}
                 </a>
               </li>
@@ -135,7 +135,7 @@ export function ContactPanel({ open }: { open: boolean }) {
         <br />
         ideas
         <br />
-        <span className="text-[var(--red)]">worth playing</span>
+        <span className="text-[var(--accent)]">worth playing</span>
         <br />
         with
       </p>

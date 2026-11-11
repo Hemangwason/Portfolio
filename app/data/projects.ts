@@ -626,27 +626,32 @@ export const projects: Project[] = [
   },
 ];
 
-/* Interleaved so product and visual work alternate. Every project
-   appears the same number of times on the globe, and this order is
-   the case number shown in each case sheet. */
+/* Priority order. The globe hands out its slots centre-first in this
+   order, and the project scroll and the "All" bubble follow it too:
+   illustrative work leads, other campaign work next, product last
+   (so product sits towards the corners of the globe). Each project
+   appears exactly once. */
 const SHOWCASE_IDS = [
-  "sidetake",
-  "street-football",
-  "sidetalk",
-  "zepto-turns-5",
-  "boomerang",
-  "healthy-high-five",
-  "jexlin",
+  // illustrative — the centre
   "asia-cup-2025",
-  "crater",
-  "halloween-zomato",
-  "sid-voice-host",
   "onam",
-  "independence-day-banner",
+  "healthy-high-five",
+  "zepto-turns-5",
   "raksha-bandhan",
-  "goat-offers-bumrah",
+  "independence-day-banner",
+  // other visual + motion work
+  "street-football",
+  "halloween-zomato",
   "durga-puja-pandal",
+  "goat-offers-bumrah",
   "zomato-plus-identity",
+  // product — the corners
+  "sidetake",
+  "sidetalk",
+  "boomerang",
+  "jexlin",
+  "crater",
+  "sid-voice-host",
 ] as const;
 
 export const showcase: Project[] = SHOWCASE_IDS.map((id) =>

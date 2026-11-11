@@ -24,10 +24,12 @@ const R = 10;
 const DEG = Math.PI / 180;
 
 /* ── layout: every project exactly once ──────────────────────────
-   All 17 sit on the face of the globe in three rows of six, spaced
-   like Griflan's clusters (one empty cell between tiles, two between
-   rows), so the visible face is always full. Spin and tilt are
-   softly limited so the work can never be turned out of view. */
+   17 tiles on the face of the globe in three rows (6·6·5), spaced
+   like Griflan's clusters. Slots are ranked by how central they sit
+   in the resting view and handed out in `tiles` order — so the first
+   tiles (the illustrative work) land in the middle and the last ones
+   (product work) at the corners. Spin and tilt stop hard at the edge
+   of the work, so the empty back of the globe never comes round. */
 const ROWS: Array<{ lat: number; count: number }> = [
   { lat: 9, count: 6 },
   { lat: 27, count: 6 },
@@ -38,39 +40,42 @@ const TILE_WIDTH_DEG = 17; // at the equator — a Griflan cluster's footprint
 const TILE_MAX_HEIGHT_DEG = 11;
 const TILE_RADIUS = R * 1.002;
 const HOVER_SCALE = 1.014;
+/** Where the eye lands at rest; slots nearest it are the most central. */
+const FOCUS_LAT = 3;
+const FOCUS_LAT_WEIGHT = 1.3;
 
 /* ── grid ────────────────────────────────────────────────────────── */
 const LON_CELL = 6;
 const LAT_CELL = 4.5;
 const LAT_EDGE = 81;
 
-/* ── camera ─────────────────────────────────────────────────────── */
-const CAMERA_DISTANCE = 17;
+/* ── camera: close in, Griflan-style — horizon under the header,
+   the sphere's sides beyond the frame ─────────────────────────── */
+const CAMERA_DISTANCE = 15.5;
 const FOV_WIDE = 46;
-const FOV_NARROW = 64;
+const FOV_NARROW = 62;
 const HORIZON_MARGIN = 0.95;
-/** Starting tilt that centres the equator row in view. */
-const TILT_REST = -0.19;
+const TILT_REST = -0.21;
 
-/* ── motion ─────────────────────────────────────────────────────── */
-const SWAY_SPIN = 0.22; // rad of idle left-right sway
-const SWAY_SPEED = 0.11; // rad / s of the sway phase
-const SPIN_LIMIT = 0.75; // rad either side of centre
-const TILT_MIN = -0.42;
-const TILT_MAX = 0.1;
-const LIMIT_SPRING = 4; // pull back inside the limits, per second
-const WHEEL_GAIN = 0.00016; // rad per px of wheel delta
-const MAX_TILT_SPEED = 0.05; // rad per frame
-const SPEED_DECAY = 0.9;
-const DRAG_SPIN = 0.0028;
-const DRAG_TILT = 0.0024;
-const STEER_SPIN = 0.18; // cursor parallax, rad at the screen edge
-const STEER_TILT = 0.09;
-const STEER_EASE = 3;
+/* ── motion (deliberately calm) ─────────────────────────────────── */
+const SWAY_SPIN = 0.05; // rad of idle left-right sway
+const SWAY_SPEED = 0.12; // rad / s of the sway phase
+const SPIN_LIMIT = 0.5; // hard stop, rad either side of centre
+const TILT_MIN = -0.3; // hard stops
+const TILT_MAX = 0.12;
+const WHEEL_GAIN = 0.00007; // rad per px of wheel delta
+const MAX_TILT_SPEED = 0.02; // rad per frame
+const SPEED_DECAY = 0.88;
+const DRAG_SPIN = 0.0013;
+const DRAG_TILT = 0.0011;
+const TOUCH_FACTOR = 0.7;
+const STEER_SPIN = 0.06; // cursor parallax, rad at the screen edge
+const STEER_TILT = 0.035;
+const STEER_EASE = 2.5;
 /** Scroll speed swells the middle: a tighter lens and a closer camera. */
-const WARP_FOV = -12; // narrower lens → the centre swells
-const WARP_DOLLY = 1.4;
-const WARP_GAIN = 34;
+const WARP_FOV = -9; // narrower lens → the centre swells
+const WARP_DOLLY = 0.9;
+const WARP_GAIN = 70;
 const WARP_ATTACK = 9; // swell fast while scrolling…
 const WARP_RELEASE = 1.8; // …and settle back slowly
 const CLICK_SLOP_PX = 6;
@@ -94,22 +99,36 @@ function sphericalPoint(lonDeg: number, latDeg: number, r: number): THREE.Vector
 
 type Placement = { lon: number; lat: number; wDeg: number; hDeg: number };
 
-function placements(tiles: GlobeTile[]): Placement[] {
-  const out: Placement[] = [];
-  let i = 0;
+/** Slots ranked from most to least central. */
+function rankedSlots(): Array<{ lon: number; lat: number }> {
+  const slots: Array<{ lon: number; lat: number; score: number }> = [];
   ROWS.forEach((row) => {
     const cos = Math.cos(row.lat * DEG);
-    for (let k = 0; k < row.count && i < tiles.length; k++, i++) {
-      let hDeg = TILE_WIDTH_DEG / tiles[i].aspect;
-      let wDeg = TILE_WIDTH_DEG / cos;
-      if (hDeg > TILE_MAX_HEIGHT_DEG) {
-        hDeg = TILE_MAX_HEIGHT_DEG;
-        wDeg = (hDeg * tiles[i].aspect) / cos;
-      }
-      out.push({ lon: 90 + (k - (row.count - 1) / 2) * LON_PITCH, lat: row.lat, wDeg, hDeg });
+    for (let k = 0; k < row.count; k++) {
+      const dLon = (k - (row.count - 1) / 2) * LON_PITCH;
+      slots.push({
+        lon: 90 + dLon,
+        lat: row.lat,
+        score: Math.abs(dLon) * cos + Math.abs(row.lat - FOCUS_LAT) * FOCUS_LAT_WEIGHT,
+      });
     }
   });
-  return out;
+  return slots.sort((a, b) => a.score - b.score);
+}
+
+function placements(tiles: GlobeTile[]): Placement[] {
+  const slots = rankedSlots();
+  return tiles.map((t, i) => {
+    const slot = slots[i] ?? slots[slots.length - 1];
+    const cos = Math.cos(slot.lat * DEG);
+    let hDeg = TILE_WIDTH_DEG / t.aspect;
+    let wDeg = TILE_WIDTH_DEG / cos;
+    if (hDeg > TILE_MAX_HEIGHT_DEG) {
+      hDeg = TILE_MAX_HEIGHT_DEG;
+      wDeg = (hDeg * t.aspect) / cos;
+    }
+    return { lon: slot.lon, lat: slot.lat, wDeg, hDeg };
+  });
 }
 
 function tileGeometry(p: Placement): THREE.BufferGeometry {
@@ -140,15 +159,43 @@ function gridLines(color: string): THREE.LineSegments {
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
-  return new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.16 }));
+  return new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.1 }));
+}
+
+/* Pastel colour fields painted across the sphere (blush, peach,
+   periwinkle, lilac), washed toward the paper colour so tiles pop. */
+const IRIS = ["#ffc3dd", "#ffd8bd", "#c9d7ff", "#dcc9ff"].map((c) => new THREE.Color(c));
+const IRIS_WASH = 0.55;
+
+function iridescentSphere(radius: number, paper: string): THREE.BufferGeometry {
+  const geo = new THREE.SphereGeometry(radius, 96, 64);
+  const pos = geo.attributes.position;
+  const colors = new Float32Array(pos.count * 3);
+  const base = new THREE.Color(paper);
+  const a = new THREE.Color();
+  const b = new THREE.Color();
+  const c = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i) / radius;
+    const y = pos.getY(i) / radius;
+    const z = pos.getZ(i) / radius;
+    const u = 0.5 + 0.5 * Math.sin(x * 2.1 + z * 1.3);
+    const v = 0.5 + 0.5 * Math.sin(y * 2.4 - x * 0.9);
+    a.copy(IRIS[0]).lerp(IRIS[2], u);
+    b.copy(IRIS[1]).lerp(IRIS[3], u);
+    c.copy(a).lerp(b, v).lerp(base, IRIS_WASH);
+    colors.set([c.r, c.g, c.b], i * 3);
+  }
+  geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  return geo;
 }
 
 export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts: GlobeOptions): GlobeHandle {
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+  renderer.setClearColor(0x000000, 0);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(opts.background);
   scene.fog = new THREE.Fog(opts.background, 10, 22);
 
   const camera = new THREE.PerspectiveCamera(FOV_WIDE, 1, 0.05, 80);
@@ -159,10 +206,7 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
 
   const globe = new THREE.Group();
   scene.add(globe);
-  const core = new THREE.Mesh(
-    new THREE.SphereGeometry(R * 0.996, 96, 64),
-    new THREE.MeshBasicMaterial({ color: opts.background }),
-  );
+  const core = new THREE.Mesh(iridescentSphere(R * 0.996, opts.background), new THREE.MeshBasicMaterial({ vertexColors: true }));
   globe.add(core);
   globe.add(gridLines(opts.lineColor));
 
@@ -267,6 +311,18 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
     camera.lookAt(lookTarget);
   };
 
+  /** Hard stops at the edge of the work — momentum dies there. */
+  const stopAtEdges = () => {
+    if (spin > SPIN_LIMIT || spin < -SPIN_LIMIT) {
+      spin = clamp(spin, -SPIN_LIMIT, SPIN_LIMIT);
+      spinSpeed = 0;
+    }
+    if (tilt > TILT_MAX || tilt < TILT_MIN) {
+      tilt = clamp(tilt, TILT_MIN, TILT_MAX);
+      tiltSpeed = 0;
+    }
+  };
+
   /* ── picking ───────────────────────────────────────────────── */
   const raycaster = new THREE.Raycaster();
   const ndc = new THREE.Vector2();
@@ -313,10 +369,12 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
       drag.x = e.clientX;
       drag.y = e.clientY;
       drag.travel += Math.abs(dx) + Math.abs(dy);
-      spinSpeed = dx * DRAG_SPIN;
-      tiltSpeed = clamp(dy * DRAG_TILT, -MAX_TILT_SPEED, MAX_TILT_SPEED);
+      const gain = e.pointerType === "touch" ? TOUCH_FACTOR : 1;
+      spinSpeed = dx * DRAG_SPIN * gain;
+      tiltSpeed = clamp(dy * DRAG_TILT * gain, -MAX_TILT_SPEED, MAX_TILT_SPEED);
       spin += spinSpeed;
       tilt += tiltSpeed;
+      stopAtEdges();
       if (drag.travel > CLICK_SLOP_PX) {
         canvas.style.cursor = "grabbing";
         setHovered(null);
@@ -477,13 +535,7 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
         tiltSpeed *= decay;
         spinSpeed *= decay;
       }
-      if (!drag) {
-        const pull = 1 - Math.exp(-dt * LIMIT_SPRING);
-        if (spin > SPIN_LIMIT) spin += (SPIN_LIMIT - spin) * pull;
-        if (spin < -SPIN_LIMIT) spin += (-SPIN_LIMIT - spin) * pull;
-        if (tilt > TILT_MAX) tilt += (TILT_MAX - tilt) * pull;
-        if (tilt < TILT_MIN) tilt += (TILT_MIN - tilt) * pull;
-      }
+      stopAtEdges();
       if (!opts.reducedMotion) swayPhase += dt * SWAY_SPEED;
       const k = 1 - Math.exp(-dt * STEER_EASE);
       steerX += (steerTargetX - steerX) * k;

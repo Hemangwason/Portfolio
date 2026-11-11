@@ -135,7 +135,7 @@ export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose, onS
     <div
       ref={scrollerRef}
       data-scroll-momentum
-      className={`reel fixed inset-0 z-20 overflow-y-auto overscroll-contain bg-[var(--bg)] ${visible ? "reel-shown" : "reel-hidden"}`}
+      className={`reel fixed inset-0 z-20 overflow-y-auto overscroll-contain iris-bg ${visible ? "reel-shown" : "reel-hidden"}`}
     >
       <div className="pb-[40vh]" style={{ paddingTop: "calc(var(--hdr-h) + 24px)" }}>
         {ordered.map((p, i) => (
@@ -143,11 +143,11 @@ export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose, onS
         ))}
 
         <div className="flex flex-col items-center gap-5 px-6 py-24 text-center">
-          <p className="label text-[var(--cream-faint)]">That&rsquo;s all {projects.length}</p>
+          <p className="label text-[var(--ink-faint)]">That&rsquo;s all {projects.length}</p>
           <button
             type="button"
             onClick={onClose}
-            className="display rounded-[4px] bg-[var(--red)] px-6 py-3 text-[24px] leading-none text-white transition-transform hover:scale-[0.97]"
+            className="display cta-iris rounded-full px-7 py-3.5 text-[22px] leading-none"
           >
             Back to the globe
           </button>
@@ -194,13 +194,13 @@ function ReelSection({ project, eager }: { project: Project; eager: boolean }) {
 
       <div className="mx-auto mt-8 grid max-w-[1320px] grid-cols-1 gap-6 md:grid-cols-[1fr_1.15fr] md:gap-12">
         <div>
-          <p className="label text-[11px] text-[var(--red)]">
+          <p className="label text-[11px] text-[var(--accent)]">
             {fieldLabel(project)} · {project.client ?? "Independent"} · {project.year}
           </p>
           <h2 id={`reel-${project.id}`} className="display mt-3 text-[clamp(2.4rem,4.4vw,3.6rem)] leading-[0.95]">
             {project.title}
           </h2>
-          <p className="mt-3 text-[clamp(1.1rem,1.5vw,1.4rem)] font-medium leading-[1.2] tracking-[-0.01em] text-[var(--cream-soft)]">
+          <p className="mt-3 text-[clamp(1.1rem,1.5vw,1.4rem)] font-medium leading-[1.2] tracking-[-0.01em] text-[var(--ink-soft)]">
             {project.tagline}
           </p>
         </div>
@@ -208,7 +208,7 @@ function ReelSection({ project, eager }: { project: Project; eager: boolean }) {
         <div className="text-[15px] leading-[1.5]">
           <p>{project.blurb}</p>
           {expanded && (
-            <div className="mt-4 space-y-4 text-[var(--cream-soft)]">
+            <div className="mt-4 space-y-4 text-[var(--ink-soft)]">
               {project.writeup.map((para, i) => (
                 <p key={i}>{para}</p>
               ))}
@@ -219,11 +219,11 @@ function ReelSection({ project, eager }: { project: Project; eager: boolean }) {
               type="button"
               onClick={() => setExpanded((v) => !v)}
               aria-expanded={expanded}
-              className="label text-[11px] underline underline-offset-4 hover:text-[var(--red)]"
+              className="label text-[11px] underline underline-offset-4 hover:text-[var(--accent)]"
             >
               {expanded ? "Show less" : "Read the full story"}
             </button>
-            {project.role && <span className="label text-[11px] text-[var(--cream-faint)]">{project.role}</span>}
+            {project.role && <span className="label text-[11px] text-[var(--ink-faint)]">{project.role}</span>}
           </div>
         </div>
       </div>

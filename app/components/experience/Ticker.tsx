@@ -10,7 +10,7 @@ export function Ticker({ items, className = "" }: { items: string[]; className?:
       <div aria-hidden className="flex overflow-hidden whitespace-nowrap">
         <div className="ticker-track">
           {track.map((t, i) => (
-            <span key={i} className="label whitespace-nowrap text-[11px] text-[var(--cream)]">
+            <span key={i} className="label whitespace-nowrap text-[11px] text-[var(--ink)]">
               {t}
               <span className="px-2">•</span>
             </span>
