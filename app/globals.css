@@ -273,20 +273,27 @@ h1, h2, h3, h4, p, li, dd {
 
 /* ── project reel ───────────────────────────────────────────────── */
 
+/* hidden: laid out but invisible (measured for the match cut);
+   shown: a short swap in — the still under the tile is identical;
+   closing: shrink + fade while the camera pulls back to the globe. */
 .reel {
   transform-origin: 50% 38%;
-  transition:
-    opacity 520ms ease,
-    transform 640ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reel-hidden {
   opacity: 0;
-  transform: scale(0.9);
   pointer-events: none;
 }
 .reel-shown {
   opacity: 1;
-  transform: none;
+  transition: opacity 160ms ease;
+}
+.reel-closing {
+  opacity: 0;
+  transform: scale(0.94);
+  pointer-events: none;
+  transition:
+    opacity 520ms ease,
+    transform 640ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reel-media {
   transform-origin: 50% 100%;

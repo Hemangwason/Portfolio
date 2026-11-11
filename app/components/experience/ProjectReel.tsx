@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fieldLabel, filmFor, type Project } from "../../data/projects";
+import type { ReelPhase } from "./Experience";
 
 type Props = {
   projects: Project[];
@@ -11,7 +12,7 @@ type Props = {
   onClose: () => void;
   /** True once the visitor has scrolled past the top — shrinks the header. */
   onScrolled: (scrolled: boolean) => void;
-  visible: boolean;
+  phase: ReelPhase;
 };
 
 const SCROLLED_PX = 12;
@@ -24,14 +25,34 @@ const MIN_SCALE = 0.9;
 const EXIT_SPAN = 0.4;
 const EXIT_MIN_OPACITY = 0.3;
 const PLAY_RATIO = 0.35;
+const VIDEO_START_DELAY_MS = 450;
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+
+/** First play jumps to the frame the still was cut from; after that it
+    just resumes. */
+function playFromStill(v: HTMLVideoElement) {
+  if (v.dataset.seeked) {
+    v.play().catch(() => {});
+    return;
+  }
+  const go = () => {
+    v.dataset.seeked = "1";
+    const start = Number(v.dataset.start || 0);
+    if (Number.isFinite(v.duration) && start > 0) v.currentTime = v.duration * start;
+    v.play().catch(() => {});
+  };
+  if (v.readyState >= 1) go();
+  else v.addEventListener("loadedmetadata", go, { once: true });
+}
 
 /**
  * Every project in one continuous scroll, starting from the one that
  * was clicked: the video, then its text.
  */
-export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose, onScrolled, visible }: Props) {
+export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose, onScrolled, phase }: Props) {
+  const shownRef = useRef(phase === "shown");
+  shownRef.current = phase === "shown";
   const scrollerRef = useRef<HTMLDivElement>(null);
   const currentRef = useRef(startId);
 
@@ -107,7 +128,7 @@ export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose, onS
       (entries) => {
         entries.forEach((e) => {
           const v = e.target as HTMLVideoElement;
-          if (e.intersectionRatio >= PLAY_RATIO) v.play().catch(() => {});
+          if (e.intersectionRatio >= PLAY_RATIO && shownRef.current) playFromStill(v);
           else v.pause();
         });
       },
@@ -124,6 +145,22 @@ export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose, onS
     };
   }, [ordered]);
 
+  // Once the match cut lands, start the in-view videos after a beat so
+  // the still the tile flew in with is what the eye settles on first.
+  useEffect(() => {
+    if (phase !== "shown") return;
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const t = setTimeout(() => {
+      const vh = scroller.clientHeight;
+      scroller.querySelectorAll<HTMLVideoElement>("video").forEach((v) => {
+        const r = v.getBoundingClientRect();
+        if (r.bottom > 0 && r.top < vh) playFromStill(v);
+      });
+    }, VIDEO_START_DELAY_MS);
+    return () => clearTimeout(t);
+  }, [phase]);
+
   // Menu jumps.
   useEffect(() => {
     if (!jumpTo) return;
@@ -135,7 +172,7 @@ export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose, onS
     <div
       ref={scrollerRef}
       data-scroll-momentum
-      className={`reel fixed inset-0 z-20 overflow-y-auto overscroll-contain iris-bg ${visible ? "reel-shown" : "reel-hidden"}`}
+      className={`reel fixed inset-0 z-20 overflow-y-auto overscroll-contain iris-bg reel-${phase}`}
     >
       <div className="pb-[40vh]" style={{ paddingTop: "calc(var(--hdr-h) + 24px)" }}>
         {ordered.map((p, i) => (
@@ -177,13 +214,13 @@ function ReelSection({ project, eager }: { project: Project; eager: boolean }) {
         {src ? (
           <video
             data-src={src}
+            data-start={film.startAt}
             src={eager ? src : undefined}
             poster={film.poster}
             muted
             loop
             playsInline
             preload={eager ? "auto" : "none"}
-            autoPlay={eager}
             aria-label={`${project.title} — film`}
             className="absolute inset-0 h-full w-full object-contain"
           />

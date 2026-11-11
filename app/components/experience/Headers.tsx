@@ -47,7 +47,7 @@ function NavLink({
 
 function Wordmark({ className = "" }: { className?: string }) {
   return (
-    <span className={`display logo-sweep whitespace-nowrap leading-none tracking-[-0.01em] ${className}`}>
+    <span className={`display logo-sweep inline-block whitespace-nowrap px-[0.06em] py-[0.12em] leading-[1.1] tracking-[-0.01em] ${className}`}>
       Hemang <span className="font-medium">Wason</span>
     </span>
   );
@@ -122,7 +122,7 @@ export function BoardHeader({ actions, active, collapsed }: { actions: NavAction
             <GradientOrb size={30} blur={1} />
           </div>
           <div className="flex flex-1 items-center justify-center">
-            <Wordmark className="text-[1.9rem]" />
+            <Wordmark className="text-[clamp(1.15rem,calc((100vw_-_172px)/6.6),1.9rem)]" />
           </div>
           <div className="w-[96px] shrink-0 p-[6px]">
             <SayHello onClick={actions.onContact} className="h-full w-full whitespace-nowrap text-[15px]" />

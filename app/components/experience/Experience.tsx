@@ -22,8 +22,18 @@ const LINE = "#17151b";
 const LOADER_MIN_MS = 1300;
 const LOADER_MAX_MS = 5000;
 const REEL_FADE_MS = 520;
-/** The project view starts fading in this far into the camera dive. */
-const REEL_REVEAL_AT_MS = 520;
+/** Swap from the landed tile to the project view — same still, so short. */
+const REEL_SWAP_MS = 160;
+/** Loader fade (600ms) plus a beat on the floating globe. */
+const ARRIVAL_DELAY_MS = 900;
+
+export type ReelPhase = "hidden" | "shown" | "closing";
+
+const nextFrames = (n: number) =>
+  new Promise<void>((resolve) => {
+    const step = (left: number) => (left <= 0 ? resolve() : requestAnimationFrame(() => step(left - 1)));
+    step(n);
+  });
 
 function pathFor(view: View, projectId?: string | null): string {
   if (view === "project" && projectId) return `/projects/${projectId}`;
@@ -48,7 +58,8 @@ export function Experience({ initialView = "board", initialProject }: Props) {
 
   const [view, setView] = useState<View>(initialView === "project" ? "board" : initialView);
   const [reelStart, setReelStart] = useState<string | null>(null);
-  const [reelVisible, setReelVisible] = useState(false);
+  const [reelPhase, setReelPhase] = useState<ReelPhase>("hidden");
+  const reelVisible = reelPhase === "shown";
   const [current, setCurrent] = useState<string | null>(null);
   const [jumpTo, setJumpTo] = useState<{ id: string; nonce: number } | null>(null);
   const [boardReady, setBoardReady] = useState(false);
@@ -129,20 +140,23 @@ export function Experience({ initialView = "board", initialProject }: Props) {
     setCurrent(id);
     setReelScrolled(false);
     if (push) window.history.pushState(null, "", pathFor("project", id));
-    // The view fades in over the last part of the dive, so the camera
-    // seems to land inside the project rather than cut to it.
-    const reveal = new Promise<void>((resolve) =>
-      setTimeout(() => {
-        setReelStart(id);
-        requestAnimationFrame(() => setReelVisible(true));
-        resolve();
-      }, REEL_REVEAL_AT_MS),
-    );
-    await Promise.all([boardRef.current?.flyIn(id), reveal]);
+
+    // Match cut: lay the project view out invisibly, measure where its
+    // first frame will sit, and fly the tile onto exactly that rect.
+    // The frame's poster is the same still the tile shows, so the swap
+    // that follows is invisible.
+    setReelPhase("hidden");
+    setReelStart(id);
+    await nextFrames(2);
+    const frame = document
+      .querySelector<HTMLElement>(`[data-reel-id="${CSS.escape(id)}"] .reel-media`)
+      ?.getBoundingClientRect();
+    await boardRef.current?.flyIn(id, frame);
+    setReelPhase("shown");
     setTimeout(() => {
       boardRef.current?.setActive(false);
       busyRef.current = false;
-    }, REEL_FADE_MS);
+    }, REEL_SWAP_MS + 80);
   }, []);
   const openProjectRef = useRef(openProject);
   openProjectRef.current = openProject;
@@ -154,17 +168,27 @@ export function Experience({ initialView = "board", initialProject }: Props) {
     setReelScrolled(false);
     // Shrink + fade the view while the camera is already pulling back
     // out, so closing reads as one move back onto the globe.
-    setReelVisible(false);
+    setReelPhase("closing");
     const unmount = new Promise<void>((resolve) =>
       setTimeout(() => {
         setReelStart(null);
         setCurrent(null);
+        setReelPhase("hidden");
         resolve();
       }, REEL_FADE_MS),
     );
     await Promise.all([boardRef.current?.flyOut(), unmount]);
     busyRef.current = false;
   }, []);
+
+  // Arrival: once the loader clears, fly from the floating globe in.
+  useEffect(() => {
+    if (!loaderDone || !boardReady) return;
+    if (initialView === "project") return;
+    // Wait for the loader's fade so the whole journey in is visible.
+    const t = setTimeout(() => boardRef.current?.enter(), ARRIVAL_DELAY_MS);
+    return () => clearTimeout(t);
+  }, [loaderDone, boardReady, initialView]);
 
   const go = useCallback(
     async (next: Exclude<View, "project">, push = true) => {
@@ -270,7 +294,7 @@ export function Experience({ initialView = "board", initialProject }: Props) {
 
       {reelStart && (
         <ProjectReel
-            visible={reelVisible}
+            phase={reelPhase}
             projects={showcase}
             startId={reelStart}
             jumpTo={jumpTo}

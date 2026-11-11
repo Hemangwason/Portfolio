@@ -13,8 +13,11 @@ export type GlobeOptions = {
 
 export type GlobeHandle = {
   setActive: (active: boolean) => void;
-  /** Camera dives straight onto the tile for `id`. */
-  flyIn: (id: string) => Promise<void>;
+  /** Arrival: fly from the floating globe into the close-up view. */
+  enter: () => void;
+  /** Camera dives onto the tile for `id`; with `target` (client px) the
+      tile lands exactly on that rect — the project's first frame. */
+  flyIn: (id: string, target?: DOMRect) => Promise<void>;
   /** Camera pulls back out to the resting view of the globe. */
   flyOut: () => Promise<void>;
   dispose: () => void;
@@ -31,17 +34,16 @@ const DEG = Math.PI / 180;
    (product work) at the corners. Spin and tilt stop hard at the edge
    of the work, so the empty back of the globe never comes round. */
 const ROWS: Array<{ lat: number; count: number }> = [
-  { lat: 9, count: 6 },
-  { lat: 27, count: 6 },
-  { lat: -9, count: 5 },
+  { lat: 7, count: 6 },
+  { lat: 22, count: 6 },
+  { lat: -8, count: 5 },
 ];
-const LON_PITCH = 23;
-const TILE_WIDTH_DEG = 17; // at the equator — a Griflan cluster's footprint
-const TILE_MAX_HEIGHT_DEG = 11;
+const LON_PITCH = 20;
+const TILE_WIDTH_DEG = 16.5; // at the equator
+const TILE_MAX_HEIGHT_DEG = 10.5;
 const TILE_RADIUS = R * 1.002;
-const HOVER_SCALE = 1.014;
 /** Where the eye lands at rest; slots nearest it are the most central. */
-const FOCUS_LAT = 3;
+const FOCUS_LAT = 1;
 const FOCUS_LAT_WEIGHT = 1.3;
 
 /* ── grid ────────────────────────────────────────────────────────── */
@@ -56,6 +58,15 @@ const FOV_WIDE = 46;
 const FOV_NARROW = 62;
 const HORIZON_MARGIN = 0.95;
 const TILT_REST = -0.21;
+/** Outside: the whole globe floating in the frame. */
+const OUTSIDE_DISTANCE = 33;
+const OUTSIDE_FOV = 40;
+const FOG_NEAR = 10;
+const FOG_FAR = 22;
+const DEPTH_EASE = 1.05; // per second — the fly-in / pull-out pace
+/** Wheel travel needed to pull out (at the top edge) or dive back in. */
+const PULL_OUT_PX = 240;
+const DIVE_IN_PX = 60;
 
 /* ── motion (deliberately calm) ─────────────────────────────────── */
 const SWAY_SPIN = 0.05; // rad of idle left-right sway
@@ -81,9 +92,15 @@ const WARP_RELEASE = 1.8; // …and settle back slowly
 const CLICK_SLOP_PX = 6;
 const FILL_RATIO = 0.82;
 const FLY_IN_MS = 900;
+/** The landing tile starts flattening this far into the dive. */
+const FLATTEN_FROM = 0.45;
 const FLY_OUT_MS = 850;
 const FLIGHT_GRACE_MS = 250;
 
+const smoothstep = (a: number, b: number, x: number) => {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+};
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
@@ -131,8 +148,12 @@ function placements(tiles: GlobeTile[]): Placement[] {
   });
 }
 
+/** A curved tile on the sphere, plus a morph target that lays the same
+    tile flat on the tangent plane at its centre (same width and height
+    in world units). The flat shape is what the project view's first
+    frame is, so the match cut morphs into it as the camera lands. */
 function tileGeometry(p: Placement): THREE.BufferGeometry {
-  return new THREE.SphereGeometry(
+  const geo = new THREE.SphereGeometry(
     TILE_RADIUS,
     20,
     12,
@@ -141,53 +162,116 @@ function tileGeometry(p: Placement): THREE.BufferGeometry {
     (90 - (p.lat + p.hDeg / 2)) * DEG,
     p.hDeg * DEG,
   );
+  const centre = sphericalPoint(p.lon, p.lat, TILE_RADIUS);
+  const east = sphericalPoint(p.lon + 0.01, p.lat, TILE_RADIUS).sub(centre).normalize();
+  const north = sphericalPoint(p.lon, p.lat + 0.01, TILE_RADIUS).sub(centre).normalize();
+  const cos = Math.cos(p.lat * DEG);
+  const pos = geo.attributes.position;
+  const flat = new Float32Array(pos.count * 3);
+  const v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const y = pos.getY(i);
+    const z = pos.getZ(i);
+    const lat = Math.asin(Math.max(-1, Math.min(1, y / TILE_RADIUS))) / DEG;
+    const lon = Math.atan2(z, -x) / DEG;
+    let dLon = lon - p.lon;
+    dLon = ((dLon + 540) % 360) - 180;
+    v.copy(centre)
+      .addScaledVector(east, TILE_RADIUS * cos * dLon * DEG)
+      .addScaledVector(north, TILE_RADIUS * (lat - p.lat) * DEG);
+    flat.set([v.x, v.y, v.z], i * 3);
+  }
+  geo.morphAttributes.position = [new THREE.Float32BufferAttribute(flat, 3)];
+  return geo;
 }
 
-function gridLines(color: string): THREE.LineSegments {
+/* Grid lines carry a colour gradient across the globe — blush at the
+   top, violet and sky through the middle, peach at the bottom. */
+const LINE_STOPS = ["#ff5aa5", "#9a7bff", "#4aa8ff", "#ff9b62"].map((c) => new THREE.Color(c));
+const LINE_OPACITY = 0.9;
+
+function lineColour(latDeg: number, lonDeg: number, out: THREE.Color): THREE.Color {
+  const t = Math.min(0.999, Math.max(0, (LAT_EDGE - latDeg) / (2 * LAT_EDGE)));
+  const shifted = Math.min(0.999, Math.max(0, t + 0.12 * Math.sin(lonDeg * DEG * 2)));
+  const seg = shifted * (LINE_STOPS.length - 1);
+  const i = Math.floor(seg);
+  return out.copy(LINE_STOPS[i]).lerp(LINE_STOPS[i + 1], seg - i);
+}
+
+function gridLines(): THREE.LineSegments {
   const r = R * 0.9985;
   const pts: number[] = [];
-  const push = (a: THREE.Vector3, b: THREE.Vector3) => pts.push(a.x, a.y, a.z, b.x, b.y, b.z);
+  const cols: number[] = [];
+  const c = new THREE.Color();
+  const push = (lonA: number, latA: number, lonB: number, latB: number) => {
+    const a = sphericalPoint(lonA, latA, r);
+    const b = sphericalPoint(lonB, latB, r);
+    pts.push(a.x, a.y, a.z, b.x, b.y, b.z);
+    lineColour(latA, lonA, c);
+    cols.push(c.r, c.g, c.b);
+    lineColour(latB, lonB, c);
+    cols.push(c.r, c.g, c.b);
+  };
   for (let lon = 0; lon < 360; lon += LON_CELL) {
-    for (let lat = -LAT_EDGE; lat < LAT_EDGE; lat += 1.5) {
-      push(sphericalPoint(lon, lat, r), sphericalPoint(lon, lat + 1.5, r));
-    }
+    for (let lat = -LAT_EDGE; lat < LAT_EDGE; lat += 1.5) push(lon, lat, lon, lat + 1.5);
   }
   for (let lat = -LAT_EDGE; lat <= LAT_EDGE + 0.01; lat += LAT_CELL) {
-    for (let lon = 0; lon < 360; lon += 2) {
-      push(sphericalPoint(lon, lat, r), sphericalPoint(lon + 2, lat, r));
-    }
+    for (let lon = 0; lon < 360; lon += 2) push(lon, lat, lon + 2, lat);
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
-  return new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.1 }));
+  geo.setAttribute("color", new THREE.Float32BufferAttribute(cols, 3));
+  return new THREE.LineSegments(
+    geo,
+    new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: LINE_OPACITY }),
+  );
 }
 
-/* Pastel colour fields painted across the sphere (blush, peach,
-   periwinkle, lilac), washed toward the paper colour so tiles pop. */
-const IRIS = ["#ffc3dd", "#ffd8bd", "#c9d7ff", "#dcc9ff"].map((c) => new THREE.Color(c));
-const IRIS_WASH = 0.55;
-
-function iridescentSphere(radius: number, paper: string): THREE.BufferGeometry {
-  const geo = new THREE.SphereGeometry(radius, 96, 64);
-  const pos = geo.attributes.position;
-  const colors = new Float32Array(pos.count * 3);
-  const base = new THREE.Color(paper);
-  const a = new THREE.Color();
-  const b = new THREE.Color();
-  const c = new THREE.Color();
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i) / radius;
-    const y = pos.getY(i) / radius;
-    const z = pos.getZ(i) / radius;
-    const u = 0.5 + 0.5 * Math.sin(x * 2.1 + z * 1.3);
-    const v = 0.5 + 0.5 * Math.sin(y * 2.4 - x * 0.9);
-    a.copy(IRIS[0]).lerp(IRIS[2], u);
-    b.copy(IRIS[1]).lerp(IRIS[3], u);
-    c.copy(a).lerp(b, v).lerp(base, IRIS_WASH);
-    colors.set([c.r, c.g, c.b], i * 3);
-  }
-  geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-  return geo;
+/* A white, pearl-like globe: pure white face, a soft iridescent rim
+   where the surface turns away, and the scene fog toward the horizon. */
+function pearlMaterial(): THREE.ShaderMaterial {
+  return new THREE.ShaderMaterial({
+    fog: true,
+    uniforms: THREE.UniformsUtils.merge([
+      THREE.UniformsLib.fog,
+      {
+        uBase: { value: new THREE.Color("#ffffff") },
+        uRimTop: { value: new THREE.Color("#e9d9ff") },
+        uRimBottom: { value: new THREE.Color("#ffdcea") },
+      },
+    ]),
+    vertexShader: /* glsl */ `
+      #include <common>
+      #include <fog_pars_vertex>
+      varying vec3 vNormal;
+      varying vec3 vView;
+      void main() {
+        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+        vNormal = normalize(normalMatrix * normal);
+        vView = normalize(-mvPosition.xyz);
+        gl_Position = projectionMatrix * mvPosition;
+        #include <fog_vertex>
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      #include <common>
+      #include <fog_pars_fragment>
+      uniform vec3 uBase;
+      uniform vec3 uRimTop;
+      uniform vec3 uRimBottom;
+      varying vec3 vNormal;
+      varying vec3 vView;
+      void main() {
+        float rim = pow(1.0 - max(dot(vNormal, vView), 0.0), 2.4);
+        vec3 rimColour = mix(uRimBottom, uRimTop, 0.5 + 0.5 * vNormal.y);
+        gl_FragColor = vec4(mix(uBase, rimColour, rim * 0.9), 1.0);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+        #include <fog_fragment>
+      }
+    `,
+  });
 }
 
 export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts: GlobeOptions): GlobeHandle {
@@ -196,7 +280,8 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(opts.background, 10, 22);
+  const fog = new THREE.Fog(opts.background, FOG_NEAR, FOG_FAR);
+  scene.fog = fog;
 
   const camera = new THREE.PerspectiveCamera(FOV_WIDE, 1, 0.05, 80);
   const restPos = new THREE.Vector3();
@@ -206,9 +291,9 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
 
   const globe = new THREE.Group();
   scene.add(globe);
-  const core = new THREE.Mesh(iridescentSphere(R * 0.996, opts.background), new THREE.MeshBasicMaterial({ vertexColors: true }));
+  const core = new THREE.Mesh(new THREE.SphereGeometry(R * 0.996, 96, 64), pearlMaterial());
   globe.add(core);
-  globe.add(gridLines(opts.lineColor));
+  globe.add(gridLines());
 
   /* ── tiles ─────────────────────────────────────────────────── */
   const loader = new THREE.TextureLoader();
@@ -283,6 +368,8 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
   let steerTargetX = 0;
   let steerTargetY = 0;
   let warp = 0;
+  let depth = 0;
+  let depthTarget = 0;
   let swayPhase = 0;
   let active = false;
   let flying = false;
@@ -290,6 +377,10 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
   let raf = 0;
   let last = performance.now();
   let picked: THREE.Mesh | null = null;
+  let landed: THREE.Mesh | null = null;
+  const setFlatness = (mesh: THREE.Mesh, amount: number) => {
+    if (mesh.morphTargetInfluences) mesh.morphTargetInfluences[0] = amount;
+  };
 
   const placeRest = () => {
     camera.fov = baseFov;
@@ -300,15 +391,28 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
     camera.updateProjectionMatrix();
   };
 
+  /* Depth 0 = outside (the whole globe floating), 1 = inside (the
+     close-up surface). The camera blends between the two poses. */
+  const outsidePos = new THREE.Vector3(0, 0, OUTSIDE_DISTANCE);
+  const outsideTarget = new THREE.Vector3(0, 0, 0);
+  const blendPos = new THREE.Vector3();
+
   const applyRest = () => {
+    const k = easeInOutCubic(clamp(depth, 0, 1));
     // Warp: faster scroll → tighter lens and a closer camera, so the
     // middle of the globe swells outward and settles back.
-    camera.fov = baseFov + warp * WARP_FOV;
+    const insideFov = baseFov + warp * WARP_FOV;
+    camera.fov = OUTSIDE_FOV + (insideFov - OUTSIDE_FOV) * k;
     camera.updateProjectionMatrix();
-    camera.position.copy(restPos).addScaledVector(new THREE.Vector3(0, 0, -1), warp * WARP_DOLLY);
+    blendPos.copy(restPos).addScaledVector(new THREE.Vector3(0, 0, -1), warp * WARP_DOLLY);
+    camera.position.lerpVectors(outsidePos, blendPos, k);
     camera.up.set(0, 1, 0);
-    lookTarget.copy(restTarget);
+    lookTarget.lerpVectors(outsideTarget, restTarget, k);
     camera.lookAt(lookTarget);
+    // Fog is tuned for the close-up; push it back as the camera pulls
+    // out so the floating globe stays crisp.
+    fog.near = FOG_NEAR + (1 - k) * (OUTSIDE_DISTANCE - CAMERA_DISTANCE);
+    fog.far = FOG_FAR + (1 - k) * (OUTSIDE_DISTANCE - CAMERA_DISTANCE) * 1.6;
   };
 
   /** Hard stops at the edge of the work — momentum dies there. */
@@ -414,10 +518,31 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
     setHovered(null);
   };
 
+  let pull = 0;
   const onWheel = (e: WheelEvent) => {
     if (flying || parked) return;
     const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1;
     const delta = clamp(e.deltaY * unit, -140, 140);
+
+    // Outside: scrolling down dives back into the surface.
+    if (depthTarget < 1) {
+      pull = delta > 0 ? pull + delta : 0;
+      if (pull > DIVE_IN_PX) {
+        depthTarget = 1;
+        pull = 0;
+      }
+      return;
+    }
+    // Inside, pinned at the top row: keep scrolling up to pull out.
+    if (tilt >= TILT_MAX - 1e-3 && delta < 0) {
+      pull -= delta;
+      if (pull > PULL_OUT_PX) {
+        depthTarget = 0;
+        pull = 0;
+      }
+    } else {
+      pull = 0;
+    }
     // Scrolling down rolls the rows up and away.
     tiltSpeed = clamp(tiltSpeed - delta * WHEEL_GAIN, -MAX_TILT_SPEED, MAX_TILT_SPEED);
   };
@@ -446,7 +571,14 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
   resize();
 
   /* ── flights ───────────────────────────────────────────────── */
-  const fly = (toPos: THREE.Vector3, toTarget: THREE.Vector3, toUp: THREE.Vector3, toFov: number, ms: number) =>
+  const fly = (
+    toPos: THREE.Vector3,
+    toTarget: THREE.Vector3,
+    toUp: THREE.Vector3,
+    toFov: number,
+    ms: number,
+    onStep?: (k: number) => void,
+  ) =>
     new Promise<void>((resolve) => {
       const fromPos = camera.position.clone();
       const fromTarget = lookTarget.clone();
@@ -463,6 +595,7 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
         camera.fov = fromFov + (toFov - fromFov) * k;
         camera.updateProjectionMatrix();
         camera.lookAt(lookTarget);
+        onStep?.(k);
         if (!active) renderer.render(scene, camera);
       };
       const finish = () => {
@@ -484,7 +617,7 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
       setTimeout(finish, duration + FLIGHT_GRACE_MS);
     });
 
-  const flyIn = (id: string) => {
+  const flyIn = (id: string, target?: DOMRect) => {
     setHovered(null);
     const index = tiles.findIndex((t) => t.id === id);
     const mesh = picked && picked.userData.index === index ? picked : meshes[index];
@@ -502,20 +635,46 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
       .sub(centre)
       .normalize();
     const normal = centre.clone().normalize();
+    const right = normal.clone().negate().cross(north).normalize();
     const cos = Math.cos(spot.lat * DEG);
     const tileW = TILE_RADIUS * cos * spot.wDeg * DEG;
     const tileH = TILE_RADIUS * spot.hDeg * DEG;
-    const half = (baseFov / 2) * DEG;
-    const dist = Math.max(
-      tileW / (FILL_RATIO * 2 * Math.tan(half) * camera.aspect),
-      tileH / (FILL_RATIO * 2 * Math.tan(half)),
-    );
-    return fly(centre.clone().addScaledVector(normal, dist), centre, north, baseFov, FLY_IN_MS);
+    const tanHalf = Math.tan((baseFov / 2) * DEG);
+
+    let dist: number;
+    const camPos = new THREE.Vector3();
+    if (target && target.width > 0) {
+      // Match cut: choose the distance at which the tile is exactly as
+      // wide as the project's first frame, then slide the camera so the
+      // tile sits on that frame's position in the viewport.
+      const view = canvas.getBoundingClientRect();
+      dist = (tileW * view.width) / (target.width * 2 * tanHalf * camera.aspect);
+      const visibleW = 2 * dist * tanHalf * camera.aspect;
+      const visibleH = 2 * dist * tanHalf;
+      const ox = ((target.left + target.width / 2 - view.left) / view.width - 0.5) * visibleW;
+      const oy = ((target.top + target.height / 2 - view.top) / view.height - 0.5) * visibleH;
+      camPos.copy(centre).addScaledVector(normal, dist).addScaledVector(right, -ox).addScaledVector(north, oy);
+    } else {
+      dist = Math.max(
+        tileW / (FILL_RATIO * 2 * tanHalf * camera.aspect),
+        tileH / (FILL_RATIO * 2 * tanHalf),
+      );
+      camPos.copy(centre).addScaledVector(normal, dist);
+    }
+    const lookAt = camPos.clone().sub(normal);
+    landed = mesh;
+    return fly(camPos, lookAt, north, baseFov, FLY_IN_MS, (k) => setFlatness(mesh, smoothstep(FLATTEN_FROM, 1, k)));
   };
 
   const flyOut = () => {
     placeRest();
-    return fly(restPos.clone(), restTarget.clone(), new THREE.Vector3(0, 1, 0), baseFov, FLY_OUT_MS).then(() => {
+    depth = 1;
+    depthTarget = 1;
+    const tile = landed;
+    landed = null;
+    return fly(restPos.clone(), restTarget.clone(), new THREE.Vector3(0, 1, 0), baseFov, FLY_OUT_MS, (k) => {
+      if (tile) setFlatness(tile, 1 - smoothstep(0, 1 - FLATTEN_FROM, k));
+    }).then(() => {
       warp = 0;
       parked = false;
     });
@@ -537,6 +696,10 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
       }
       stopAtEdges();
       if (!opts.reducedMotion) swayPhase += dt * SWAY_SPEED;
+      depth = opts.reducedMotion
+        ? depthTarget
+        : depth + (depthTarget - depth) * (1 - Math.exp(-dt * DEPTH_EASE));
+      if (Math.abs(depthTarget - depth) < 1e-3) depth = depthTarget;
       const k = 1 - Math.exp(-dt * STEER_EASE);
       steerX += (steerTargetX - steerX) * k;
       steerY += (steerTargetY - steerY) * k;
@@ -549,11 +712,6 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
       applyRest();
     }
 
-    meshes.forEach((m) => {
-      const s = m === hovered ? HOVER_SCALE : 1;
-      const next = m.scale.x + (s - m.scale.x) * 0.18;
-      m.scale.setScalar(next);
-    });
     if (hovered && videoReady && hovered.material !== videoMat) hovered.material = videoMat;
 
     if (++frameCount % HOVER_RECHECK_FRAMES === 0) refreshHover();
@@ -579,6 +737,9 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
 
   return {
     setActive,
+    enter: () => {
+      depthTarget = 1;
+    },
     flyIn,
     flyOut,
     dispose: () => {

@@ -685,6 +685,29 @@ const STILL_SIZES: Record<string, readonly [number, number]> = {
 
 const STILL_VERSION = 3;
 
+/* Where in each full video its still was cut (fraction of duration).
+   The open view starts playback from here, so the picture carries on
+   from the very frame the globe tile showed. */
+const STILL_AT: Record<string, number> = {
+  "asia-cup-2025": 0.36,
+  boomerang: 0.22,
+  crater: 0.92,
+  "durga-puja-pandal": 0.6,
+  "goat-offers-bumrah": 0.6,
+  "halloween-zomato": 0.35,
+  "healthy-high-five": 0.08,
+  "independence-day-banner": 0.22,
+  jexlin: 0.36,
+  onam: 0.35,
+  "raksha-bandhan": 0.92,
+  "sid-voice-host": 0.08,
+  sidetake: 0.08,
+  sidetalk: 0.08,
+  "street-football": 0.25,
+  "zepto-turns-5": 0.35,
+  "zomato-plus-identity": 0.35,
+};
+
 export function stillFor(id: string): ProjectStill {
   const [width, height] = STILL_SIZES[id] ?? [960, 540];
   return { src: `/projects/stills/${id}.jpg?v=${STILL_VERSION}`, width, height };
@@ -712,15 +735,16 @@ const FILM_SIZES: Record<string, readonly [number, number]> = {
   "zomato-plus-identity": [1280, 720],
 };
 
-export type ProjectFilm = { src?: string; poster: string; width: number; height: number };
+export type ProjectFilm = { src?: string; poster: string; width: number; height: number; startAt: number };
 
 /** The full-length video shown when a project is open, with its poster. */
 export function filmFor(p: Project): ProjectFilm {
   const media = p.masthead ?? p.thumbnail;
   const still = stillFor(p.id);
   const [width, height] = FILM_SIZES[p.id] ?? [still.width, still.height];
-  if (media?.type !== "video") return { poster: still.src, width, height };
-  return { src: media.src, poster: still.src, width, height };
+  const startAt = STILL_AT[p.id] ?? 0;
+  if (media?.type !== "video") return { poster: still.src, width, height, startAt };
+  return { src: media.src, poster: still.src, width, height, startAt };
 }
 
 /** The short loop that plays on a board tile while it's hovered. */
