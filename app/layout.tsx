@@ -1,24 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Geist_Mono } from "next/font/google";
+import { Instrument_Serif, Roboto_Mono } from "next/font/google";
 import { Analytics } from "./components/Analytics";
 import "./globals.css";
 
-const archivo = Archivo({
-  variable: "--font-sans",
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-serif",
   subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
   display: "swap",
 });
 
-const geistMono = Geist_Mono({
+const robotoMono = Roboto_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Hemang Wason — Product & Visual Designer",
+  title: "Hemang Wason — Product, Visual & Motion Designer",
   description:
-    "The working index of Hemang Wason — product, visual and motion design. Ex-Zomato, currently Zepto. 17 cases on file.",
+    "Hemang Wason — product, visual and motion design. Ex-Zomato, currently Zepto. Every project on one globe.",
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -35,7 +37,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0a0a0b",
+  themeColor: "#000000",
 };
 
 export default function RootLayout({
@@ -46,12 +48,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${instrumentSerif.variable} ${robotoMono.variable} h-full antialiased`}
     >
-      <body
-        className="grain flex min-h-full flex-col bg-[var(--background)] text-[var(--foreground)]"
-        suppressHydrationWarning
-      >
+      <body className="flex min-h-full flex-col" suppressHydrationWarning>
         {children}
         <Analytics />
       </body>

@@ -5,412 +5,199 @@
 @source "./**/*.{ts,tsx}";
 
 /* ────────────────────────────────────────────────────────────────────
-   HW·OS — single dark instrument theme.
-   Carbon canvas, bone ink, one amber signal. The work carries color.
+   Paper (light) is the default surface — the globe, the about panel
+   and the case sheet. Ink (dark) is reserved for the entrance and
+   the contact close.
    ──────────────────────────────────────────────────────────────────── */
 
 :root {
-  --background: #0a0a0b;
-  --surface: #121214;
-  --surface-raised: #17171a;
-  --foreground: #eceadf;
+  --paper: #f2f0ea;
+  --paper-raised: #fbfaf6;
+  --ink: #141414;
+  --ink-soft: rgba(20, 20, 20, 0.62);
+  --ink-faint: rgba(20, 20, 20, 0.42);
+  --rule: rgba(20, 20, 20, 0.16);
+  --rule-strong: rgba(20, 20, 20, 0.34);
 
-  --amber: #ffb000;
-  --amber-ink: #ffc94d;
-  --amber-dim: rgba(255, 176, 0, 0.14);
+  --night: #0c0b0b;
+  --night-ink: #f4efe2;
+  --night-rule: rgba(244, 239, 226, 0.16);
 
-  /* legacy aliases still referenced by shared components */
-  --brand: #ffb000;
-  --accent: #ffb000;
-  --muted: #8d8b82;
+  --signal: #ff3b2f;
 
-  --ink-strong: rgba(236, 234, 223, 0.96);
-  --ink: rgba(236, 234, 223, 0.82);
-  --ink-base: rgba(236, 234, 223, 0.64);
-  --ink-soft: rgba(236, 234, 223, 0.5);
-  --ink-faint: rgba(236, 234, 223, 0.38);
-  --ink-mute: rgba(236, 234, 223, 0.26);
+  /* legacy aliases read by ProjectProcessOverlay */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --brand: var(--signal);
+  --accent: var(--signal);
+  --line: var(--rule);
+  --line-strong: var(--rule-strong);
+  --ink-strong: rgba(20, 20, 20, 0.92);
+  --ink-base: rgba(20, 20, 20, 0.66);
+  --ink-mute: rgba(20, 20, 20, 0.3);
+  --surface: var(--paper-raised);
+  --border: var(--rule);
 
-  --line: rgba(236, 234, 223, 0.1);
-  --line-strong: rgba(236, 234, 223, 0.22);
-  --border: rgba(236, 234, 223, 0.1);
+  --font-times: "Times New Roman", Times, "Liberation Serif", serif;
 
-  --card: rgba(255, 255, 255, 0.03);
-  --card-strong: rgba(18, 18, 20, 0.86);
-  --chip-bg: rgba(255, 255, 255, 0.05);
-  --chip-border: rgba(236, 234, 223, 0.12);
-  --tag-bg: rgba(255, 255, 255, 0.04);
-  --tag-border: rgba(236, 234, 223, 0.1);
+  --header-h: 146px;
+}
 
-  --backdrop: rgba(5, 5, 6, 0.82);
-  --grid-dot: rgba(236, 234, 223, 0.06);
-
-  /* chrome bar heights — content pads against these */
-  --bar-top: 44px;
-  --bar-bottom: 38px;
-
-  color-scheme: dark;
+@media (max-width: 767px) {
+  :root {
+    --header-h: 104px;
+  }
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
-  --color-amber: var(--amber);
-  --font-sans: var(--font-sans);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-night: var(--night);
+  --color-signal: var(--signal);
+  --font-serif: var(--font-serif);
   --font-mono: var(--font-mono);
 }
 
 html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-serif), var(--font-times);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-/* `clip` blocks horizontal overflow without creating a scroll container, so
-   sticky descendants still bind to the viewport. */
+/* `clip` blocks horizontal overflow without creating a scroll
+   container, so sticky descendants still bind to the viewport. */
 html,
 body {
   overflow-x: clip;
 }
 
 ::selection {
-  background: var(--amber);
-  color: #0a0a0b;
+  background: var(--signal);
+  color: #fff;
 }
 
-/* Kill the iOS double-tap delay and the grey/blue tap flash on every
-   tappable surface. :focus-visible rings stay for keyboard users. */
 * {
   -webkit-tap-highlight-color: transparent;
 }
 
 :focus-visible {
-  outline: 1.5px solid var(--amber);
+  outline: 1.5px solid var(--signal);
   outline-offset: 3px;
 }
 
-/* Allow long words to break inside narrow containers instead of
-   pushing the layout horizontally. */
 h1, h2, h3, h4, p, li, dd {
   overflow-wrap: anywhere;
 }
 
-/* iOS momentum scroll on internal scrollers. */
-[data-scroll-momentum] {
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-}
-@media (prefers-reduced-motion: reduce) {
-  [data-scroll-momentum] {
-    scroll-behavior: auto;
-  }
+.times {
+  font-family: var(--font-times);
 }
 
-/* Single faint amber pin so the canvas isn't a flat slab — one cheap
-   radial, no blur stack. */
-body {
-  background-image: radial-gradient(
-    ellipse 55% 38% at 80% -4%,
-    rgba(255, 176, 0, 0.05),
-    transparent 70%
-  );
-}
-
-/* Film grain — static SVG noise tile, fixed, compositor-cheap. */
-.grain::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 70;
-  pointer-events: none;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 160px 160px;
-}
-
-.dotted-grid {
-  background-image: radial-gradient(var(--grid-dot) 1px, transparent 1px);
-  background-size: 22px 22px;
-}
-
-/* ── HUD primitives ─────────────────────────────────────────────── */
-
-.hud-label {
+.mono-label {
   font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 10px;
-  letter-spacing: 0.22em;
+  font-size: 12px;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  font-weight: 500;
-}
-
-.hud-bar {
-  background: rgba(10, 10, 11, 0.78);
-  backdrop-filter: blur(10px) saturate(1.1);
-  -webkit-backdrop-filter: blur(10px) saturate(1.1);
-}
-
-/* frosted glass chip — the Sidetake-card DNA */
-.glass {
-  background: var(--card);
-  backdrop-filter: blur(12px) saturate(1.15);
-  -webkit-backdrop-filter: blur(12px) saturate(1.15);
-  border: 1px solid var(--chip-border);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 8px 24px -12px rgba(0, 0, 0, 0.7);
-}
-
-.glass-strong {
-  background: var(--card-strong);
-  backdrop-filter: blur(14px) saturate(1.2);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  border: 1px solid var(--border);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 18px 40px -20px rgba(0, 0, 0, 0.85);
-}
-
-/* corner reticle brackets */
-.reticle {
-  position: relative;
-}
-.reticle::before,
-.reticle::after {
-  content: "";
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border: 1px solid var(--line-strong);
-  pointer-events: none;
-}
-.reticle::before {
-  top: 0;
-  left: 0;
-  border-right: 0;
-  border-bottom: 0;
-}
-.reticle::after {
-  bottom: 0;
-  right: 0;
-  border-left: 0;
-  border-top: 0;
-}
-
-/* Live status dot — quiet pulse via opacity (compositor friendly). */
-@keyframes liveOpacity {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
-}
-.live-dot {
-  animation: liveOpacity 2.4s ease-in-out infinite;
-  will-change: opacity;
-}
-@media (prefers-reduced-motion: reduce) {
-  .live-dot { animation: none; }
 }
 
 /* ── Entrance ───────────────────────────────────────────────────── */
 
-.entrance-name {
-  font-weight: 800;
-  letter-spacing: -0.045em;
-  line-height: 0.88;
-  text-transform: uppercase;
+/* chrome inverts automatically once the bird floods the screen white */
+.entrance-chrome {
+  mix-blend-mode: difference;
+  color: #fff;
 }
 
-.entrance-name .letter {
-  display: inline-block;
-  transform-origin: 50% 80%;
-  animation: letterIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: var(--letter-delay, 0s);
+.entrance-poster {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  will-change: transform, opacity;
+  transform: translate(-50%, -50%) scale(0);
 }
 
-@keyframes letterIn {
-  from {
-    opacity: 0;
-    transform: translateY(110%);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ── Globe header grid ──────────────────────────────────────────── */
+
+.gl-cell {
+  border-color: var(--rule);
 }
 
-.fade-up {
-  animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: var(--fade-delay, 0s);
+.gl-link {
+  transition: background-color 160ms ease, color 160ms ease;
 }
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* boot line: terminal caret blink */
-@keyframes caretBlink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-.boot-caret {
-  display: inline-block;
-  width: 0.55em;
-  height: 1em;
-  background: var(--amber);
-  vertical-align: text-bottom;
-  animation: caretBlink 1s steps(1) infinite;
+.gl-link:hover {
+  background: var(--ink);
+  color: var(--paper);
 }
 
-@keyframes bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+@keyframes flap {
+  0%, 100% { transform: scaleY(1) translateY(0); }
+  50% { transform: scaleY(0.72) translateY(3px); }
+}
+.bird-flap {
+  transform-origin: 50% 55%;
+  animation: flap 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 
-/* slow reticle spin behind the entrance name */
-@keyframes slowSpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.ticker-pill {
+  background: rgba(20, 20, 20, 0.86);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
 }
-.slow-spin {
-  animation: slowSpin 90s linear infinite;
-  will-change: transform;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .entrance-name .letter,
-  .fade-up {
-    animation: none;
-  }
-  .slow-spin,
-  .boot-caret {
-    animation: none;
-  }
-}
-
-/* ── Ticker ─────────────────────────────────────────────────────── */
 
 .scroll-marquee {
   display: flex;
   overflow: hidden;
   white-space: nowrap;
 }
-
 .scroll-marquee-track {
   display: inline-flex;
-  gap: 0;
-  animation: marquee 46s linear infinite;
+  animation: marquee 48s linear infinite;
   will-change: transform;
 }
-
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .scroll-marquee-track {
-    animation: none;
-  }
+/* ── Case sheet ─────────────────────────────────────────────────── */
+
+.case-sheet {
+  will-change: clip-path;
 }
 
-/* ── Work index rows ────────────────────────────────────────────── */
-
-.index-row {
-  position: relative;
-  transition: background-color 200ms ease;
-}
-.index-row:hover {
-  background-color: rgba(255, 255, 255, 0.025);
+.case-rule {
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--rule) 0 1px,
+    transparent 1px calc(100% / 12)
+  );
 }
 
-.index-row .row-title {
-  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), color 200ms ease;
+@keyframes infoDrop {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-@media (hover: hover) {
-  .index-row:hover .row-title {
-    transform: translateX(14px);
-  }
-}
-
-.index-row .row-tick {
-  opacity: 0;
-  transform: scaleY(0.4);
-  transition: opacity 200ms ease, transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-.index-row:hover .row-tick {
-  opacity: 1;
-  transform: scaleY(1);
+.info-drop {
+  animation: infoDrop 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .index-row .row-title,
-  .index-row .row-tick {
-    transition: none;
-  }
-  .index-row:hover .row-title {
-    transform: none;
-  }
-}
-
-/* floating hover preview panel */
-.index-preview {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 60;
-  pointer-events: none;
-  will-change: transform;
-  transition: opacity 180ms ease;
-}
-
-/* ── Case overlay ───────────────────────────────────────────────── */
-
-@keyframes caseIn {
-  from { opacity: 0; transform: translateY(26px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes caseOut {
-  from { opacity: 1; transform: translateY(0); }
-  to   { opacity: 0; transform: translateY(18px); }
-}
-.case-overlay[data-open="true"] {
-  animation: caseIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.case-overlay[data-open="false"] {
-  animation: caseOut 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
-  pointer-events: none;
-}
-@media (prefers-reduced-motion: reduce) {
-  .case-overlay { animation: none; }
-}
-
-/* CSS-only fade+rise on initial paint — no scroll listeners. */
-@keyframes riseIn {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.rise-in {
-  animation: riseIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: var(--rise-delay, 0s);
-  will-change: opacity, transform;
-}
-@media (prefers-reduced-motion: reduce) {
-  .rise-in { animation: none; }
-}
-
-/* Process flow overlay — single keyframed fade (no framer-motion).
-   data-open="true" plays the entry, data-open="false" the exit; the
-   wrapper handles unmount via setTimeout. */
+/* Process flow overlay — keyframed fade, wrapper handles unmount. */
 @keyframes processOverlayIn {
   from { opacity: 0; }
-  to   { opacity: 1; }
+  to { opacity: 1; }
 }
 @keyframes processOverlayOut {
   from { opacity: 1; }
-  to   { opacity: 0; }
+  to { opacity: 0; }
 }
 .process-overlay[data-open="true"] {
   animation: processOverlayIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -421,6 +208,14 @@ body {
   will-change: opacity;
   pointer-events: none;
 }
+
 @media (prefers-reduced-motion: reduce) {
-  .process-overlay { animation: none; }
+  .bird-flap,
+  .scroll-marquee-track,
+  .info-drop {
+    animation: none;
+  }
+  .process-overlay {
+    animation: none;
+  }
 }

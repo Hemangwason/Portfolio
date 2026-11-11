@@ -626,21 +626,32 @@ export const projects: Project[] = [
   },
 ];
 
-export const productProjects = projects.filter((p) => p.kind === "ground");
-export const visualProjects = projects.filter((p) => p.kind === "play");
-
-// Hand-curated home-carousel order — alternates ground / play so the
-// horizontal swipe never feels like a single-discipline lump. Six is
-// the cap; the rest live on /ground and /play.
-const FEATURED_IDS = [
-  "sidetake", // ground
-  "healthy-high-five", // play
-  "sidetalk", // ground
-  "asia-cup-2025", // play
-  "jexlin", // ground
-  "street-football", // play
+/* Interleaved so product and visual work alternate. Every project
+   appears the same number of times on the globe, and this order is
+   the case number shown in each case sheet. */
+const SHOWCASE_IDS = [
+  "sidetake",
+  "street-football",
+  "sidetalk",
+  "zepto-turns-5",
+  "boomerang",
+  "healthy-high-five",
+  "jexlin",
+  "asia-cup-2025",
+  "crater",
+  "halloween-zomato",
+  "sid-voice-host",
+  "onam",
+  "independence-day-banner",
+  "raksha-bandhan",
+  "goat-offers-bumrah",
+  "durga-puja-pandal",
+  "zomato-plus-identity",
 ] as const;
 
-export const featuredProjects: Project[] = FEATURED_IDS.map((id) =>
+export const showcase: Project[] = SHOWCASE_IDS.map((id) =>
   projects.find((p) => p.id === id),
 ).filter((p): p is Project => Boolean(p));
+
+/** Per-project 3×2 frame atlas used to texture the globe tiles. */
+export const globeAtlas = (id: string): string => `/projects/globe/${id}.jpg`;
