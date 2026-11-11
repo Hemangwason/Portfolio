@@ -325,14 +325,14 @@ export const projects: Project[] = [
     clientLabel: "Company",
     thumbnail: {
       type: "video",
-      src: "/projects/thumbs/street-football.mp4",
-      poster: "/projects/thumbs/street-football-poster.jpg",
+      src: "/projects/thumbs/street-football.mp4?v=2",
+      poster: "/projects/thumbs/street-football-poster.jpg?v=2",
       bg: "#C7CEDF",
     },
     masthead: {
       type: "video",
-      src: "/projects/street-football.mp4?v=2",
-      poster: "/projects/street-football-poster.jpg?v=2",
+      src: "/projects/street-football.mp4?v=3",
+      poster: "/projects/street-football-poster.jpg?v=3",
       bg: "#7A8AB8",
     },
     writeup: [
@@ -357,14 +357,14 @@ export const projects: Project[] = [
     clientLabel: "Company",
     thumbnail: {
       type: "video",
-      src: "/projects/thumbs/zepto-turns-5.mp4",
-      poster: "/projects/thumbs/zepto-turns-5-poster.jpg",
+      src: "/projects/thumbs/zepto-turns-5.mp4?v=2",
+      poster: "/projects/thumbs/zepto-turns-5-poster.jpg?v=2",
       bg: "#5435A5",
     },
     masthead: {
       type: "video",
-      src: "/projects/zepto-turns-5.mp4?v=2",
-      poster: "/projects/zepto-turns-5-poster.jpg?v=2",
+      src: "/projects/zepto-turns-5.mp4?v=3",
+      poster: "/projects/zepto-turns-5-poster.jpg?v=3",
       bg: "#5435A5",
     },
     writeup: [
@@ -705,12 +705,12 @@ const STILL_SIZES: Record<string, readonly [number, number]> = {
   "sid-voice-host": [960, 524],
   sidetake: [960, 540],
   sidetalk: [960, 520],
-  "street-football": [960, 540],
-  "zepto-turns-5": [960, 540],
+  "street-football": [896, 900],
+  "zepto-turns-5": [672, 900],
   "zomato-plus-identity": [960, 540],
 };
 
-const STILL_VERSION = 4;
+const STILL_VERSION = 5;
 
 /* Where in each full video its still was cut (fraction of duration).
    The open view starts playback from here, so the picture carries on
@@ -757,8 +757,8 @@ const FILM_SIZES: Record<string, readonly [number, number]> = {
   "sid-voice-host": [1600, 872],
   sidetake: [1600, 900],
   sidetalk: [1280, 692],
-  "street-football": [1600, 900],
-  "zepto-turns-5": [1600, 900],
+  "street-football": [896, 900],
+  "zepto-turns-5": [672, 900],
   "zomato-plus-identity": [1280, 720],
 };
 
