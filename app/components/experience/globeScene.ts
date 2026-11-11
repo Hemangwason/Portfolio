@@ -27,24 +27,30 @@ export type GlobeHandle = {
 
 
 /* ── layout: every project exactly once ──────────────────────────
-   17 tiles on the face of the globe in three rows (6·6·5), spaced
-   like Griflan's clusters. Slots are ranked by how central they sit
-   in the resting view and handed out in `tiles` order — so the first
-   tiles (the illustrative work) land in the middle and the last ones
-   (product work) at the corners. Spin and tilt stop hard at the edge
-   of the work, so the empty back of the globe never comes round. */
+   17 tiles on the face of the globe in three rows (6·6·5). Every tile
+   is the same height and each row is packed with one constant gap —
+   the same arc as the gap between rows — so square and tall pieces sit
+   as evenly as wide ones. Slots are ranked by how central they sit in
+   the resting view and handed out in `tiles` order, so the first tiles
+   land in the middle and the last ones (product work) at the ends of
+   the rows. Spin and tilt stop hard at the edge of the work, so the
+   empty back of the globe never comes round. */
 const ROWS: Array<{ lat: number; count: number }> = [
   { lat: 7, count: 6 },
-  { lat: 22, count: 6 },
-  { lat: -8, count: 5 },
+  { lat: 21, count: 6 },
+  { lat: -7, count: 5 },
 ];
+/** Only used to rank slots by centrality. */
 const LON_PITCH = 20;
-const TILE_WIDTH_DEG = 16.5; // at the equator
-const TILE_MAX_HEIGHT_DEG = 10.5;
+const TILE_HEIGHT_DEG = 10;
+/** Gap between neighbouring tiles, in arc degrees — matches the row gap. */
+const TILE_GAP_DEG = 4;
 const TILE_RADIUS = R * 1.002;
 /** Where the eye lands at rest; slots nearest it are the most central. */
 const FOCUS_LAT = 1;
 const FOCUS_LAT_WEIGHT = 1.3;
+/** Row half-width (lon degrees) the spin stop was tuned for. */
+const REFERENCE_EXTENT_DEG = 58.5;
 
 /* ── camera: close in, Griflan-style — horizon under the header,
    the sphere's sides beyond the frame ─────────────────────────── */
@@ -66,9 +72,9 @@ const DIVE_IN_PX = 60;
 /* ── motion (deliberately calm) ─────────────────────────────────── */
 const SWAY_SPIN = 0.05; // rad of idle left-right sway
 const SWAY_SPEED = 0.12; // rad / s of the sway phase
-const SPIN_LIMIT = 0.5; // hard stop, rad either side of centre
-const TILT_MIN = -0.3; // hard stops
-const TILT_MAX = 0.12;
+const SPIN_LIMIT = 0.5; // hard stop, rad either side of centre (reference layout)
+const TILT_MIN = -0.285; // hard stops (rows span 21° to -7°)
+const TILT_MAX = 0.105;
 const WHEEL_GAIN = 0.00007; // rad per px of wheel delta
 const MAX_TILT_SPEED = 0.02; // rad per frame
 const SPEED_DECAY = 0.88;
@@ -95,36 +101,52 @@ const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v
 
 type Placement = { lon: number; lat: number; wDeg: number; hDeg: number };
 
+type Slot = { row: number; k: number; score: number };
+
 /** Slots ranked from most to least central. */
-function rankedSlots(): Array<{ lon: number; lat: number }> {
-  const slots: Array<{ lon: number; lat: number; score: number }> = [];
-  ROWS.forEach((row) => {
+function rankedSlots(): Slot[] {
+  const slots: Slot[] = [];
+  ROWS.forEach((row, r) => {
     const cos = Math.cos(row.lat * DEG);
     for (let k = 0; k < row.count; k++) {
       const dLon = (k - (row.count - 1) / 2) * LON_PITCH;
-      slots.push({
-        lon: 90 + dLon,
-        lat: row.lat,
-        score: Math.abs(dLon) * cos + Math.abs(row.lat - FOCUS_LAT) * FOCUS_LAT_WEIGHT,
-      });
+      slots.push({ row: r, k, score: Math.abs(dLon) * cos + Math.abs(row.lat - FOCUS_LAT) * FOCUS_LAT_WEIGHT });
     }
   });
   return slots.sort((a, b) => a.score - b.score);
 }
 
+/** Each row's tiles, left to right, packed edge to edge with one gap
+    and centred on the front of the globe. */
 function placements(tiles: GlobeTile[]): Placement[] {
   const slots = rankedSlots();
-  return tiles.map((t, i) => {
-    const slot = slots[i] ?? slots[slots.length - 1];
-    const cos = Math.cos(slot.lat * DEG);
-    let hDeg = TILE_WIDTH_DEG / t.aspect;
-    let wDeg = TILE_WIDTH_DEG / cos;
-    if (hDeg > TILE_MAX_HEIGHT_DEG) {
-      hDeg = TILE_MAX_HEIGHT_DEG;
-      wDeg = (hDeg * t.aspect) / cos;
-    }
-    return { lon: slot.lon, lat: slot.lat, wDeg, hDeg };
+  const byRow: Array<Array<{ tile: number; k: number }>> = ROWS.map(() => []);
+  tiles.forEach((_, i) => {
+    const slot = slots[Math.min(i, slots.length - 1)];
+    byRow[slot.row].push({ tile: i, k: slot.k });
   });
+  const out: Placement[] = new Array(tiles.length);
+  byRow.forEach((items, r) => {
+    const lat = ROWS[r].lat;
+    const cos = Math.cos(lat * DEG);
+    const ordered = [...items].sort((a, b) => a.k - b.k);
+    const widths = ordered.map(({ tile }) => (TILE_HEIGHT_DEG * tiles[tile].aspect) / cos);
+    const gap = TILE_GAP_DEG / cos;
+    const total = widths.reduce((sum, w) => sum + w, 0) + gap * Math.max(0, ordered.length - 1);
+    let left = 90 - total / 2;
+    ordered.forEach(({ tile }, j) => {
+      out[tile] = { lon: left + widths[j] / 2, lat, wDeg: widths[j], hDeg: TILE_HEIGHT_DEG };
+      left += widths[j] + gap;
+    });
+  });
+  return out;
+}
+
+/** How far the globe may spin: the widest row's reach, relative to the
+    layout the stop was tuned on. */
+function spinLimitFor(spots: Placement[]): number {
+  const reach = Math.max(...spots.map((p) => Math.abs(p.lon - 90) + p.wDeg / 2));
+  return clamp(SPIN_LIMIT + (reach - REFERENCE_EXTENT_DEG) * DEG, 0.3, 0.7);
 }
 
 /** A curved tile on the sphere, plus a morph target that lays the same
@@ -194,6 +216,7 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
   const maxAniso = renderer.capabilities.getMaxAnisotropy();
   const textures: THREE.Texture[] = [];
   const spots = placements(tiles);
+  const spinLimit = spinLimitFor(spots);
   let loaded = 0;
   const markLoaded = () => {
     loaded++;
@@ -307,8 +330,8 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
 
   /** Hard stops at the edge of the work — momentum dies there. */
   const stopAtEdges = () => {
-    if (spin > SPIN_LIMIT || spin < -SPIN_LIMIT) {
-      spin = clamp(spin, -SPIN_LIMIT, SPIN_LIMIT);
+    if (spin > spinLimit || spin < -spinLimit) {
+      spin = clamp(spin, -spinLimit, spinLimit);
       spinSpeed = 0;
     }
     if (tilt > TILT_MAX || tilt < TILT_MIN) {

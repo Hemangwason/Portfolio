@@ -666,15 +666,16 @@ const SHOWCASE_IDS = [
   "independence-day-banner",
   "halloween-zomato",
   "goat-offers-bumrah",
-  // the rest of the visual + motion work
-  "diya-rush",
+  // the rest of the visual + motion work, ordered so the three rows
+  // come out about the same length on the globe
   "onam",
+  "diya-rush",
   "zepto-turns-5",
-  "raksha-bandhan",
-  "street-football",
   "durga-puja-pandal",
   "zomato-plus-identity",
-  // product — the corners
+  "raksha-bandhan",
+  "street-football",
+  // product — the ends of the rows
   "sidetake",
   "sidetalk",
   "jexlin",
