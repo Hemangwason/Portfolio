@@ -28,5 +28,5 @@ export const BOARD_TICKER = [
   "Teaching Lottie a new trick",
   "Hanging festival lights on the home feed",
   "Buffering 1.81M birthday wishes",
-  "Scroll to zoom · drag to turn · click to open",
+  "Scroll to spin · drag to turn · click to open",
 ];

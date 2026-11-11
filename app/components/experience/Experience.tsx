@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { loopFor, showcase, stillFor } from "../../data/projects";
-import type { BoardHandle } from "./boardScene";
+import type { GlobeHandle } from "./globeScene";
 import { BoardHeader, PillHeader, type NavActions } from "./Headers";
 import { BOARD_TICKER } from "./links";
 import { Loader } from "./Loader";
@@ -21,7 +21,9 @@ const BG = "#181616";
 const LINE = "#f5eedc";
 const LOADER_MIN_MS = 1300;
 const LOADER_MAX_MS = 5000;
-const REEL_FADE_MS = 380;
+const REEL_FADE_MS = 520;
+/** The project view starts fading in this far into the camera dive. */
+const REEL_REVEAL_AT_MS = 520;
 
 function pathFor(view: View, projectId?: string | null): string {
   if (view === "project" && projectId) return `/projects/${projectId}`;
@@ -40,7 +42,7 @@ function parsePath(pathname: string): { view: View; project?: string } {
 
 export function Experience({ initialView = "board", initialProject }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const boardRef = useRef<BoardHandle | null>(null);
+  const boardRef = useRef<GlobeHandle | null>(null);
   const uRef = useRef<HTMLSpanElement>(null);
   const vRef = useRef<HTMLSpanElement>(null);
 
@@ -52,6 +54,7 @@ export function Experience({ initialView = "board", initialProject }: Props) {
   const [boardReady, setBoardReady] = useState(false);
   const [loaderDone, setLoaderDone] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [reelScrolled, setReelScrolled] = useState(false);
   const busyRef = useRef(false);
   const viewRef = useRef(view);
   viewRef.current = view;
@@ -63,10 +66,10 @@ export function Experience({ initialView = "board", initialProject }: Props) {
     let disposed = false;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    import("./boardScene")
-      .then(({ createBoard }) => {
+    import("./globeScene")
+      .then(({ createGlobe }) => {
         if (disposed) return;
-        const handle = createBoard(
+        const handle = createGlobe(
           canvas,
           showcase.map((p) => {
             const s = stillFor(p.id);
@@ -78,9 +81,9 @@ export function Experience({ initialView = "board", initialProject }: Props) {
             reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
             onSelect: (id) => openProjectRef.current(id),
             onReady: () => setBoardReady(true),
-            onFrame: (yawDeg, zoomPct) => {
-              if (uRef.current) uRef.current.textContent = yawDeg.toFixed(6);
-              if (vRef.current) vRef.current.textContent = zoomPct.toFixed(6);
+            onFrame: (tiltDeg, spinDeg) => {
+              if (uRef.current) uRef.current.textContent = tiltDeg.toFixed(6);
+              if (vRef.current) vRef.current.textContent = spinDeg.toFixed(6);
             },
           },
         );
@@ -124,10 +127,18 @@ export function Experience({ initialView = "board", initialProject }: Props) {
     busyRef.current = true;
     setView("project");
     setCurrent(id);
+    setReelScrolled(false);
     if (push) window.history.pushState(null, "", pathFor("project", id));
-    await boardRef.current?.flyIn(id);
-    setReelStart(id);
-    requestAnimationFrame(() => setReelVisible(true));
+    // The view fades in over the last part of the dive, so the camera
+    // seems to land inside the project rather than cut to it.
+    const reveal = new Promise<void>((resolve) =>
+      setTimeout(() => {
+        setReelStart(id);
+        requestAnimationFrame(() => setReelVisible(true));
+        resolve();
+      }, REEL_REVEAL_AT_MS),
+    );
+    await Promise.all([boardRef.current?.flyIn(id), reveal]);
     setTimeout(() => {
       boardRef.current?.setActive(false);
       busyRef.current = false;
@@ -140,11 +151,18 @@ export function Experience({ initialView = "board", initialProject }: Props) {
     if (busyRef.current) return;
     busyRef.current = true;
     boardRef.current?.setActive(true);
+    setReelScrolled(false);
+    // Shrink + fade the view while the camera is already pulling back
+    // out, so closing reads as one move back onto the globe.
     setReelVisible(false);
-    await new Promise((r) => setTimeout(r, REEL_FADE_MS));
-    setReelStart(null);
-    setCurrent(null);
-    await boardRef.current?.flyOut();
+    const unmount = new Promise<void>((resolve) =>
+      setTimeout(() => {
+        setReelStart(null);
+        setCurrent(null);
+        resolve();
+      }, REEL_FADE_MS),
+    );
+    await Promise.all([boardRef.current?.flyOut(), unmount]);
     busyRef.current = false;
   }, []);
 
@@ -219,7 +237,7 @@ export function Experience({ initialView = "board", initialProject }: Props) {
         <canvas
           ref={canvasRef}
           className="block h-full w-full cursor-grab touch-none select-none"
-          aria-label="Board of projects. Scroll to zoom, drag to turn, click a tile to open it."
+          aria-label="Globe of projects. Scroll to spin, drag to turn, click a tile to open it."
         />
         <span
           ref={uRef}
@@ -238,10 +256,10 @@ export function Experience({ initialView = "board", initialProject }: Props) {
         {failed && <BoardFallback onOpen={(id) => void openProject(id)} />}
       </div>
 
-      <BoardHeader actions={actions} active={headerActive} collapsed={inProject} />
+      <BoardHeader actions={actions} active={headerActive} collapsed={inProject && reelScrolled} />
       <PillHeader
         actions={actions}
-        visible={inProject && reelVisible}
+        visible={inProject && reelVisible && reelScrolled}
         projects={showcase}
         current={currentProject}
         onPick={(id) => void openProject(id)}
@@ -251,18 +269,18 @@ export function Experience({ initialView = "board", initialProject }: Props) {
       <ContactPanel open={view === "contact"} />
 
       {reelStart && (
-        <div style={{ opacity: reelVisible ? 1 : 0 }} className="reel">
-          <ProjectReel
+        <ProjectReel
+            visible={reelVisible}
             projects={showcase}
             startId={reelStart}
             jumpTo={jumpTo}
             onCurrent={onCurrent}
+            onScrolled={setReelScrolled}
             onClose={() => {
               window.history.pushState(null, "", "/");
               void closeProject().then(() => setView("board"));
             }}
           />
-        </div>
       )}
 
       <Ticker

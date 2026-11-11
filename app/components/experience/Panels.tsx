@@ -45,7 +45,7 @@ export function AboutPanel({ open }: { open: boolean }) {
       <div className="mt-8 max-w-[420px] space-y-5 text-[15px] leading-[1.4] text-[var(--cream)]">
         <p>
           Hemang Wason is a product, visual and motion designer — ex-Zomato,
-          currently at Zepto. This board is a bird&rsquo;s-eye view of the work:
+          currently at Zepto. This globe is a bird&rsquo;s-eye view of the work:
           games, campaigns, identities and products, every one given the same space.
         </p>
         <p>

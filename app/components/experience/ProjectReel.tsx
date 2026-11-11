@@ -9,7 +9,12 @@ type Props = {
   jumpTo: { id: string; nonce: number } | null;
   onCurrent: (id: string) => void;
   onClose: () => void;
+  /** True once the visitor has scrolled past the top — shrinks the header. */
+  onScrolled: (scrolled: boolean) => void;
+  visible: boolean;
 };
+
+const SCROLLED_PX = 12;
 
 /* Entering media rises lying back (top edge away from you) and
    stands up as it reaches the upper third of the screen. */
@@ -26,7 +31,7 @@ const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
  * Every project in one continuous scroll, starting from the one that
  * was clicked: the video, then its text.
  */
-export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose }: Props) {
+export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose, onScrolled, visible }: Props) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const currentRef = useRef(startId);
 
@@ -40,8 +45,14 @@ export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose }: P
     const scroller = scrollerRef.current;
     if (!scroller) return;
     let raf = 0;
+    let wasScrolled = false;
     const update = () => {
       raf = 0;
+      const scrolled = scroller.scrollTop > SCROLLED_PX;
+      if (scrolled !== wasScrolled) {
+        wasScrolled = scrolled;
+        onScrolled(scrolled);
+      }
       const vh = scroller.clientHeight;
       const probe = vh * 0.45;
       scroller.querySelectorAll<HTMLElement>("[data-reel-id]").forEach((section) => {
@@ -76,7 +87,7 @@ export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose }: P
       window.removeEventListener("resize", schedule);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [ordered, onCurrent]);
+  }, [ordered, onCurrent, onScrolled]);
 
   // Videos stream only when near the viewport and play only in view.
   useEffect(() => {
@@ -124,9 +135,9 @@ export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose }: P
     <div
       ref={scrollerRef}
       data-scroll-momentum
-      className="reel fixed inset-0 z-20 overflow-y-auto overscroll-contain bg-[var(--bg)]"
+      className={`reel fixed inset-0 z-20 overflow-y-auto overscroll-contain bg-[var(--bg)] ${visible ? "reel-shown" : "reel-hidden"}`}
     >
-      <div className="pb-[40vh] pt-[92px]">
+      <div className="pb-[40vh]" style={{ paddingTop: "calc(var(--hdr-h) + 24px)" }}>
         {ordered.map((p, i) => (
           <ReelSection key={p.id} project={p} eager={i === 0} />
         ))}
@@ -138,7 +149,7 @@ export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose }: P
             onClick={onClose}
             className="display rounded-[4px] bg-[var(--red)] px-6 py-3 text-[24px] leading-none text-white transition-transform hover:scale-[0.97]"
           >
-            Back to the board
+            Back to the globe
           </button>
         </div>
       </div>

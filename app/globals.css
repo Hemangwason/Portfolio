@@ -93,8 +93,61 @@ h1, h2, h3, h4, p, li, dd {
   color: var(--red);
 }
 
+/* The full header shrinks into the pill's footprint (and grows back
+   out of it) with a clip-path morph; the pill fades in once it lands. */
+.hdr {
+  clip-path: inset(0px 0px 0px 0px round 0px);
+  transition:
+    clip-path 640ms cubic-bezier(0.76, 0, 0.24, 1),
+    opacity 220ms ease;
+}
 .hdr-collapsed {
-  transform: translateY(-100%);
+  clip-path: inset(20px calc(50% - 240px) calc(100% - 66px) calc(50% - 240px) round 10px);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    clip-path 560ms cubic-bezier(0.76, 0, 0.24, 1),
+    opacity 200ms ease 360ms;
+}
+@media (max-width: 767px) {
+  .hdr-collapsed {
+    clip-path: inset(20px calc(50% - 150px) calc(100% - 66px) calc(50% - 150px) round 10px);
+  }
+}
+
+.pill-wrap {
+  transition: opacity 180ms ease;
+}
+.pill-wrap[data-visible="true"] {
+  transition: opacity 260ms ease 380ms;
+}
+
+/* Wordmark: a colour band washes through the letters every few
+   seconds, faster while hovered. */
+.logo-sweep {
+  background-image: linear-gradient(
+    100deg,
+    var(--cream) 0%,
+    var(--cream) 38%,
+    #29d36b 44%,
+    #7b5cff 50%,
+    #ff3b30 56%,
+    var(--cream) 62%,
+    var(--cream) 100%
+  );
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: logoSweep 7s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+.logo-sweep:hover {
+  animation-duration: 2.4s;
+}
+@keyframes logoSweep {
+  0%, 58% { background-position: 100% 0; }
+  92%, 100% { background-position: 0% 0; }
 }
 
 .pill {
@@ -188,7 +241,19 @@ h1, h2, h3, h4, p, li, dd {
 /* ── project reel ───────────────────────────────────────────────── */
 
 .reel {
-  transition: opacity 380ms ease;
+  transform-origin: 50% 38%;
+  transition:
+    opacity 520ms ease,
+    transform 640ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reel-hidden {
+  opacity: 0;
+  transform: scale(0.9);
+  pointer-events: none;
+}
+.reel-shown {
+  opacity: 1;
+  transform: none;
 }
 .reel-media {
   transform-origin: 50% 100%;
@@ -198,8 +263,14 @@ h1, h2, h3, h4, p, li, dd {
 @media (prefers-reduced-motion: reduce) {
   .ticker-track,
   .wire-cube,
-  .loader-word {
+  .loader-word,
+  .logo-sweep {
     animation: none;
+  }
+  .hdr,
+  .hdr-collapsed,
+  .pill-wrap {
+    transition: none;
   }
   .panel,
   .reel,

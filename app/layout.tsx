@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Hemang Wason — Product, Visual & Motion Designer",
   description:
-    "Hemang Wason — product, visual and motion design. Ex-Zomato, currently Zepto. Every project on one board.",
+    "Hemang Wason — product, visual and motion design. Ex-Zomato, currently Zepto. Every project on one globe.",
   icons: {
     icon: [
       { url: "/favicon.ico" },

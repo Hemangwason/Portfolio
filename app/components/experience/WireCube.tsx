@@ -7,7 +7,7 @@ const FACES: Array<{ transform: string; color: string }> = [
   { transform: "rotateX(-90deg) translateZ(var(--half))", color: "#ffb000" },
 ];
 
-/** A slowly spinning wireframe cube — the board's square motif. */
+/** A slowly spinning wireframe cube — the loader and header motif. */
 export function WireCube({ size = 48, className = "" }: { size?: number; className?: string }) {
   return (
     <div

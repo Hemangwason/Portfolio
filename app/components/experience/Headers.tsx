@@ -47,8 +47,8 @@ function NavLink({
 
 function Wordmark({ className = "" }: { className?: string }) {
   return (
-    <span className={`display whitespace-nowrap leading-none tracking-[-0.01em] text-[var(--cream)] ${className}`}>
-      Hemang <span className="font-medium opacity-70">Wason</span>
+    <span className={`display logo-sweep whitespace-nowrap leading-none tracking-[-0.01em] ${className}`}>
+      Hemang <span className="font-medium">Wason</span>
     </span>
   );
 }
@@ -57,7 +57,7 @@ function Wordmark({ className = "" }: { className?: string }) {
 export function BoardHeader({ actions, active, collapsed }: { actions: NavActions; active: Active; collapsed: boolean }) {
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-40 border-b border-[var(--rule)] bg-[var(--bg)] transition-transform duration-500 ${collapsed ? "hdr-collapsed" : ""}`}
+      className={`hdr fixed inset-x-0 top-0 z-40 border-b border-[var(--rule)] bg-[var(--bg)] ${collapsed ? "hdr-collapsed" : ""}`}
       style={{ height: "var(--hdr-h)" }}
     >
       {/* desktop */}
@@ -188,7 +188,8 @@ export function PillHeader({
 
   return (
     <div
-      className={`pointer-events-none fixed inset-x-0 top-0 z-50 transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"}`}
+      data-visible={visible}
+      className={`pill-wrap pointer-events-none fixed inset-x-0 top-0 z-50 ${visible ? "opacity-100" : "opacity-0"}`}
       aria-hidden={!visible}
     >
       <div className={`flex items-start justify-between ${visible ? "pointer-events-auto" : ""}`}>
@@ -210,7 +211,7 @@ export function PillHeader({
           type="button"
           onClick={actions.onHome}
           className="hidden items-center border-r border-[var(--rule-strong)] px-3 sm:flex"
-          aria-label="Back to the board"
+          aria-label="Back to the globe"
         >
           <Wordmark className="text-[22px]" />
         </button>
