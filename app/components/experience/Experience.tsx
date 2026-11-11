@@ -251,10 +251,6 @@ export function Experience({ initialView = "board", initialProject }: Props) {
 
   const inProject = view === "project";
   const headerActive = inProject ? "project" : view === "board" ? "home" : view;
-  const tickerItems = currentProject
-    ? [...currentProject.tags, currentProject.client ?? "Independent", currentProject.year]
-    : BOARD_TICKER;
-
   return (
     <main className="fixed inset-0 overflow-hidden">
       <div className="absolute inset-x-0 bottom-0" style={{ top: "var(--hdr-h)" }}>
@@ -307,11 +303,9 @@ export function Experience({ initialView = "board", initialProject }: Props) {
           />
       )}
 
-      <Ticker
-        key={currentProject?.id ?? "board"}
-        items={tickerItems}
-        className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2"
-      />
+      {!inProject && (
+        <Ticker items={BOARD_TICKER} className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2" />
+      )}
 
       {!inProject && <QuickView onOpen={() => void openProject(showcase[0].id)} />}
 

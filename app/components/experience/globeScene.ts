@@ -83,12 +83,6 @@ const TOUCH_FACTOR = 0.7;
 const STEER_SPIN = 0.06; // cursor parallax, rad at the screen edge
 const STEER_TILT = 0.035;
 const STEER_EASE = 2.5;
-/** Scroll speed swells the middle: a tighter lens and a closer camera. */
-const WARP_FOV = -9; // narrower lens → the centre swells
-const WARP_DOLLY = 0.9;
-const WARP_GAIN = 70;
-const WARP_ATTACK = 9; // swell fast while scrolling…
-const WARP_RELEASE = 1.8; // …and settle back slowly
 const CLICK_SLOP_PX = 6;
 const FILL_RATIO = 0.82;
 const FLY_IN_MS = 900;
@@ -367,7 +361,6 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
   let steerY = 0;
   let steerTargetX = 0;
   let steerTargetY = 0;
-  let warp = 0;
   let depth = 0;
   let depthTarget = 0;
   let swayPhase = 0;
@@ -395,17 +388,14 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
      close-up surface). The camera blends between the two poses. */
   const outsidePos = new THREE.Vector3(0, 0, OUTSIDE_DISTANCE);
   const outsideTarget = new THREE.Vector3(0, 0, 0);
-  const blendPos = new THREE.Vector3();
 
   const applyRest = () => {
     const k = easeInOutCubic(clamp(depth, 0, 1));
-    // Warp: faster scroll → tighter lens and a closer camera, so the
-    // middle of the globe swells outward and settles back.
-    const insideFov = baseFov + warp * WARP_FOV;
-    camera.fov = OUTSIDE_FOV + (insideFov - OUTSIDE_FOV) * k;
+    // Size stays constant while scrolling or dragging — only the depth
+    // axis (arrive / pull out) moves the camera in or out.
+    camera.fov = OUTSIDE_FOV + (baseFov - OUTSIDE_FOV) * k;
     camera.updateProjectionMatrix();
-    blendPos.copy(restPos).addScaledVector(new THREE.Vector3(0, 0, -1), warp * WARP_DOLLY);
-    camera.position.lerpVectors(outsidePos, blendPos, k);
+    camera.position.lerpVectors(outsidePos, restPos, k);
     camera.up.set(0, 1, 0);
     lookTarget.lerpVectors(outsideTarget, restTarget, k);
     camera.lookAt(lookTarget);
@@ -675,7 +665,6 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
     return fly(restPos.clone(), restTarget.clone(), new THREE.Vector3(0, 1, 0), baseFov, FLY_OUT_MS, (k) => {
       if (tile) setFlatness(tile, 1 - smoothstep(0, 1 - FLATTEN_FROM, k));
     }).then(() => {
-      warp = 0;
       parked = false;
     });
   };
@@ -703,10 +692,6 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
       const k = 1 - Math.exp(-dt * STEER_EASE);
       steerX += (steerTargetX - steerX) * k;
       steerY += (steerTargetY - steerY) * k;
-      const speed = Math.abs(tiltSpeed) + Math.abs(spinSpeed) * 0.5;
-      const warpTarget = opts.reducedMotion ? 0 : clamp(speed * WARP_GAIN, 0, 1);
-      const rate = warpTarget > warp ? WARP_ATTACK : WARP_RELEASE;
-      warp += (warpTarget - warp) * (1 - Math.exp(-dt * rate));
       const sway = Math.sin(swayPhase) * SWAY_SPIN;
       globe.rotation.set(tilt + steerY * STEER_TILT, spin + sway + steerX * STEER_SPIN, 0);
       applyRest();
