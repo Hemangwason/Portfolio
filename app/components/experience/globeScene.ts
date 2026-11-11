@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { DEG, R, gridLines, pearlMaterial, sphericalPoint } from "./globeSurface";
+import { DEG, LAT_CELL, LON_CELL, R, gridLines, pearlMaterial, sphericalPoint } from "./globeSurface";
+import { createAutopilot } from "./globeAutopilot";
 import { createSheen, SHEEN_GESTURE_GAP_MS, SHEEN_TRIGGER_PX } from "./globeSheen";
 
 export type GlobeTile = { id: string; still: string; aspect: number; loop?: string };
@@ -27,30 +28,39 @@ export type GlobeHandle = {
 
 
 /* ── layout: every project exactly once ──────────────────────────
-   17 tiles on the face of the globe in three rows (6·6·5). Every tile
-   is the same height and each row is packed with one constant gap —
-   the same arc as the gap between rows — so square and tall pieces sit
-   as evenly as wide ones. Slots are ranked by how central they sit in
-   the resting view and handed out in `tiles` order, so the first tiles
-   land in the middle and the last ones (product work) at the ends of
-   the rows. Spin and tilt stop hard at the edge of the work, so the
-   empty back of the globe never comes round. */
+   17 tiles in four rows (4·5·4·4), laid out on the grid like Griflan's:
+   every tile is two grid cells tall, rows sit on the grid lines, and
+   there are two empty cells between rows and between neighbouring
+   tiles, so each piece has room to itself. Slots are ranked by how
+   central they sit in the resting view and handed out in `tiles` order,
+   so the first tiles land in the middle and the last ones (product
+   work) at the ends of the rows. Spin and tilt stop hard at the edge of
+   the work, so the empty back of the globe never comes round. */
+const GAP_CELLS = 2;
+const TILE_CELLS_TALL = 2;
+const TILE_HEIGHT_DEG = TILE_CELLS_TALL * LAT_CELL;
+/** Gap between neighbouring tiles, in longitude. */
+const TILE_GAP_LON = GAP_CELLS * LON_CELL;
+const ROW_PITCH = (TILE_CELLS_TALL + GAP_CELLS) * LAT_CELL;
+/** The centre row's band starts on the equator line. */
+const CENTRE_ROW_LAT = TILE_HEIGHT_DEG / 2;
 const ROWS: Array<{ lat: number; count: number }> = [
-  { lat: 7, count: 6 },
-  { lat: 21, count: 6 },
-  { lat: -7, count: 5 },
+  { lat: CENTRE_ROW_LAT, count: 5 },
+  { lat: CENTRE_ROW_LAT + ROW_PITCH, count: 4 },
+  { lat: CENTRE_ROW_LAT - ROW_PITCH, count: 4 },
+  { lat: CENTRE_ROW_LAT - 2 * ROW_PITCH, count: 4 },
 ];
 /** Only used to rank slots by centrality. */
 const LON_PITCH = 20;
-const TILE_HEIGHT_DEG = 10;
-/** Gap between neighbouring tiles, in arc degrees — matches the row gap. */
-const TILE_GAP_DEG = 4;
 const TILE_RADIUS = R * 1.002;
 /** Where the eye lands at rest; slots nearest it are the most central. */
 const FOCUS_LAT = 1;
 const FOCUS_LAT_WEIGHT = 1.3;
-/** Row half-width (lon degrees) the spin stop was tuned for. */
+/** The layout the spin and tilt stops were tuned on: row half-width
+    and the top / bottom edges of the work (degrees). */
 const REFERENCE_EXTENT_DEG = 58.5;
+const REFERENCE_TOP_DEG = 27.25;
+const REFERENCE_BOTTOM_DEG = -13.25;
 
 /* ── camera: close in, Griflan-style — horizon under the header,
    the sphere's sides beyond the frame ─────────────────────────── */
@@ -70,11 +80,9 @@ const PULL_OUT_PX = 240;
 const DIVE_IN_PX = 60;
 
 /* ── motion (deliberately calm) ─────────────────────────────────── */
-const SWAY_SPIN = 0.05; // rad of idle left-right sway
-const SWAY_SPEED = 0.12; // rad / s of the sway phase
 const SPIN_LIMIT = 0.5; // hard stop, rad either side of centre (reference layout)
-const TILT_MIN = -0.285; // hard stops (rows span 21° to -7°)
-const TILT_MAX = 0.105;
+const TILT_MIN = -0.3; // hard stops (reference layout)
+const TILT_MAX = 0.12;
 const WHEEL_GAIN = 0.00007; // rad per px of wheel delta
 const MAX_TILT_SPEED = 0.02; // rad per frame
 const SPEED_DECAY = 0.88;
@@ -131,7 +139,7 @@ function placements(tiles: GlobeTile[]): Placement[] {
     const cos = Math.cos(lat * DEG);
     const ordered = [...items].sort((a, b) => a.k - b.k);
     const widths = ordered.map(({ tile }) => (TILE_HEIGHT_DEG * tiles[tile].aspect) / cos);
-    const gap = TILE_GAP_DEG / cos;
+    const gap = TILE_GAP_LON;
     const total = widths.reduce((sum, w) => sum + w, 0) + gap * Math.max(0, ordered.length - 1);
     let left = 90 - total / 2;
     ordered.forEach(({ tile }, j) => {
@@ -142,11 +150,17 @@ function placements(tiles: GlobeTile[]): Placement[] {
   return out;
 }
 
-/** How far the globe may spin: the widest row's reach, relative to the
-    layout the stop was tuned on. */
-function spinLimitFor(spots: Placement[]): number {
+/** Where spin and tilt stop: the work's reach, relative to the layout
+    the stops were tuned on. Lower rows need the globe to roll further. */
+function limitsFor(spots: Placement[]): { spin: number; tiltMin: number; tiltMax: number } {
   const reach = Math.max(...spots.map((p) => Math.abs(p.lon - 90) + p.wDeg / 2));
-  return clamp(SPIN_LIMIT + (reach - REFERENCE_EXTENT_DEG) * DEG, 0.3, 0.7);
+  const top = Math.max(...spots.map((p) => p.lat + p.hDeg / 2));
+  const bottom = Math.min(...spots.map((p) => p.lat - p.hDeg / 2));
+  return {
+    spin: clamp(SPIN_LIMIT + (reach - REFERENCE_EXTENT_DEG) * DEG, 0.15, 0.75),
+    tiltMin: TILT_MIN - (REFERENCE_BOTTOM_DEG - bottom) * DEG,
+    tiltMax: TILT_MAX - (REFERENCE_TOP_DEG - top) * DEG,
+  };
 }
 
 /** A curved tile on the sphere, plus a morph target that lays the same
@@ -216,7 +230,11 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
   const maxAniso = renderer.capabilities.getMaxAnisotropy();
   const textures: THREE.Texture[] = [];
   const spots = placements(tiles);
-  const spinLimit = spinLimitFor(spots);
+  const limits = limitsFor(spots);
+  const spinLimit = limits.spin;
+  const tiltMin = limits.tiltMin;
+  const tiltMax = limits.tiltMax;
+  const autopilot = createAutopilot({ spin: spinLimit, tiltMin, tiltRest: TILT_REST }, opts.reducedMotion);
   let loaded = 0;
   const markLoaded = () => {
     loaded++;
@@ -286,7 +304,6 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
   let steerTargetY = 0;
   let depth = 0;
   let depthTarget = 0;
-  let swayPhase = 0;
   let active = false;
   let flying = false;
   let parked = false;
@@ -334,8 +351,8 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
       spin = clamp(spin, -spinLimit, spinLimit);
       spinSpeed = 0;
     }
-    if (tilt > TILT_MAX || tilt < TILT_MIN) {
-      tilt = clamp(tilt, TILT_MIN, TILT_MAX);
+    if (tilt > tiltMax || tilt < tiltMin) {
+      tilt = clamp(tilt, tiltMin, tiltMax);
       tiltSpeed = 0;
     }
   };
@@ -385,7 +402,15 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
     drag = { x: e.clientX, y: e.clientY, travel: 0, id: e.pointerId };
     tiltSpeed = 0;
     spinSpeed = 0;
+    autopilot.touch();
+    lightAt(e);
     canvas.setPointerCapture(e.pointerId);
+  };
+
+  /** The grid lights up under the pointer (mouse hover, or a finger while dragging). */
+  const lightAt = (e: PointerEvent) => {
+    const rect = canvas.getBoundingClientRect();
+    sheen.point(((e.clientX - rect.left) / rect.width) * 2 - 1, -(((e.clientY - rect.top) / rect.height) * 2 - 1));
   };
 
   const onMove = (e: PointerEvent) => {
@@ -394,7 +419,9 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
       steerTargetX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
       steerTargetY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
     }
+    if (e.pointerType === "mouse" || drag) lightAt(e);
     if (drag && e.pointerId === drag.id) {
+      autopilot.touch();
       const dx = e.clientX - drag.x;
       const dy = e.clientY - drag.y;
       drag.x = e.clientX;
@@ -426,6 +453,8 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
     if (!drag || e.pointerId !== drag.id) return;
     const wasClick = drag.travel < CLICK_SLOP_PX;
     drag = null;
+    autopilot.touch();
+    if (e.pointerType !== "mouse") sheen.release();
     canvas.style.cursor = "grab";
     if (canvas.hasPointerCapture(e.pointerId)) canvas.releasePointerCapture(e.pointerId);
     if (!wasClick) return;
@@ -437,18 +466,21 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
 
   const onCancel = () => {
     drag = null;
+    sheen.release();
   };
 
   const onLeave = () => {
     mouse = null;
     steerTargetX = 0;
     steerTargetY = 0;
+    sheen.release();
     setHovered(null);
   };
 
   let pull = 0;
   const onWheel = (e: WheelEvent) => {
     if (flying || parked) return;
+    autopilot.touch();
     const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1;
     const delta = clamp(e.deltaY * unit, -140, 140);
 
@@ -462,7 +494,7 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
       return;
     }
     // Inside, pinned at the top row: keep scrolling up to pull out.
-    if (tilt >= TILT_MAX - 1e-3 && delta < 0) {
+    if (tilt >= tiltMax - 1e-3 && delta < 0) {
       pull -= delta;
       if (pull > PULL_OUT_PX) {
         depthTarget = 0;
@@ -490,6 +522,7 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
     if (!w || !h) return;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
+    sheen.setAspect(camera.aspect);
     baseFov = camera.aspect < 1 ? FOV_NARROW : FOV_WIDE;
     placeRest();
     if (!flying && !parked) applyRest();
@@ -622,8 +655,12 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
         tiltSpeed *= decay;
         spinSpeed *= decay;
       }
+      if (depth > 0.5) {
+        const next = autopilot.step(dt, now, spin, tilt, Boolean(drag || hovered));
+        spin = next.spin;
+        tilt = next.tilt;
+      }
       stopAtEdges();
-      if (!opts.reducedMotion) swayPhase += dt * SWAY_SPEED;
       depth = opts.reducedMotion
         ? depthTarget
         : depth + (depthTarget - depth) * (1 - Math.exp(-dt * DEPTH_EASE));
@@ -631,12 +668,11 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
       const k = 1 - Math.exp(-dt * STEER_EASE);
       steerX += (steerTargetX - steerX) * k;
       steerY += (steerTargetY - steerY) * k;
-      const sway = Math.sin(swayPhase) * SWAY_SPIN;
-      globe.rotation.set(tilt + steerY * STEER_TILT, spin + sway + steerX * STEER_SPIN, 0);
+      globe.rotation.set(tilt + steerY * STEER_TILT, spin + steerX * STEER_SPIN, 0);
       applyRest();
     }
 
-    sheen.update(now);
+    sheen.update(now, dt);
     if (hovered && videoReady && hovered.material !== videoMat) hovered.material = videoMat;
 
     if (++frameCount % HOVER_RECHECK_FRAMES === 0) refreshHover();

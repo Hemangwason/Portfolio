@@ -7,9 +7,11 @@ import { SHEEN_FRAGMENT_PARS, SHEEN_VERTEX, SHEEN_VERTEX_PARS, type SheenUniform
 export const R = 10;
 export const DEG = Math.PI / 180;
 
-const LON_CELL = 6;
-const LAT_CELL = 4.5;
-const LAT_EDGE = 81;
+/** Grid cell size — the tile layout is measured in these cells. */
+export const LON_CELL = 4.5;
+export const LAT_CELL = 3.6;
+/** A whole number of cells from the equator, so a grid line runs along it. */
+const LAT_EDGE = 22 * LAT_CELL;
 
 export function sphericalPoint(lonDeg: number, latDeg: number, r: number): THREE.Vector3 {
   const phi = lonDeg * DEG;
@@ -89,8 +91,12 @@ function lineMaterial(sheen: SheenUniforms): THREE.ShaderMaterial {
       varying vec3 vLine;
       void main() {
         float band = sheenBand();
+        float glow = cursorGlow();
         vec3 colour = mix(vLine, sheenColour(-1.0), band * 0.85);
-        gl_FragColor = vec4(colour, min(1.0, uOpacity + band * 0.1));
+        // Near the pointer the lines deepen into a richer, brighter gradient.
+        colour = mix(colour, cursorColour(), glow);
+        float alpha = uOpacity * (1.0 - 0.25 * (1.0 - glow)) + band * 0.1 + glow * 0.25;
+        gl_FragColor = vec4(colour, min(1.0, alpha));
         #include <colorspace_fragment>
         #include <fog_fragment>
       }
@@ -140,7 +146,9 @@ export function pearlMaterial(sheen: SheenUniforms): THREE.ShaderMaterial {
         float rim = pow(1.0 - max(dot(vNormal, vView), 0.0), 2.4);
         vec3 rimColour = mix(uRimBottom, uRimTop, 0.5 + 0.5 * vNormal.y);
         vec3 pearl = mix(uBase, rimColour, rim * 0.9);
-        gl_FragColor = vec4(mix(pearl, sheenColour(1.0), sheenBand() * 0.38), 1.0);
+        pearl = mix(pearl, sheenColour(1.0), sheenBand() * 0.38);
+        // A faint wash of colour on the surface under the pointer.
+        gl_FragColor = vec4(mix(pearl, cursorColour(), cursorGlow() * 0.07), 1.0);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
         #include <fog_fragment>
