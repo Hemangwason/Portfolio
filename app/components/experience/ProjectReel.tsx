@@ -26,7 +26,8 @@ const MIN_SCALE = 0.9;
 const EXIT_SPAN = 0.4;
 const EXIT_MIN_OPACITY = 0.3;
 const PLAY_RATIO = 0.35;
-const VIDEO_START_DELAY_MS = 450;
+/** After the match cut lands, the open card's video starts on the next beat. */
+const VIDEO_START_DELAY_MS = 180;
 /** A section's text rises in once its top passes this share of the screen. */
 const TEXT_REVEAL_AT = 0.88;
 /** After the match cut, the first project's text follows the picture in. */
@@ -37,21 +38,37 @@ const PREFETCH_MARGIN_LEAN = "5% 0px";
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
-/** First play jumps to the frame the still was cut from; after that it
-    just resumes. */
-function playFromStill(v: HTMLVideoElement) {
+/** Give a lazily-sourced video its file and let it start buffering. */
+function ensureSource(v: HTMLVideoElement, lean: boolean) {
+  if (v.getAttribute("src") || !v.dataset.src) return;
+  v.preload = lean ? "metadata" : "auto";
+  v.src = v.dataset.src;
+}
+
+/** Play a reel video. The first play jumps to the frame its still was
+    cut from, so the picture carries on from the poster; after that it
+    just resumes. Calling play() is what makes a not-yet-loaded video
+    fetch, so it is never left waiting on metadata that won't come. */
+function playFromStill(v: HTMLVideoElement, lean: boolean) {
+  ensureSource(v, lean);
+  const resume = () => {
+    v.play().catch(() => {
+      // Autoplay refused (e.g. iOS Low Power Mode): the poster stays up.
+    });
+  };
   if (v.dataset.seeked) {
-    v.play().catch(() => {});
+    resume();
     return;
   }
-  const go = () => {
+  const seek = () => {
+    if (v.dataset.seeked) return;
     v.dataset.seeked = "1";
     const start = Number(v.dataset.start || 0);
     if (Number.isFinite(v.duration) && start > 0) v.currentTime = v.duration * start;
-    v.play().catch(() => {});
   };
-  if (v.readyState >= 1) go();
-  else v.addEventListener("loadedmetadata", go, { once: true });
+  if (v.readyState >= HTMLMediaElement.HAVE_METADATA) seek();
+  else v.addEventListener("loadedmetadata", seek, { once: true });
+  resume();
 }
 
 /**
@@ -119,29 +136,30 @@ export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose, onS
     };
   }, [ordered, onCurrent, onScrolled]);
 
-  // Videos stream only when near the viewport and play only in view.
+  // Videos start buffering as they near the viewport and autoplay as
+  // soon as their card is in view — every card, so it's clear they move.
   useEffect(() => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
+    const lean = isConstrainedNetwork();
     const videos = [...scroller.querySelectorAll<HTMLVideoElement>("video[data-src]")];
     const near = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
-          const v = e.target as HTMLVideoElement;
-          if (e.isIntersecting && !v.src && v.dataset.src) v.src = v.dataset.src;
+          if (e.isIntersecting) ensureSource(e.target as HTMLVideoElement, lean);
         });
       },
-      { root: scroller, rootMargin: isConstrainedNetwork() ? PREFETCH_MARGIN_LEAN : PREFETCH_MARGIN },
+      { root: scroller, rootMargin: lean ? PREFETCH_MARGIN_LEAN : PREFETCH_MARGIN },
     );
     const inView = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           const v = e.target as HTMLVideoElement;
-          if (e.intersectionRatio >= PLAY_RATIO && shownRef.current) playFromStill(v);
-          else v.pause();
+          if (e.intersectionRatio >= PLAY_RATIO && shownRef.current) playFromStill(v, lean);
+          else if (e.intersectionRatio < PLAY_RATIO) v.pause();
         });
       },
-      { root: scroller, threshold: [0, PLAY_RATIO, 1] },
+      { root: scroller, threshold: [0, PLAY_RATIO, 0.6, 1] },
     );
     videos.forEach((v) => {
       near.observe(v);
@@ -168,10 +186,12 @@ export function ProjectReel({ projects, startId, jumpTo, onCurrent, onClose, onS
       });
     }, TEXT_REVEAL_DELAY_MS);
     const t = setTimeout(() => {
+      const lean = isConstrainedNetwork();
       const vh = scroller.clientHeight;
-      scroller.querySelectorAll<HTMLVideoElement>("video").forEach((v) => {
+      scroller.querySelectorAll<HTMLVideoElement>("video[data-src]").forEach((v) => {
         const r = v.getBoundingClientRect();
-        if (r.bottom > 0 && r.top < vh) playFromStill(v);
+        const visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+        if (r.height > 0 && visible / r.height >= PLAY_RATIO) playFromStill(v, lean);
       });
     }, VIDEO_START_DELAY_MS);
     return () => {
