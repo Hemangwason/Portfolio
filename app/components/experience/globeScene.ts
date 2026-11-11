@@ -27,7 +27,7 @@ export type GlobeHandle = {
 
 
 /* ── layout: every project exactly once ──────────────────────────
-   18 tiles on the face of the globe in three rows of six, spaced
+   17 tiles on the face of the globe in three rows (6·6·5), spaced
    like Griflan's clusters. Slots are ranked by how central they sit
    in the resting view and handed out in `tiles` order — so the first
    tiles (the illustrative work) land in the middle and the last ones
@@ -36,7 +36,7 @@ export type GlobeHandle = {
 const ROWS: Array<{ lat: number; count: number }> = [
   { lat: 7, count: 6 },
   { lat: 22, count: 6 },
-  { lat: -8, count: 6 },
+  { lat: -8, count: 5 },
 ];
 const LON_PITCH = 20;
 const TILE_WIDTH_DEG = 16.5; // at the equator

@@ -71,6 +71,37 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    id: "zepto-club",
+    title: "Zepto Club",
+    tagline: "A premium membership, revealed like an invitation",
+    kind: "play",
+    year: "2026",
+    tags: ["Membership", "Visual system", "Motion", "Lottie"],
+    accent: "var(--accent)",
+    emoji: "\u{1F451}",
+    blurb:
+      "Zepto's invite-only membership, introduced as a small ceremony: the purple deepens, a gold Club card is revealed in light, and cashback becomes Z-Coins you can see. The motion cashback modal hit an 11% CTR, about three times the static version.",
+    role: "Product visual designer",
+    client: "Zepto",
+    clientLabel: "Company",
+    thumbnail: {
+      type: "video",
+      src: "/projects/thumbs/zepto-club.mp4",
+      poster: "/projects/thumbs/zepto-club-poster.jpg",
+      bg: "#120A24",
+    },
+    masthead: {
+      type: "video",
+      src: "/projects/zepto-club.mp4",
+      poster: "/projects/zepto-club-poster.jpg",
+      bg: "#120A24",
+    },
+    writeup: [
+      "Zepto Club is the paid layer on top of Zepto: cashback in Z-Coins, free and priority delivery, priority support and member-only offers. It had to feel like a tier apart without slowing down an app people open to get something fast. My part was the visual world and how it moves. Zepto's purple deepens into a darker, lit stage; gold is saved for moments of access and reward; and a small cast of objects, the metallic Club card, the wordmark, Z-Coins and the benefit symbols, carries the same language from the first invite to benefit pages, cashback modals, CTAs and upsell strips.",
+      "Motion does the persuading. The card is revealed rather than shown, benefits arrive one at a time, and in the cashback modal a familiar bill summary hands focus to the 5% line before Z-Coins spill out of it, so a line item becomes a reward you can see. It all shipped as modular .lottie files with static fallbacks, from 6 KB CTAs to 400 KB full-screen moments. Since launch, 11% of invited users have become members, the motion cashback modal's 11% CTR is about three times its static predecessor's 3.6%, the Lottie experiences drive roughly 9% of all Club purchases, and members show 75% retention at day 30.",
+    ],
+  },
+  {
     id: "diya-rush",
     title: "Diya Rush",
     tagline: "A twenty-second Diwali game, lit one diya at a time",
@@ -222,35 +253,6 @@ export const projects: Project[] = [
     ],
   },
   {
-    id: "boomerang",
-    title: "Boomerang",
-    tagline: "Alumni rehiring as a live, ranked pipeline",
-    kind: "ground",
-    year: "2026",
-    tags: ["AI", "B2B", "Hiring", "Hackathon"],
-    accent: "var(--brand)",
-    emoji: "🪃",
-    blurb:
-      "AI scores every former employee 0\u2013100, surfaces a \u201Cwhy now\u201D signal, and drafts the re-engagement message \u2014 designed and shipped in under five hours at ContextCon.",
-    role: "Solo designer \u00B7 front-end",
-    client: "Boomerang",
-    thumbnail: {
-      type: "video",
-      src: "/projects/thumbs/boomerang.mp4",
-      poster: "/projects/thumbs/boomerang-poster.jpg",
-      bg: "#D8D6F2",
-    },
-    masthead: {
-      type: "video",
-      src: "/projects/boomerang.mp4",
-      poster: "/projects/boomerang-poster.jpg",
-      bg: "#D8D6F2",
-    },
-    writeup: [
-      "Boomerang is an AI-powered alumni rehiring platform built in under five hours for ContextCon. Instead of tracking former employees on LinkedIn one-by-one, it scores each on their likelihood to return (0\u2013100), surfaces a \u2018why now\u2019 signal, and drafts the re-engagement message \u2014 turning a static alumni list into a live, ranked pipeline. HR software defaults to rows, filters, and status pills; I wanted Boomerang to feel like the system was thinking. Glass on a purple-to-blue wallpaper with drifting orbs, score rings around avatars so the score is the person, JetBrains Mono numbers as proof they were computed. Blank canvas to shipped demo in one afternoon \u2014 exactly the thesis ContextCon set out to prove.",
-    ],
-  },
-  {
     id: "jexlin",
     title: "Jexlin",
     tagline: "Streetwear as a medium for point of view",
@@ -277,35 +279,6 @@ export const projects: Project[] = [
     },
     writeup: [
       "Jexlin is a fashion and accessories label built around self-expression \u2014 streetwear energy, bold visual language, experimental pieces. The ambition was to treat fashion as a medium for point of view, not transactional merch: a label where every piece reads like a sentence in a bigger story. As a designer, that meant treating brand and product as one artifact from day one \u2014 pieces that read like chapters, campaigns that feel narrative rather than catalogue, a storefront where the tone is as considered as the typography. The result isn\u2019t another fashion label fighting for attention in a feed \u2014 it\u2019s a point of view you can put on.",
-    ],
-  },
-  {
-    id: "crater",
-    title: "Crater",
-    tagline: "A defense layer for the AI era",
-    kind: "ground",
-    year: "2026",
-    tags: ["AI", "Security", "B2B"],
-    accent: "var(--brand)",
-    emoji: "🛡️",
-    blurb:
-      "A live risk-intelligence layer that detects AI tool usage across browsers, apps, and extensions \u2014 and warns users in the moment of risk instead of after the breach.",
-    role: "Founding designer",
-    client: "Crater",
-    thumbnail: {
-      type: "video",
-      src: "/projects/thumbs/crater.mp4",
-      poster: "/projects/thumbs/crater-poster.jpg",
-      bg: "#0B0B0B",
-    },
-    masthead: {
-      type: "video",
-      src: "/projects/crater.mp4",
-      poster: "/projects/crater-poster.jpg",
-      bg: "#0B0B0B",
-    },
-    writeup: [
-      "Crater is a defense layer for the AI era. People paste sensitive data into chatbots, install extensions with full-page permissions, and connect plugins that quietly train on their work \u2014 without understanding retention, sharing, or scope. Traditional security tools don\u2019t see AI-specific risk. Crater sits across the surfaces where AI gets used \u2014 sites, apps, extensions, plugins, enterprise integrations \u2014 detects tool usage in real time, and warns the user in the moment of risk rather than after a breach. Hard blocks get routed around; a trust layer that informs in-context changes behavior more durably than a firewall that says no. AI safety is a horizontal problem, not a vertical product \u2014 exactly the wedge incumbents can\u2019t easily occupy.",
     ],
   },
   {
@@ -686,26 +659,25 @@ export const projects: Project[] = [
    (so product sits towards the corners of the globe). Each project
    appears exactly once. */
 const SHOWCASE_IDS = [
-  // illustrative — the centre
-  "diya-rush",
-  "asia-cup-2025",
-  "onam",
+  // the centre: the main pieces
+  "zepto-club",
   "healthy-high-five",
+  "asia-cup-2025",
+  "independence-day-banner",
+  "halloween-zomato",
+  "goat-offers-bumrah",
+  // the rest of the visual + motion work
+  "diya-rush",
+  "onam",
   "zepto-turns-5",
   "raksha-bandhan",
-  "independence-day-banner",
-  // other visual + motion work
   "street-football",
-  "halloween-zomato",
   "durga-puja-pandal",
-  "goat-offers-bumrah",
   "zomato-plus-identity",
   // product — the corners
   "sidetake",
   "sidetalk",
-  "boomerang",
   "jexlin",
-  "crater",
   "sid-voice-host",
 ] as const;
 
@@ -720,9 +692,8 @@ export type ProjectStill = { src: string; width: number; height: number };
    tiles and as the poster while the video streams in. */
 const STILL_SIZES: Record<string, readonly [number, number]> = {
   "asia-cup-2025": [960, 540],
-  boomerang: [960, 524],
   "diya-rush": [960, 960],
-  crater: [960, 576],
+  "zepto-club": [960, 540],
   "durga-puja-pandal": [960, 540],
   "goat-offers-bumrah": [960, 540],
   "halloween-zomato": [960, 960],
@@ -747,8 +718,7 @@ const STILL_VERSION = 4;
 const STILL_AT: Record<string, number> = {
   "asia-cup-2025": 0.36,
   "diya-rush": 0.052,
-  boomerang: 0.22,
-  crater: 0.92,
+  "zepto-club": 0.084,
   "durga-puja-pandal": 0.6,
   "goat-offers-bumrah": 0.6,
   "halloween-zomato": 0.35,
@@ -774,9 +744,8 @@ export function stillFor(id: string): ProjectStill {
    exactly (some differ in aspect from their board loop). */
 const FILM_SIZES: Record<string, readonly [number, number]> = {
   "asia-cup-2025": [1280, 720],
-  boomerang: [1280, 698],
   "diya-rush": [1000, 1000],
-  crater: [1280, 768],
+  "zepto-club": [1280, 720],
   "durga-puja-pandal": [1280, 720],
   "goat-offers-bumrah": [1280, 720],
   "halloween-zomato": [1080, 1080],
