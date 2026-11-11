@@ -1,11 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Hanken_Grotesk, Geist_Mono } from "next/font/google";
+import { Archivo, Geist_Mono } from "next/font/google";
 import { Analytics } from "./components/Analytics";
-import { Ghost } from "./components/Ghost";
-import { GhostProvider } from "./components/GhostContext";
 import "./globals.css";
 
-const hanken = Hanken_Grotesk({
+const archivo = Archivo({
   variable: "--font-sans",
   subsets: ["latin"],
   display: "swap",
@@ -18,9 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hemang's Playground — product & visual design",
+  title: "Hemang Wason — Product & Visual Designer",
   description:
-    "Hemang is a product designer. Click play for visual work, ground for product work.",
+    "The working index of Hemang Wason — product, visual and motion design. Ex-Zomato, currently Zepto. 17 cases on file.",
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -37,7 +35,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#ffffff",
+  themeColor: "#0a0a0b",
 };
 
 export default function RootLayout({
@@ -48,16 +46,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${hanken.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${archivo.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body
-        className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]"
+        className="grain flex min-h-full flex-col bg-[var(--background)] text-[var(--foreground)]"
         suppressHydrationWarning
       >
-        <GhostProvider>
-          {children}
-          <Ghost />
-        </GhostProvider>
+        {children}
         <Analytics />
       </body>
     </html>
