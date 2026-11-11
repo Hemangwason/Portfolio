@@ -653,5 +653,75 @@ export const showcase: Project[] = SHOWCASE_IDS.map((id) =>
   projects.find((p) => p.id === id),
 ).filter((p): p is Project => Boolean(p));
 
-/** Per-project 3×2 frame atlas used to texture the globe tiles. */
-export const globeAtlas = (id: string): string => `/projects/globe/${id}.jpg`;
+export type ProjectStill = { src: string; width: number; height: number };
+
+/* One hand-picked frame per project, cut from its full-length video
+   at 960px so it shares that video's exact aspect. Used on the board
+   tiles and as the poster while the video streams in. */
+const STILL_SIZES: Record<string, readonly [number, number]> = {
+  "asia-cup-2025": [960, 540],
+  boomerang: [960, 524],
+  crater: [960, 576],
+  "durga-puja-pandal": [960, 540],
+  "goat-offers-bumrah": [960, 540],
+  "halloween-zomato": [960, 960],
+  "healthy-high-five": [960, 540],
+  "independence-day-banner": [960, 540],
+  jexlin: [960, 524],
+  onam: [826, 960],
+  "raksha-bandhan": [946, 960],
+  "sid-voice-host": [960, 524],
+  sidetake: [960, 540],
+  sidetalk: [960, 520],
+  "street-football": [960, 540],
+  "zepto-turns-5": [960, 540],
+  "zomato-plus-identity": [960, 540],
+};
+
+const STILL_VERSION = 3;
+
+export function stillFor(id: string): ProjectStill {
+  const [width, height] = STILL_SIZES[id] ?? [960, 540];
+  return { src: `/projects/stills/${id}.jpg?v=${STILL_VERSION}`, width, height };
+}
+
+/* Native size of each full-length video, so the open view frames it
+   exactly (some differ in aspect from their board loop). */
+const FILM_SIZES: Record<string, readonly [number, number]> = {
+  "asia-cup-2025": [1280, 720],
+  boomerang: [1280, 698],
+  crater: [1280, 768],
+  "durga-puja-pandal": [1280, 720],
+  "goat-offers-bumrah": [1280, 720],
+  "halloween-zomato": [1080, 1080],
+  "healthy-high-five": [1280, 720],
+  "independence-day-banner": [1280, 720],
+  jexlin: [1280, 698],
+  onam: [1080, 1256],
+  "raksha-bandhan": [1080, 1096],
+  "sid-voice-host": [1600, 872],
+  sidetake: [1600, 900],
+  sidetalk: [1280, 692],
+  "street-football": [1600, 900],
+  "zepto-turns-5": [1600, 900],
+  "zomato-plus-identity": [1280, 720],
+};
+
+export type ProjectFilm = { src?: string; poster: string; width: number; height: number };
+
+/** The full-length video shown when a project is open, with its poster. */
+export function filmFor(p: Project): ProjectFilm {
+  const media = p.masthead ?? p.thumbnail;
+  const still = stillFor(p.id);
+  const [width, height] = FILM_SIZES[p.id] ?? [still.width, still.height];
+  if (media?.type !== "video") return { poster: still.src, width, height };
+  return { src: media.src, poster: still.src, width, height };
+}
+
+/** The short loop that plays on a board tile while it's hovered. */
+export function loopFor(p: Project): string | undefined {
+  return p.thumbnail?.type === "video" ? p.thumbnail.src : undefined;
+}
+
+export const fieldLabel = (p: Project): string =>
+  p.kind === "ground" ? "Product" : "Visual + Motion";

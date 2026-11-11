@@ -1,26 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Serif, Roboto_Mono } from "next/font/google";
+import { Hanken_Grotesk } from "next/font/google";
 import { Analytics } from "./components/Analytics";
 import "./globals.css";
 
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-serif",
+const hanken = Hanken_Grotesk({
+  variable: "--font-hanken",
   subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
   display: "swap",
 });
 
-const robotoMono = Roboto_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  display: "swap",
-});
+const SITE_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "http://localhost:3000";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Hemang Wason — Product, Visual & Motion Designer",
   description:
-    "Hemang Wason — product, visual and motion design. Ex-Zomato, currently Zepto. Every project on one globe.",
+    "Hemang Wason — product, visual and motion design. Ex-Zomato, currently Zepto. Every project on one board.",
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -37,7 +34,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#000000",
+  themeColor: "#181616",
 };
 
 export default function RootLayout({
@@ -48,9 +45,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${instrumentSerif.variable} ${robotoMono.variable} h-full antialiased`}
+      className={`${hanken.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col" suppressHydrationWarning>
+      <body suppressHydrationWarning>
         {children}
         <Analytics />
       </body>

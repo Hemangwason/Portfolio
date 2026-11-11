@@ -4,79 +4,54 @@
    files under app/ are reliably picked up by Turbopack-driven dev. */
 @source "./**/*.{ts,tsx}";
 
-/* ────────────────────────────────────────────────────────────────────
-   Paper (light) is the default surface — the globe, the about panel
-   and the case sheet. Ink (dark) is reserved for the entrance and
-   the contact close.
-   ──────────────────────────────────────────────────────────────────── */
-
 :root {
-  --paper: #f2f0ea;
-  --paper-raised: #fbfaf6;
-  --ink: #141414;
-  --ink-soft: rgba(20, 20, 20, 0.62);
-  --ink-faint: rgba(20, 20, 20, 0.42);
-  --rule: rgba(20, 20, 20, 0.16);
-  --rule-strong: rgba(20, 20, 20, 0.34);
+  --bg: #181616;
+  --bg-raised: #211e1e;
+  --cream: #f5eedc;
+  --cream-soft: rgba(245, 238, 220, 0.66);
+  --cream-faint: rgba(245, 238, 220, 0.42);
+  --rule: rgba(245, 238, 220, 0.14);
+  --rule-strong: rgba(245, 238, 220, 0.26);
+  --red: #ff3b30;
 
-  --night: #0c0b0b;
-  --night-ink: #f4efe2;
-  --night-rule: rgba(244, 239, 226, 0.16);
+  --font-stack: var(--font-hanken), "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-  --signal: #ff3b2f;
+  /* header grid geometry — panels align to these columns */
+  --hdr-side: 134px;
+  --hdr-centre: 400px;
+  --hdr-h: 146px;
 
-  /* legacy aliases read by ProjectProcessOverlay */
-  --background: var(--paper);
-  --foreground: var(--ink);
-  --brand: var(--signal);
-  --accent: var(--signal);
-  --line: var(--rule);
-  --line-strong: var(--rule-strong);
-  --ink-strong: rgba(20, 20, 20, 0.92);
-  --ink-base: rgba(20, 20, 20, 0.66);
-  --ink-mute: rgba(20, 20, 20, 0.3);
-  --surface: var(--paper-raised);
-  --border: var(--rule);
-
-  --font-times: "Times New Roman", Times, "Liberation Serif", serif;
-
-  --header-h: 146px;
+  color-scheme: dark;
 }
 
 @media (max-width: 767px) {
   :root {
-    --header-h: 104px;
+    --hdr-h: 98px;
   }
 }
 
 @theme inline {
-  --color-paper: var(--paper);
-  --color-ink: var(--ink);
-  --color-night: var(--night);
-  --color-signal: var(--signal);
-  --font-serif: var(--font-serif);
-  --font-mono: var(--font-mono);
+  --color-bg: var(--bg);
+  --color-cream: var(--cream);
+  --color-red: var(--red);
+  --font-sans: var(--font-stack);
 }
 
 html,
 body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-serif), var(--font-times);
+  height: 100%;
+  background: var(--bg);
+  color: var(--cream);
+  font-family: var(--font-stack);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-}
-
-/* `clip` blocks horizontal overflow without creating a scroll
-   container, so sticky descendants still bind to the viewport. */
-html,
-body {
-  overflow-x: clip;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 ::selection {
-  background: var(--signal);
+  background: var(--red);
   color: #fff;
 }
 
@@ -85,137 +60,150 @@ body {
 }
 
 :focus-visible {
-  outline: 1.5px solid var(--signal);
-  outline-offset: 3px;
+  outline: 1.5px solid var(--red);
+  outline-offset: 2px;
 }
 
 h1, h2, h3, h4, p, li, dd {
   overflow-wrap: anywhere;
 }
 
-.times {
-  font-family: var(--font-times);
+/* Two voices, one family: tight bold display, small tracked labels. */
+.display {
+  font-family: var(--font-stack);
+  font-weight: 700;
+  letter-spacing: -0.03em;
 }
 
-.mono-label {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 12px;
-  letter-spacing: 0.04em;
+.label {
+  font-family: var(--font-stack);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-/* ── Entrance ───────────────────────────────────────────────────── */
+/* ── header ─────────────────────────────────────────────────────── */
 
-/* chrome inverts automatically once the bird floods the screen white */
-.entrance-chrome {
-  mix-blend-mode: difference;
-  color: #fff;
+.hdr-link {
+  transition: color 160ms ease;
+}
+.hdr-link:hover,
+.hdr-link[aria-current="page"] {
+  color: var(--red);
 }
 
-.entrance-poster {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  will-change: transform, opacity;
-  transform: translate(-50%, -50%) scale(0);
+.hdr-collapsed {
+  transform: translateY(-100%);
 }
 
-/* ── Globe header grid ──────────────────────────────────────────── */
-
-.gl-cell {
-  border-color: var(--rule);
-}
-
-.gl-link {
-  transition: background-color 160ms ease, color 160ms ease;
-}
-.gl-link:hover {
-  background: var(--ink);
-  color: var(--paper);
-}
-
-@keyframes flap {
-  0%, 100% { transform: scaleY(1) translateY(0); }
-  50% { transform: scaleY(0.72) translateY(3px); }
-}
-.bird-flap {
-  transform-origin: 50% 55%;
-  animation: flap 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-}
-
-.ticker-pill {
-  background: rgba(20, 20, 20, 0.86);
+.pill {
+  background: rgba(24, 22, 22, 0.92);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  border: 1px solid var(--rule-strong);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 12px 30px -12px rgba(0, 0, 0, 0.7);
 }
 
-.scroll-marquee {
-  display: flex;
-  overflow: hidden;
-  white-space: nowrap;
+/* ── ticker pill ────────────────────────────────────────────────── */
+
+.ticker {
+  background: rgba(24, 22, 22, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(245, 238, 220, 0.3);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6), 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
 }
-.scroll-marquee-track {
+.ticker-track {
   display: inline-flex;
-  animation: marquee 48s linear infinite;
+  animation: tick 52s linear infinite;
   will-change: transform;
 }
-@keyframes marquee {
+@keyframes tick {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
 
-/* ── Case sheet ─────────────────────────────────────────────────── */
+/* ── wireframe cube (loader + mascot cell) ──────────────────────── */
 
-.case-sheet {
-  will-change: clip-path;
+.wire-cube {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: cubeSpin 9s linear infinite;
+}
+.wire-cube > span {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--face, #ff3b30);
+  background-image:
+    linear-gradient(var(--face, #ff3b30) 1px, transparent 1px),
+    linear-gradient(90deg, var(--face, #ff3b30) 1px, transparent 1px);
+  background-size: 25% 25%;
+  opacity: 0.85;
+}
+@keyframes cubeSpin {
+  from { transform: rotateX(-24deg) rotateY(0deg); }
+  to { transform: rotateX(-24deg) rotateY(360deg); }
 }
 
-.case-rule {
-  background-image: repeating-linear-gradient(
-    90deg,
-    var(--rule) 0 1px,
-    transparent 1px calc(100% / 12)
-  );
+/* ── loader ─────────────────────────────────────────────────────── */
+
+.loader-word {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  background: linear-gradient(90deg, #29d36b, #7b5cff, #ff3b30, #f5eedc, #f5eedc);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: wordSweep 2.2s cubic-bezier(0.5, 0, 0.2, 1) both;
+}
+@keyframes wordSweep {
+  from { background-position: 0% 0; opacity: 0.25; }
+  to { background-position: 100% 0; opacity: 1; }
 }
 
-@keyframes infoDrop {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.info-drop {
-  animation: infoDrop 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-/* Process flow overlay — keyframed fade, wrapper handles unmount. */
-@keyframes processOverlayIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes processOverlayOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
-.process-overlay[data-open="true"] {
-  animation: processOverlayIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
-  will-change: opacity;
-}
-.process-overlay[data-open="false"] {
-  animation: processOverlayOut 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
-  will-change: opacity;
+.fade-out {
+  opacity: 0;
   pointer-events: none;
+  transition: opacity 600ms ease;
+}
+
+/* ── side panels (about / contact) ──────────────────────────────── */
+
+/* Tailwind v4 slides with the `translate` property, not `transform`. */
+.panel {
+  transition: translate 520ms cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* Panels span the header's side column plus its tagline column. */
+@media (min-width: 768px) {
+  .panel-w {
+    width: calc(var(--hdr-side) + (100vw - var(--hdr-side) * 2 - var(--hdr-centre)) / 2);
+  }
+}
+
+/* ── project reel ───────────────────────────────────────────────── */
+
+.reel {
+  transition: opacity 380ms ease;
+}
+.reel-media {
+  transform-origin: 50% 100%;
+  will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bird-flap,
-  .scroll-marquee-track,
-  .info-drop {
+  .ticker-track,
+  .wire-cube,
+  .loader-word {
     animation: none;
   }
-  .process-overlay {
-    animation: none;
+  .panel,
+  .reel,
+  .fade-out {
+    transition: none;
   }
 }
