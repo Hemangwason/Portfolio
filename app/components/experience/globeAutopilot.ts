@@ -1,6 +1,6 @@
 /* Idle drift: when nobody is touching the globe it turns slowly on its
-   own, side to side across the work and gently down through the rows
-   and back, turning round softly before each edge. Any scroll, drag or
+   own, side to side across the work and gently up and down through the
+   rows around the middle, turning round softly before each edge. Any scroll, drag or
    tile hover hands control straight back to the visitor. */
 
 const IDLE_MS = 2600;
@@ -10,12 +10,13 @@ const TILT_RATE = 0.012; // rad / s
 const DRIFT_EASE = 0.7;
 /** Share of the spin range at which the drift turns round. */
 const TURN_AT = 0.85;
-/** Keep the vertical drift this far inside the lowest stop. */
-const TILT_FLOOR_MARGIN = 0.08;
-/** And no higher than this above the resting tilt. */
-const TILT_CEILING_ABOVE_REST = 0.03;
+/** Keep the vertical drift this far inside the stops… */
+const TILT_EDGE_MARGIN = 0.08;
+/** …and within this much of the resting tilt, either way. */
+const TILT_DRIFT_RANGE = 0.18;
 
-export type DriftBounds = { spin: number; tiltMin: number; tiltRest: number };
+/** Read on every step, so a caller may update `tiltRest` (e.g. on resize). */
+export type DriftBounds = { spin: number; tiltMin: number; tiltMax: number; tiltRest: number };
 
 export type Autopilot = {
   /** The visitor did something: stop drifting and wait for idle again. */
@@ -30,8 +31,6 @@ export function createAutopilot(bounds: DriftBounds, reducedMotion: boolean): Au
   let tiltVel = 0;
   let spinDir = 1;
   let tiltDir = -1;
-  const tiltLow = bounds.tiltMin + TILT_FLOOR_MARGIN;
-  const tiltHigh = bounds.tiltRest + TILT_CEILING_ABOVE_REST;
 
   return {
     touch: () => {
@@ -41,6 +40,8 @@ export function createAutopilot(bounds: DriftBounds, reducedMotion: boolean): Au
     },
     step: (dt, now, spin, tilt, held) => {
       const cruising = !reducedMotion && !held && now - lastInput > IDLE_MS;
+      const tiltLow = Math.max(bounds.tiltMin + TILT_EDGE_MARGIN, bounds.tiltRest - TILT_DRIFT_RANGE);
+      const tiltHigh = Math.min(bounds.tiltMax - TILT_EDGE_MARGIN, bounds.tiltRest + TILT_DRIFT_RANGE);
       if (spin > bounds.spin * TURN_AT) spinDir = -1;
       else if (spin < -bounds.spin * TURN_AT) spinDir = 1;
       if (tilt > tiltHigh) tiltDir = -1;

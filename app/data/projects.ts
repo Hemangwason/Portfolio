@@ -667,18 +667,18 @@ const SHOWCASE_IDS = [
   "halloween-zomato",
   "goat-offers-bumrah",
   // the rest of the visual + motion work, ordered so the four rows
-  // (4·5·4·4) come out about the same length on the globe
-  "raksha-bandhan",
+  // (4·4·5·4) come out about the same length on the globe
+  "durga-puja-pandal",
   "diya-rush",
   "street-football",
+  "raksha-bandhan",
+  "zomato-plus-identity",
   "onam",
   "zepto-turns-5",
-  "durga-puja-pandal",
-  "zomato-plus-identity",
   // product — the ends of the rows
-  "sidetake",
   "jexlin",
   "sidetalk",
+  "sidetake",
   "sid-voice-host",
 ] as const;
 

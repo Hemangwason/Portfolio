@@ -28,8 +28,8 @@ export type GlobeHandle = {
 
 
 /* ── layout: every project exactly once ──────────────────────────
-   17 tiles in four rows (4·5·4·4), laid out on the grid like Griflan's:
-   every tile is two grid cells tall, rows sit on the grid lines, and
+   17 tiles in four rows (4·4·5·4), laid out on the grid like Griflan's:
+   every tile is three grid cells tall, rows sit on the grid lines, and
    there are two empty cells between rows and between neighbouring
    tiles, so each piece has room to itself. Slots are ranked by how
    central they sit in the resting view and handed out in `tiles` order,
@@ -37,38 +37,43 @@ export type GlobeHandle = {
    work) at the ends of the rows. Spin and tilt stop hard at the edge of
    the work, so the empty back of the globe never comes round. */
 const GAP_CELLS = 2;
-const TILE_CELLS_TALL = 2;
+/** Three cells tall: big enough to read each preview without zooming. */
+const TILE_CELLS_TALL = 3;
 const TILE_HEIGHT_DEG = TILE_CELLS_TALL * LAT_CELL;
 /** Gap between neighbouring tiles, in longitude. */
 const TILE_GAP_LON = GAP_CELLS * LON_CELL;
 const ROW_PITCH = (TILE_CELLS_TALL + GAP_CELLS) * LAT_CELL;
-/** The centre row's band starts on the equator line. */
+/** This row's band starts on the equator line. */
 const CENTRE_ROW_LAT = TILE_HEIGHT_DEG / 2;
+/* Top to bottom. The five-tile row is the one the resting view centres
+   on, with one row above and one below it hidden until you scroll. */
 const ROWS: Array<{ lat: number; count: number }> = [
-  { lat: CENTRE_ROW_LAT, count: 5 },
   { lat: CENTRE_ROW_LAT + ROW_PITCH, count: 4 },
-  { lat: CENTRE_ROW_LAT - ROW_PITCH, count: 4 },
+  { lat: CENTRE_ROW_LAT, count: 4 },
+  { lat: CENTRE_ROW_LAT - ROW_PITCH, count: 5 },
   { lat: CENTRE_ROW_LAT - 2 * ROW_PITCH, count: 4 },
 ];
 /** Only used to rank slots by centrality. */
 const LON_PITCH = 20;
 const TILE_RADIUS = R * 1.002;
-/** Where the eye lands at rest; slots nearest it are the most central. */
-const FOCUS_LAT = 1;
+/** Where the eye lands at rest — between the five-tile row and the one
+    above it, the two rows on screen — so slots nearest it rank first. */
+const FOCUS_LAT = -4;
 const FOCUS_LAT_WEIGHT = 1.3;
 /** The layout the spin and tilt stops were tuned on: row half-width
     and the top / bottom edges of the work (degrees). */
 const REFERENCE_EXTENT_DEG = 58.5;
 const REFERENCE_TOP_DEG = 27.25;
 const REFERENCE_BOTTOM_DEG = -13.25;
+/** Extra roll at the bottom stop so the last row clears the ticker. */
+const BOTTOM_ROW_CLEARANCE = 0.08;
 
 /* ── camera: close in, Griflan-style — horizon under the header,
    the sphere's sides beyond the frame ─────────────────────────── */
 const CAMERA_DISTANCE = 15.5;
-const FOV_WIDE = 46;
-const FOV_NARROW = 62;
+const FOV_WIDE = 41; // close in: the globe fills the frame, more of it waits off-screen
+const FOV_NARROW = 74; // portrait screens see a wider slice, so tiles stay whole
 const HORIZON_MARGIN = 0.95;
-const TILT_REST = -0.21;
 /** Outside: the whole globe floating in the frame. */
 const OUTSIDE_DISTANCE = 33;
 const OUTSIDE_FOV = 40;
@@ -150,6 +155,31 @@ function placements(tiles: GlobeTile[]): Placement[] {
   return out;
 }
 
+/** Latitude (deg, untilted) where a ray leaving the resting camera
+    `elevDeg` above horizontal meets the globe, or null if it misses. */
+function hitLat(elevDeg: number): number | null {
+  const e = elevDeg * DEG;
+  const b = CAMERA_DISTANCE * Math.cos(e);
+  const disc = b * b - (CAMERA_DISTANCE * CAMERA_DISTANCE - R * R);
+  if (disc < 0) return null;
+  const t = b - Math.sqrt(disc);
+  return Math.asin(clamp((t * Math.sin(e)) / R, -1, 1)) / DEG;
+}
+
+/** The resting tilt that leaves as much work out of view above the frame
+    as below it, so the view lands in the middle of the projects. The top
+    of the frame sees up to the globe's horizon; tilting by θ shifts what
+    you see by θ in latitude. */
+function restTiltFor(spots: Placement[], fov: number): number {
+  const top = Math.max(...spots.map((p) => p.lat + p.hDeg / 2));
+  const bottom = Math.min(...spots.map((p) => p.lat - p.hDeg / 2));
+  const pitch = Math.asin(R / CAMERA_DISTANCE) / DEG - (fov / 2) * HORIZON_MARGIN;
+  const horizon = Math.acos(R / CAMERA_DISTANCE) / DEG;
+  const seenTop = Math.min(hitLat(pitch + fov / 2) ?? horizon, horizon);
+  const seenBottom = hitLat(pitch - fov / 2) ?? 0;
+  return ((top + bottom - (seenTop + seenBottom)) / 2) * DEG;
+}
+
 /** Where spin and tilt stop: the work's reach, relative to the layout
     the stops were tuned on. Lower rows need the globe to roll further. */
 function limitsFor(spots: Placement[]): { spin: number; tiltMin: number; tiltMax: number } {
@@ -158,7 +188,7 @@ function limitsFor(spots: Placement[]): { spin: number; tiltMin: number; tiltMax
   const bottom = Math.min(...spots.map((p) => p.lat - p.hDeg / 2));
   return {
     spin: clamp(SPIN_LIMIT + (reach - REFERENCE_EXTENT_DEG) * DEG, 0.15, 0.75),
-    tiltMin: TILT_MIN - (REFERENCE_BOTTOM_DEG - bottom) * DEG,
+    tiltMin: TILT_MIN - (REFERENCE_BOTTOM_DEG - bottom) * DEG - BOTTOM_ROW_CLEARANCE,
     tiltMax: TILT_MAX - (REFERENCE_TOP_DEG - top) * DEG,
   };
 }
@@ -234,7 +264,11 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
   const spinLimit = limits.spin;
   const tiltMin = limits.tiltMin;
   const tiltMax = limits.tiltMax;
-  const autopilot = createAutopilot({ spin: spinLimit, tiltMin, tiltRest: TILT_REST }, opts.reducedMotion);
+  // The resting tilt depends on the field of view, so it is settled on
+  // the first resize (and kept up to date on later ones).
+  const drift = { spin: spinLimit, tiltMin, tiltMax, tiltRest: restTiltFor(spots, FOV_WIDE) };
+  const autopilot = createAutopilot(drift, opts.reducedMotion);
+  let rested = false;
   let loaded = 0;
   const markLoaded = () => {
     loaded++;
@@ -295,7 +329,7 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
 
   /* ── state ─────────────────────────────────────────────────── */
   let spin = 0;
-  let tilt = TILT_REST;
+  let tilt = drift.tiltRest;
   let tiltSpeed = 0;
   let spinSpeed = 0;
   let steerX = 0;
@@ -524,6 +558,11 @@ export function createGlobe(canvas: HTMLCanvasElement, tiles: GlobeTile[], opts:
     camera.aspect = w / h;
     sheen.setAspect(camera.aspect);
     baseFov = camera.aspect < 1 ? FOV_NARROW : FOV_WIDE;
+    drift.tiltRest = clamp(restTiltFor(spots, baseFov), tiltMin, tiltMax);
+    if (!rested) {
+      tilt = drift.tiltRest;
+      rested = true;
+    }
     placeRest();
     if (!flying && !parked) applyRest();
     if (!active) renderer.render(scene, camera);
