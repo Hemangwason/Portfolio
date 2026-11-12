@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { fieldLabel, type Project } from "../../data/projects";
+import { fieldLabel, showcase, type Project } from "../../data/projects";
 import { LINKEDIN_URL, SOCIAL_PRIMARY } from "./links";
 import { GradientOrb } from "./GradientOrb";
 
@@ -9,7 +9,13 @@ export type NavActions = {
   onHome: () => void;
   onAbout: () => void;
   onContact: () => void;
+  /** Straight into the project view, from the first project. */
+  onWork: () => void;
 };
+
+const WORK_HREF = `/projects/${showcase[0]?.id ?? ""}`;
+/** Five tabs have to fit a 320px phone. */
+const MOBILE_TAB_PAD = "px-3 min-[360px]:px-4";
 
 type Active = "home" | "about" | "contact" | "project";
 
@@ -19,12 +25,15 @@ function NavLink({
   onClick,
   current,
   className = "",
+  pad = "px-4",
 }: {
   href: string;
   label: string;
   onClick?: () => void;
   current?: boolean;
   className?: string;
+  /** Horizontal padding classes (tighter in the phone header). */
+  pad?: string;
 }) {
   const external = href.startsWith("http");
   return (
@@ -38,7 +47,7 @@ function NavLink({
         e.preventDefault();
         onClick();
       }}
-      className={`hdr-link label flex items-center justify-center px-4 ${className}`}
+      className={`hdr-link label flex items-center justify-center ${pad} ${className}`}
     >
       {label}
     </a>
@@ -66,7 +75,15 @@ export function BoardHeader({ actions, active, collapsed }: { actions: NavAction
           <NavLink href="/" label="Home" onClick={actions.onHome} current={active === "home"} className="border-r border-[var(--rule)]" />
           <NavLink href="/about" label="About" onClick={actions.onAbout} current={active === "about"} />
         </div>
-        <div className="col-start-2 row-start-1 border-b border-r border-[var(--rule)]" />
+        <div className="col-start-2 row-start-1 flex border-b border-r border-[var(--rule)]">
+          <NavLink
+            href={WORK_HREF}
+            label="Work"
+            onClick={actions.onWork}
+            current={active === "project"}
+            className="border-r border-[var(--rule)]"
+          />
+        </div>
         <div className="col-start-2 row-start-2 flex items-center justify-center border-b border-r border-[var(--rule)]">
           <p className="hidden whitespace-nowrap text-[clamp(15px,1.25vw,18px)] font-medium leading-none tracking-[-0.01em] lg:block">
             Product + Visual
@@ -111,11 +128,12 @@ export function BoardHeader({ actions, active, collapsed }: { actions: NavAction
       {/* mobile */}
       <div className="flex h-full flex-col md:hidden">
         <div className="flex h-10 border-b border-[var(--rule)]">
-          <NavLink href="/" label="Home" onClick={actions.onHome} current={active === "home"} className="border-r border-[var(--rule)]" />
-          <NavLink href="/about" label="About" onClick={actions.onAbout} current={active === "about"} className="border-r border-[var(--rule)]" />
+          <NavLink href="/" label="Home" onClick={actions.onHome} current={active === "home"} className="border-r border-[var(--rule)]" pad={MOBILE_TAB_PAD} />
+          <NavLink href="/about" label="About" onClick={actions.onAbout} current={active === "about"} className="border-r border-[var(--rule)]" pad={MOBILE_TAB_PAD} />
+          <NavLink href={WORK_HREF} label="Work" onClick={actions.onWork} current={active === "project"} className="border-r border-[var(--rule)]" pad={MOBILE_TAB_PAD} />
           <span className="flex-1" />
-          <NavLink href={SOCIAL_PRIMARY.href} label={SOCIAL_PRIMARY.label} className="border-l border-[var(--rule)]" />
-          <NavLink href={LINKEDIN_URL} label="Link" className="border-l border-[var(--rule)]" />
+          <NavLink href={SOCIAL_PRIMARY.href} label={SOCIAL_PRIMARY.label} className="border-l border-[var(--rule)]" pad={MOBILE_TAB_PAD} />
+          <NavLink href={LINKEDIN_URL} label="Link" className="border-l border-[var(--rule)]" pad={MOBILE_TAB_PAD} />
         </div>
         <div className="flex flex-1 items-stretch">
           <div className="flex w-14 shrink-0 items-center justify-center border-r border-[var(--rule)]">

@@ -208,8 +208,9 @@ export function Experience({ initialView = "board", initialProject }: Props) {
       onHome: () => go("board"),
       onAbout: () => go("about"),
       onContact: () => go("contact"),
+      onWork: () => void openProject(showcase[0].id),
     }),
-    [go],
+    [go, openProject],
   );
 
   // Deep link straight into a project once the board can fly.
